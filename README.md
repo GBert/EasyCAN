@@ -5,3 +5,6 @@ This repo contains a project of a CAN interface. Main goals are:
 - should be cheap
 - flexible (galvanic isolated is an option)
 - useable by many programs and OS (SLCAN API)
+- no programmer needed
+
+Price target is 15$ - depends on galvanic isolation 
