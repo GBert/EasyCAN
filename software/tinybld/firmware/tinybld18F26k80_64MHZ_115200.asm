@@ -9,7 +9,7 @@ baud EQU 115200			; standard TinyBld baud rates: 115200 or 19200
 	;	claudiu.chiculita@ugal.ro
 	;	http://www.etc.ugal.ro/cchiculita/software/picbootloader.htm
 	;********************************************************************
-	;thanks to Inácio
+	;thanks to Inï¿½cio
 
 	#include "icdpictypes.inc"		;takes care of: #include "p18fxxx.inc",  max_flash, IdTypePIC
 	#include "spbrgselect.inc"		; RoundResult and baud_rate
@@ -97,6 +97,8 @@ SendL macro car
 	org first_address+8
 IntrareBootloader
 					;init serial port
+	bsf TRISC,RC7
+	bcf TRISC,RC6
 	movlw b'00100100'
 	movwf TXSTA
 	movlw spbrg_value
