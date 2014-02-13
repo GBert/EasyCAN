@@ -1,7 +1,7 @@
 	radix DEC
 	LIST      P=18F26K80	; change also: Configure->SelectDevice from Mplab 
 xtal EQU 64000000		; you may want to change: _XT_OSC_1H  _HS_OSC_1H  _HSPLL_OSC_1H
-baud EQU 115200			; standard TinyBld baud rates: 115200 or 19200
+baud EQU 19200			; standard TinyBld baud rates: 115200 or 19200
 	; The above 3 lines can be changed and buid a bootloader for the desired frequency (and PIC type)
 
 	;********************************************************************
@@ -13,7 +13,7 @@ baud EQU 115200			; standard TinyBld baud rates: 115200 or 19200
 
 	#include "icdpictypes.inc"		;takes care of: #include "p18fxxx.inc",  max_flash, IdTypePIC
 	#include "spbrgselect.inc"		; RoundResult and baud_rate
-	#define first_address max_flash-200	;100 words
+	#define first_address max_flash-200	; 100 words
 
     
 	;__CONFIG  _CONFIG1L , _RETEN_OFF_1L & _XINST_OFF_1L & _INTOSCSEL_HIGH_1L & _SOSCSEL_LOW_1L
@@ -28,7 +28,7 @@ baud EQU 115200			; standard TinyBld baud rates: 115200 or 19200
 	;__CONFIG  _CONFIG2L , _BOREN_SBORDIS_2L & _PWRTEN_ON_2L & _BORV_3_2L & _BORPWR_ZPBORMV_2L
 	config  BOREN     = SBORDIS
         config	PWRTEN    = ON
-	config 	BORV      = 0		;3.0 V
+	config 	BORV      = 3		;3.0 V
 	config  BORPWR    = ZPBORMV
 	;__CONFIG  _CONFIG2H , _WDTEN_ON_2H & _WDTPS_128_2H
 	config  WDTEN     = ON
@@ -96,9 +96,7 @@ SendL macro car
 	nop
 	org first_address+8
 IntrareBootloader
-					;init serial port
-	bsf TRISC,RC7
-	bcf TRISC,RC6
+				;init serial port
 	movlw b'00100100'
 	movwf TXSTA
 	movlw spbrg_value
