@@ -298,7 +298,7 @@ static void enterbootloader(int fd, unsigned char *idByte)
 
     for (i = 0; i < 50; i++)
     {
-        DBUGF(" pulse RTS line...\n");
+        DBUGF((" pulse RTS line...\n"));
         set_rts(fd, 0);
         usleep(100*1000);
         set_rts(fd, 1);
