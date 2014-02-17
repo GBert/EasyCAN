@@ -48,7 +48,7 @@ bool;
 #include "picdata.h"
 #include "serial.h"
 
-#define DBUGF(x) //printf x
+#define DBUGF(x) printf x
 
 /* flash write block size - should be 16 for 16Fs */
 #define BLOCKSIZE 64
@@ -273,10 +273,6 @@ static void enterbootloader(int fd, unsigned char *idByte)
 
     printf("Trying to enter bootloader...\n");
     
-    printf(" pulse RTS line...\n");
-    set_rts(fd, 0);
-    usleep(100*1000);
-    set_rts(fd, 1);
 
     /* first try just C1 */
     ret = tryC1(fd, idByte, true);
@@ -302,6 +298,11 @@ static void enterbootloader(int fd, unsigned char *idByte)
 
     for (i = 0; i < 50; i++)
     {
+        DBUGF(" pulse RTS line...\n");
+        set_rts(fd, 0);
+        usleep(100*1000);
+        set_rts(fd, 1);
+        usleep(10*1000);
         ret = tryC1(fd, idByte, true);
         if (ret == 0)
             return;
@@ -445,7 +446,7 @@ int main(int argc, char *argv[])
 {
     const char *fname = NULL;
     const char *port;
-    const int baud = 57600;
+    const int baud = 19200;
     int fd;
     unsigned char idByte;
     PicData *pic;
