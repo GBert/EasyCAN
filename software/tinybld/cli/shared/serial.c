@@ -283,7 +283,7 @@ void serial_close(int fd)
 }
 
 /*
- * Set RTS (output +ve on set) (CLOCK)
+ * Set RTS / reset PIC (assuming RTS->VPP)
  */
 void set_rts(int fd, int rts)
 {
