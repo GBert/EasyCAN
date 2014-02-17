@@ -87,7 +87,7 @@ static void print_usage(char *prg)
     fprintf(stderr, "\n");
     fprintf(stderr, "         -p <port>           tty device - default /dev/ttyUSB0\n");
     fprintf(stderr, "         -s <speed>          tty device speed - default 19200\n");
-    fprintf(stderr, "         -r                  reset PIC via RTS");
+    fprintf(stderr, "         -r                  reset PIC via RTS\n");
     fprintf(stderr, "         -f <HEX file>       HEX file to upload\n");
     fprintf(stderr, "\n");
 }
@@ -484,6 +484,9 @@ int main(int argc, char *argv[])
 		break;
 	    case 'f':
 		strcpy(fname,optarg);
+		break;
+	    case 'r':
+		rts_reset = 1;
 		break;
 	    case 'v':
 		verbose = 1;

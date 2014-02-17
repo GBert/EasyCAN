@@ -287,14 +287,14 @@ void serial_close(int fd)
  */
 void set_rts(int fd, int rts)
 {
-	int status;
+    int status;
 
-	ioctl(fd, TIOCMGET, &status);
+    ioctl(fd, TIOCMGET, &status);
 
-	if (rts)
-		status |= TIOCM_RTS;
-	else
-		status &= ~TIOCM_RTS;
+    if (rts)
+	status |= TIOCM_RTS;
+    else
+	status &= ~TIOCM_RTS;
 
-	ioctl(fd, TIOCMSET, &status);
+    ioctl(fd, TIOCMSET, &status);
 }
