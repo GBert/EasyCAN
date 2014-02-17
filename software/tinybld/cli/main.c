@@ -316,10 +316,10 @@ static void enterbootloader(int fd, unsigned char *idByte)
     {
 	if (rts_reset) {
 	    DBUGF((" pulse RTS line...\n"));
+	    set_rts(fd, 1);
+	    usleep(50*1000);
 	    set_rts(fd, 0);
 	    usleep(100*1000);
-	    set_rts(fd, 1);
-	    usleep(10*1000);
 	}
         ret = tryC1(fd, idByte, true);
         if (ret == 0)
