@@ -42,6 +42,8 @@ bool;
 #endif /* WIN32 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <libgen.h>
+#include <unistd.h>
 #include <string.h>
 
 #include "intelhex.h"
@@ -75,6 +77,20 @@ Block blocks[2048];
  * for hexcallback to use
  */
 Block *blockPtr = blocks;
+
+int rts_reset;
+char default_tty_device[] = "/dev/ttyUSB0";
+
+static void print_usage(char *prg)
+{
+    fprintf(stderr, "\nUsage: %s -p <port> -s <speed> -r -f <file>\n", prg);
+    fprintf(stderr, "\n");
+    fprintf(stderr, "         -p <port>           tty device - default /dev/ttyUSB0\n");
+    fprintf(stderr, "         -s <speed>          tty device speed - default 19200\n");
+    fprintf(stderr, "         -r                  reset PIC via RTS");
+    fprintf(stderr, "         -f <HEX file>       HEX file to upload\n");
+    fprintf(stderr, "\n");
+}
 
 /**
  * Callback passed to intelhex code
@@ -298,11 +314,13 @@ static void enterbootloader(int fd, unsigned char *idByte)
 
     for (i = 0; i < 50; i++)
     {
-        DBUGF((" pulse RTS line...\n"));
-        set_rts(fd, 0);
-        usleep(100*1000);
-        set_rts(fd, 1);
-        usleep(10*1000);
+	if (rts_reset) {
+	    DBUGF((" pulse RTS line...\n"));
+	    set_rts(fd, 0);
+	    usleep(100*1000);
+	    set_rts(fd, 1);
+	    usleep(10*1000);
+	}
         ret = tryC1(fd, idByte, true);
         if (ret == 0)
             return;
@@ -444,22 +462,58 @@ static void writefirmware(int fd, PicData *pic)
 
 int main(int argc, char *argv[])
 {
-    const char *fname = NULL;
-    const char *port;
-    const int baud = 19200;
-    int fd;
+    char *fname = malloc(1024);
+    char *port = malloc(64);
+    int fd, baud, verbose, opt;
     unsigned char idByte;
     PicData *pic;
+
+    /* set defaults */
+    baud = 19200;
+    strcpy(port,default_tty_device);
+    verbose = 0;
     
-    if (argc < 2 || argc > 3)
+
+    while ((opt = getopt(argc, argv, "p:s:f:rv?")) != -1) {
+	switch (opt) {
+	    case 'p':
+		strcpy(port, optarg);
+		break;
+	    case 's':
+		baud = strtoul(optarg, (char **)NULL, 10);
+		break;
+	    case 'f':
+		strcpy(fname,optarg);
+		break;
+	    case 'v':
+		verbose = 1;
+		break;
+	    case '?':
+		print_usage(basename(argv[0]));
+		exit(0);
+		break;
+	    default:
+		fprintf(stderr, "Unknown option %c\n", opt);
+		print_usage(basename(argv[0]));
+		exit(EXIT_FAILURE);
+		break;
+	    }
+    }
+    if (verbose) {
+	/* TODO */
+    }
+
+/*    if (argc < 2 || argc > 3)
     {
         fprintf(stderr, "%s: missing parameters\n", argv[0]);
         fprintf(stderr, "syntax: %s <serial port> [<hex file>]\n", argv[0]);
         exit(EXIT_FAILURE);
     }
+
     port = argv[1];
     if (argc == 3)
         fname = argv[2];
+*/
     
     memset(blocks, 0, sizeof(blocks));
     
