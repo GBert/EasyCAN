@@ -32,9 +32,9 @@
 UserInit macro
 			
 			; Make uart pins digital
-			ifdef	ADCON1
-				error Do you need to configura uart pins to be digital? If not, remove this line
-			endif
+			;ifdef	ADCON1
+			;	error Do you need to configura uart pins to be digital? If not, remove this line
+			;endif
 			;movlw 	b'01100000'		;xxx disable 
 			;movwf 	ADCON1			;xxx analog on tx/rx 			
 			
