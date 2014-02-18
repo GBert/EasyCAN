@@ -51,7 +51,7 @@ bool;
 #include "serial.h"
 
 #define DBUGF(x) printf x
-
+#define BLOCK_DUMP 1
 /* flash write block size - should be 16 for 16Fs */
 #define BLOCKSIZE 64
 

@@ -51,7 +51,7 @@ bool;
 
 #include "firmware-data.h"
 
-#define DBUGF(x) //printf x
+#define DBUGF(x) printf x
 
 /* decode a single ASCII hex character into decimal */
 static unsigned int hextodec(int c)

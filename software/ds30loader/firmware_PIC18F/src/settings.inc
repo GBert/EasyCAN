@@ -54,7 +54,7 @@
 ;------------------------------------------------------------------------------			
 		#define		USE_UART1		1		;xxx uncomment to use uart1
 		;#define	USE_UART2		1		;xxx uncomment to use uart2
-		#define		BAUDRATE	 	19200		;xxx baudrate
+		#define		BAUDRATE	 	115200		;xxx baudrate
 		;#define	USE_ABAUD		1			;xxx uncomment to use auto baud rate detection, READ ERRATA FIRST        
 		;#define	USE_BRG16		1		;xxx uncomment to use 16-bit brg
 
