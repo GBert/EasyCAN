@@ -1,4 +1,5 @@
 /* usbreset -- send a USB port reset to a USB device */
+/* sudo ./usbreset /dev/bus/usb/004/025 */
 
 #include <stdio.h>
 #include <unistd.h>
