@@ -100,6 +100,7 @@ int __stdcall select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* except
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/time.h>
+#include <sys/ioctl.h>
 #endif
 
 /* macro definitions */
@@ -139,6 +140,8 @@ typedef unsigned long  uint32;
 uint8 g_verbose = 0;
 uint8 g_hello_only = 0;
 uint8 g_emulate = 0;
+uint8 g_reset_rts = 0;
+
 const char* g_device_path  = NULL;
 const char* g_hexfile_path = NULL;
 
@@ -473,7 +476,7 @@ int configurePort(int fd, unsigned long baudrate)
 	cfmakeraw(&g_new_tio);
 	
 	g_new_tio.c_cflag |=  (CS8 | CLOCAL | CREAD);
-	g_new_tio.c_cflag &= ~(PARENB | CSTOPB | CSIZE);
+	g_new_tio.c_cflag &= ~(PARENB | CSTOPB | CSIZE | CRTSCTS);
 	g_new_tio.c_oflag = 0;
 	g_new_tio.c_lflag = 0;
 	
@@ -489,6 +492,26 @@ int configurePort(int fd, unsigned long baudrate)
 	return tcsetattr(fd, TCSANOW, &g_new_tio);
 #endif
 }
+
+#ifndef WIN32
+/*
+ * Set RTS / reset PIC (assuming RTS->VPP)
+ */
+void set_rts(int fd, int rts)
+{
+	int status;
+
+	ioctl(fd, TIOCMGET, &status);
+
+	if (rts)
+		status |= TIOCM_RTS;
+	else
+		status &= ~TIOCM_RTS;
+
+	ioctl(fd, TIOCMSET, &status);
+}
+#endif
+
 
 int openPort(const char* dev, unsigned long flags)
 {
@@ -506,6 +529,8 @@ int parseCommandLine(int argc, const char** argv)
 			g_hexfile_path = argv[i] + 6;
 		} else if ( !strncmp(argv[i], "--dev=", 6) ) {
 			g_device_path = argv[i] + 6;
+		} else if ( !strcmp(argv[i], "--reset_rts") ) {
+			g_reset_rts = 1;
 		} else if ( !strcmp(argv[i], "--verbose") ) {
 			g_verbose = 1;
 		} else if ( !strcmp(argv[i], "--hello") ) {
@@ -552,7 +577,7 @@ int main (int argc, const char** argv)
 	puts("+++++++++++++++++++++++++++++++++++++++++");
 	puts("+ DS30Loader client for Buspirate v2/v3 +");
 	puts("+++++++++++++++++++++++++++++++++++++++++\n");
-	
+
 	if( !g_hello_only ) {
 		
 		if( !g_hexfile_path ) {
@@ -613,6 +638,14 @@ int main (int argc, const char** argv)
 	}
 	puts("OK"); //extra LF for spacing
 	
+	if (g_reset_rts) {
+        	printf(" pulse RTS line...\n");
+        	set_rts(dev_fd, 1);
+		usleep(50*1000);
+		set_rts(dev_fd, 0);
+		usleep(100*1000);
+	}
+
 	printf("Sending Hello to the Bootloader...");
 	
 	//send HELLO
