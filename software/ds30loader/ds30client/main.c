@@ -641,7 +641,7 @@ int main (int argc, const char** argv)
 	if (g_reset_rts) {
         	printf(" pulse RTS line...\n");
         	set_rts(dev_fd, 1);
-		usleep(50*1000);
+		usleep(200*1000);
 		set_rts(dev_fd, 0);
 		usleep(100*1000);
 	}
