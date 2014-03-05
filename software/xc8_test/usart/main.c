@@ -51,7 +51,10 @@ int main(void) {
 	// Fosc/64
 	// 64MHz ->
         UARTOpen(34);
-       
+
+	UARTWriteLine("\r\nUUUUUUUUUUUUUUUUUUUUUUUUUUU\r\n");       
+	UARTWriteLine("\r\nQuark calling !\r\n");       
+	UARTWriteLine("\r\nfffffffffffffffffffffffffff\r\n");       
         while (TRUE)
 	if (UARTReadLine(line, &executeTasks)) {
 		// AT command
