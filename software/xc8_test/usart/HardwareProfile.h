@@ -23,14 +23,10 @@ typedef unsigned int	WORD;
 typedef unsigned long	DWORD;
 
 // Board definitions
-#define RELAY_TRIS		(TRISBbits.TRISB0)
-#define LED_TRIS		(TRISBbits.TRISB1)
-#define BTN_TRIS		(TRISAbits.TRISA0)
+#define LED_TRIS		(TRISAbits.TRISA0)
 #define RXD_TRIS		(TRISCbits.TRISC7)
 #define TXD_TRIS		(TRISCbits.TRISC6)
-#define RELAY			(LATBbits.LATB0)
-#define LED				(LATBbits.LATB1)
-#define BTN				(PORTAbits.RA0)
+#define LED				(LATAbits.LATA0)
 #define TXD				(LATCbits.LATC6)
 
 // Function definitions

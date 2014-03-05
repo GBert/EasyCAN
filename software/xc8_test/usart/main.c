@@ -1,19 +1,91 @@
-#include <p18f26k80.h>    
-#include <usart.h> 
-#pragma config WDTEN = OFF 
-#pragma config FOSC = HS2 
-//#pragma config LVP = ON
+#define _XTAL_FREQ 64000000	/* required for __delay_ms, __delay_us macros */
+#define FCYC (_XTAL_FREQ/4L)		/* target device instruction clock freqency */
 
-void main(void) 
-{ 
-// configure USART 
-unsigned int item,i; 
-item=0x61; 
-PORTB=0xff; 
-Open1USART( USART_TX_INT_OFF & USART_RX_INT_OFF & USART_ASYNCH_MODE 
-	& USART_EIGHT_BIT & USART_CONT_RX & USART_BRGH_HIGH, 51 );/////////////////baud rate 9600 for sync=0,brgh=1,brg16=0 
-    //for(i=0;i<40000;i++); 
-    Write1USART('H'); //write value of PORTD 
-    Close1USART(); 
-    while(1); 
-} 
+#include <xc.h>
+#include "HardwareProfile.h"
+#include "Timer.h"
+#include "FIFO.h"
+#include "UART.h"
+
+#pragma config XINST = OFF
+#pragma config FOSC = HS2 
+#pragma config PLLCFG = ON
+#pragma config MCLRE = ON
+#pragma config WDTEN = OFF 
+#pragma config CANMX = PORTB
+#pragma config PWRTEN = ON
+#pragma config CP0 = OFF
+#pragma config CPD = OFF
+// #pragma config LVP = ON
+
+
+#define LINE_TIMEOUT    5000
+
+static BYTE line[128];
+BOOL onTimer = FALSE;
+DWORD startSeconds = 0;
+DWORD triggerSeconds = 0;
+DWORD lastSeconds = 0;
+BYTE timerTriggerState = 'T';
+
+void executeTasks(void);
+void timerTask(void);
+
+// Default Interrupt Service Routine
+void interrupt isr(void) {
+        if (RCIE && RCIF) {
+                UARTServeInt();
+        }
+
+        if (TMR0IE && TMR0IF) {
+                TMRServeInt();
+        }
+}
+
+int main(void) {
+        WORD num;
+
+        BoardInit();
+        TMRInit();
+        FIFOInit();
+	// Fosc/64
+	// 64MHz ->
+        UARTOpen(34);
+       
+        while (TRUE)
+	if (UARTReadLine(line, &executeTasks)) {
+		// AT command
+		if (strcmp(line, "AT") == 0) {
+			UARTWriteLine("\r\nOK\r\n");
+			continue;
+		}
+	}
+}
+void executeTasks(void) {
+        timerTask();
+}
+
+void timerTask(void) {
+        DWORD cs;
+
+        if (onTimer) {
+                if (TMRSecondsElapsed(startSeconds) >= triggerSeconds) {
+                        switch (timerTriggerState) {
+                                case '1':
+                                        break;
+                                case '0':
+                                        break;
+                                default:
+                                        break;
+                        }
+                        onTimer = FALSE;
+                } else {
+                        cs = TMRGetSecondsCount();
+                        if (cs != lastSeconds) {
+                                lastSeconds = cs;
+                                LED = !LED;
+                        }
+                }
+        }
+}
+

@@ -6,12 +6,13 @@ PROCESSOR	= 18F26K80
 MAIN		= main
 SRC		= main.c FIFO.c UART.c HardwareProfile.c Timer.c
 CC		= $(XC8DIR)/bin/xc8
+# CC		= sdcc
 BOOTLOADER	= mphidflash
 
 all: $(MAIN).hex
 
 $(MAIN).hex: $(SRC)
-	$(CC) $(SRC) --chip=$(PROCESSOR) $(CC_INCLUDE) # --CODEOFFSET=1000h --ROM=default,-0-fff
+	$(CC) $(SRC) --chip=$(PROCESSOR) $(CC_INCLUDE) --ASMLIST 
 
 flash: 
 	$(BOOTLOADER) -write main.hex -reset

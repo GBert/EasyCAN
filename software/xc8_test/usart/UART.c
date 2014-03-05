@@ -42,6 +42,7 @@ void UARTOpen(BYTE spbrg) {
 
 	// Calculate baud rate (9600 bps)
 	SPBRG = spbrg;
+	
 
 	RCSTAbits.CREN = 1;	// Enable receiver
 	TXSTAbits.TXEN = 1;	// Enable transmitter
