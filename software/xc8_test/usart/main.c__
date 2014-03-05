@@ -1,0 +1,13 @@
+#include <p18f26k80.h>
+// CONFIG1
+#pragma config WDTEN = OFF
+#pragma config STVREN = ON
+#pragma config XINST = OFF
+#pragma config CP0 = OFF
+// CONFIG2
+#pragma config FOSC = HS2
+#pragma config IESO = ON
+#pragma config WDTPS = 32768
+int main(void)
+{
+return 0; }

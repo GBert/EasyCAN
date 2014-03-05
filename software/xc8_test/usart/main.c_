@@ -1,0 +1,37 @@
+#include <xc.h>
+#include "config.h"
+#include <plib/usart.h>
+
+#define _XTAL_FREQ 64000000 //The speed of your internal(or)external oscillator
+#define USE_AND_MASKS
+
+int i = 0;
+unsigned char UART1Config = 0, baud = 0;
+unsigned char MsgFromPIC[] = "PIC Rocks\r";
+
+void Delay1Second(void);
+
+void main(int argc, char** argv) {
+
+    TRISCbits.RC6 = 0; //TX pin set as output
+    TRISCbits.RC7 = 1; //RX pin set as input
+
+    UART1Config = USART_TX_INT_OFF & USART_RX_INT_OFF & USART_ASYNCH_MODE & USART_EIGHT_BIT & USART_BRGH_HIGH ;
+    baud = 51;
+    OpenUSART(UART1Config,baud);
+
+   
+    while(1) //infinite loop
+    {
+       putsUSART(MsgFromPIC);
+       Delay0_1Second();
+    }
+}
+
+void Delay0_1Second()
+{
+    for(i=0;i<10;i++)
+    {
+         __delay_ms(10);
+    }
+}
