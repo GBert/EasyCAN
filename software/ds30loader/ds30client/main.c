@@ -470,12 +470,13 @@ int configurePort(int fd, unsigned long baudrate)
 
 	return (int)hCom;
 #else
+	
 	struct termios g_new_tio;
 	
 	memset(&g_new_tio, 0x00 , sizeof(g_new_tio));
 	cfmakeraw(&g_new_tio);
 	
-	g_new_tio.c_cflag |=  (CS8 | CLOCAL | CREAD);
+	g_new_tio.c_cflag =  (CS8 | CLOCAL | CREAD);
 	g_new_tio.c_cflag &= ~(PARENB | CSTOPB | CSIZE | CRTSCTS);
 	g_new_tio.c_oflag = 0;
 	g_new_tio.c_lflag = 0;
@@ -488,7 +489,7 @@ int configurePort(int fd, unsigned long baudrate)
 	cfsetospeed (&g_new_tio, baudrate);
 	
 	tcflush(fd, TCIOFLUSH);
-	
+	printf("   ... configured\n");	
 	return tcsetattr(fd, TCSANOW, &g_new_tio);
 #endif
 }
