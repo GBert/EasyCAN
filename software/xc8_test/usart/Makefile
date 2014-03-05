@@ -4,7 +4,7 @@ CC_INCLUDE	= -I$(XC8DIR)/include
 
 PROCESSOR	= 18F26K80
 MAIN		= main
-SRC		= main.c
+SRC		= main.c FIFO.c UART.c HardwareProfile.c Timer.c
 CC		= $(XC8DIR)/bin/xc8
 BOOTLOADER	= mphidflash
 
@@ -17,5 +17,5 @@ flash:
 	$(BOOTLOADER) -write main.hex -reset
 
 clean:
-	rm -f $(MAIN).hex funclist $(MAIN).cof $(MAIN).hxl $(MAIN).p1 $(MAIN).sdb startup.* $(MAIN).lst $(MAIN).pre $(MAIN).sym
+	rm -f $(MAIN).hex funclist $(MAIN).cof $(MAIN).hxl *.p1 $(MAIN).sdb startup.* *.as *.d *.obj *.lst *.pre $(MAIN).sym
 
