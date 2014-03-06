@@ -473,14 +473,13 @@ int configurePort(int fd, unsigned long baudrate)
 	
 	struct termios g_new_tio;
 	
-	memset(&g_new_tio, 0x00 , sizeof(g_new_tio));
-	cfmakeraw(&g_new_tio);
+	bzero(&g_new_tio, sizeof(g_new_tio));
 	
-	g_new_tio.c_cflag =  (CS8 | CLOCAL | CREAD);
+	g_new_tio.c_cflag = CLOCAL | CREAD ;
 	g_new_tio.c_cflag &= ~(PARENB | CSTOPB | CSIZE | CRTSCTS);
+	g_new_tio.c_cflag |= CS8;
 	g_new_tio.c_oflag = 0;
 	g_new_tio.c_lflag = 0;
-	
 	
 	g_new_tio.c_cc[VTIME] = 0;
 	g_new_tio.c_cc[VMIN] = 1;

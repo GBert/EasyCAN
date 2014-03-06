@@ -43,7 +43,9 @@ void interrupt isr(void) {
 }
 
 int main(void) {
-        WORD num;
+	LED = !LED;
+/*        WORD num;
+
 
         BoardInit();
         TMRInit();
@@ -62,7 +64,7 @@ int main(void) {
 			UARTWriteLine("\r\nOK\r\n");
 			continue;
 		}
-	}
+	}*/
 }
 void executeTasks(void) {
         timerTask();
