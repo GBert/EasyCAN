@@ -1,109 +1,168 @@
+/*
+ 
+ Pirate-Loader for Bootloader v4
+ 
+ Version  : 1.0.2
+ 
+ Changelog:
+ +2010-06-28 - Made HEX parser case-insensative
+ 
+  + 2010-02-04 - Changed polling interval to 10ms on Windows select wrapper, suggested by Michal (robots)
+  
+  + 2010-02-04 - Added sleep(0) between write instructions, patch submitted by kbulgrien
+ 
+  + 2010-01-22 - Added loader version number to the console output and source code
+ 
+  + 2010-01-19 - Fixed BigEndian incompatibility
+			   - Added programming simulate switch ( --simulate ) for data verification 
+ 
+  + 2010-01-18 - Initial release
+ 
+ 
+ Building:
+ 
+  UNIX family systems:
+	
+	gcc pirate-loader.c -o pirate-loader
+ 
+  WINDOWS:
+    
+	cl pirate-loader.c /DWIN32=1
+ 
+ 
+ Usage:
+	
+	Run ./pirate-loader --help for more information on usage and possible switches
+ 
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
 #include <fcntl.h>
 #include <errno.h>
 
+#define PIRATE_LOADER_VERSION "1.0.2"
+
+#define STR_EXPAND(tok) #tok
+#define OS_NAME(tok) STR_EXPAND(tok)
+
+
 #ifdef WIN32
-#include <windows.h>
-#include <time.h>
+	#include <windows.h>
+	#include <time.h>
 
-#define O_NOCTTY 0
-#define O_NDELAY 0
-#define B115200 115200
+	#define O_NOCTTY 0
+	#define O_NDELAY 0
+	#define B115200 115200
+
+	#define OS WINDOWS
 	
-int write(int fd, const void* buf, int len)
-{
-	HANDLE hCom = (HANDLE)fd;
-	int res = 0;
-	unsigned long bwritten = 0;
+	int write(int fd, const void* buf, int len)
+	{
+		HANDLE hCom = (HANDLE)fd;
+		int res = 0;
+		unsigned long bwritten = 0;
 
 
-	res = WriteFile(hCom, buf, len, &bwritten, NULL);
+		res = WriteFile(hCom, buf, len, &bwritten, NULL);
 
-	if( res == FALSE ) {
-		return -1;
-	} else {
-		return bwritten;
+		if( res == FALSE ) {
+			return -1;
+		} else {
+			return bwritten;
+		}
 	}
-}
 
-int read(int fd, void* buf, int len)
-{
-	HANDLE hCom = (HANDLE)fd;
-	int res = 0;
-	unsigned long bread = 0;
+	int read(int fd, void* buf, int len)
+	{
+		HANDLE hCom = (HANDLE)fd;
+		int res = 0;
+		unsigned long bread = 0;
 
-	res = ReadFile(hCom, buf, len, &bread, NULL);
+		res = ReadFile(hCom, buf, len, &bread, NULL);
 
-	if( res == FALSE ) {
-		return -1;
-	} else {
-		return bread;
+		if( res == FALSE ) {
+			return -1;
+		} else {
+			return bread;
+		}
 	}
-}
 
-int close(int fd)
-{
-	HANDLE hCom = (HANDLE)fd;
+	int close(int fd)
+	{
+		HANDLE hCom = (HANDLE)fd;
 
-	CloseHandle(hCom);
-	return 0;
-}
+		CloseHandle(hCom);
+		return 0;
+	}
 
-int open(const char* path, unsigned long flags)
-{
-	static char full_path[32] = {0};
+	int open(const char* path, unsigned long flags)
+	{
+		static char full_path[32] = {0};
 
-	HANDLE hCom = NULL;
+		HANDLE hCom = NULL;
 		
-	if( path[0] != '\\' ) {
-		_snprintf(full_path, sizeof(full_path) - 1, "\\\\.\\%s", path);
-		path = full_path;
+		if( path[0] != '\\' ) {
+			_snprintf(full_path, sizeof(full_path) - 1, "\\\\.\\%s", path);
+			path = full_path;
+		}
+
+		hCom = CreateFileA(path, GENERIC_WRITE | GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+		if( !hCom || hCom == INVALID_HANDLE_VALUE ) {
+			return -1;
+		} else {
+			return (int)hCom;
+		}
 	}
 
-	hCom = CreateFileA(path, GENERIC_WRITE | GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	int __stdcall select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfs, const struct timeval* timeout)
+	{
+		time_t maxtc = time(0) + (timeout->tv_sec);
+		COMSTAT cs = {0};
+		unsigned long dwErrors = 0;
 
-	if( !hCom || hCom == INVALID_HANDLE_VALUE ) {
-		return -1;
-	} else {
-		return (int)hCom;
-	}
-}
-
-int __stdcall select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfs, const struct timeval* timeout)
-{
-	time_t maxtc = time(0) + (timeout->tv_sec);
-	COMSTAT cs = {0};
-	unsigned long dwErrors = 0;
-
-	if( readfds->fd_count != 1 ) {
-		return -1;
-	}
-
-	while( time(0) <= maxtc )
-	{ //only one file supported
-		if( ClearCommError( (HANDLE)readfds->fd_array[0], 0, &cs) != TRUE ){
+		if( readfds->fd_count != 1 ) {
 			return -1;
 		}
-		if( cs.cbInQue > 0 ) {
-			return 1;
+
+		while( time(0) <= maxtc )
+		{ //only one file supported
+			if( ClearCommError( (HANDLE)readfds->fd_array[0], 0, &cs) != TRUE ){
+				return -1;
+			}
+
+			if( cs.cbInQue > 0 ) {
+				return 1;
+			}
+
+			Sleep(10);
 		}
-	Sleep(250);
+		return 0;
 	}
-	return 0;
-}
+
+	unsigned int sleep(unsigned int sec)
+	{
+		Sleep(sec * 1000);
+		
+		return 0;
+	}
 
 #else
-#include <unistd.h>
-#include <termios.h>
-#include <sys/select.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/ioctl.h>
+	#include <unistd.h>
+	#include <termios.h>
+	#include <sys/select.h>
+	#include <sys/types.h>
+	#include <sys/time.h>
+	#include <sys/ioctl.h>
 #endif
 
 /* macro definitions */
+
+#if !defined OS
+#define OS UNKNOWN
+#endif
 
 #define BOOTLOADER_HELLO_STR "\xC1"
 #define BOOTLOADER_OK 0x4B
@@ -113,16 +172,16 @@ int __stdcall select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* except
 
 #define PIC_NUM_PAGES 512
 #define PIC_NUM_ROWS_IN_PAGE  8
-#define PIC_NUM_WORDS_IN_ROW 64
+#define PIC_NUM_WORDS_IN_ROW 16
 
-#define PIC_WORD_SIZE  (3)
+#define PIC_WORD_SIZE  (2)
 #define PIC_ROW_SIZE  (PIC_NUM_WORDS_IN_ROW * PIC_WORD_SIZE)
 #define PIC_PAGE_SIZE (PIC_NUM_ROWS_IN_PAGE  * PIC_ROW_SIZE)
 
 
-#define PIC_ROW_ADDR(p,r)	(((p) * PIC_PAGE_SIZE) + ((r) * PIC_ROW_SIZE))
+#define PIC_ROW_ADDR(p,r)		(((p) * PIC_PAGE_SIZE) + ((r) * PIC_ROW_SIZE))
 #define PIC_WORD_ADDR(p,r,w)	(PIC_ROW_ADDR(p,r) + ((w) * PIC_WORD_SIZE))
-#define PIC_PAGE_ADDR(p)	(PIC_PAGE_SIZE * (p))
+#define PIC_PAGE_ADDR(p)		(PIC_PAGE_SIZE * (p))
 
 #define PAYLOAD_OFFSET 5
 #define HEADER_LENGTH PAYLOAD_OFFSET
@@ -139,9 +198,8 @@ typedef unsigned long  uint32;
 
 uint8 g_verbose = 0;
 uint8 g_hello_only = 0;
-uint8 g_emulate = 0;
+uint8 g_simulate = 0;
 uint8 g_reset_rts = 0;
-
 const char* g_device_path  = NULL;
 const char* g_hexfile_path = NULL;
 
@@ -179,9 +237,30 @@ int readWithTimeout(int fd, uint8* out, int length, int timeout)
 }
 
 unsigned char hexdec(const char* pc)
-{
-	return (((pc[0] >= 'A') ? ( pc[0] - 'A' + 10 ) : ( pc[0] - '0' ) ) << 4 | 
-			((pc[1] >= 'A') ? ( pc[1] - 'A' + 10 ) : ( pc[1] - '0' ) )) & 0x0FF;
+{	unsigned char temp;
+
+	if(pc[0]>='a'){
+		temp=pc[0]-'a'+10;
+	}else if(pc[0] >= 'A'){
+		temp=pc[0]-'A'+10;		
+	}else{
+		temp=pc[0] - '0';
+	}
+	temp=temp<<4;
+	
+	if(pc[1]>='a'){
+		temp|=pc[1]-'a'+10;
+	}else if(pc[1] >= 'A'){
+		temp|=pc[1]-'A'+10;		
+	}else{
+		temp|=pc[1] - '0';
+	}
+	
+	return(temp & 0x0FF);
+
+	
+	//return (((pc[0] >= 'A') ? ( pc[0] - 'A' + 10 ) : ( pc[0] - '0' ) ) << 4 | 
+	//		((pc[1] >= 'A') ? ( pc[1] - 'A' + 10 ) : ( pc[1] - '0' ) )) & 0x0FF;
 	
 }
 
@@ -388,7 +467,7 @@ int sendFirmware(int fd, uint8* data, uint8* pages_used)
 		
 		printf("Erasing page %ld, %04lx...", page, u_addr);
 		
-		if( g_emulate == 0 && sendCommandAndWaitForResponse(fd, command) < 0 ) {
+		if( g_simulate == 0 && sendCommandAndWaitForResponse(fd, command) < 0 ) {
 			return -1;
 		}
 		
@@ -409,11 +488,13 @@ int sendFirmware(int fd, uint8* data, uint8* pages_used)
 			
 			printf("Writing page %ld row %ld, %04lx...", page, row + page*PIC_NUM_ROWS_IN_PAGE, u_addr);
 			
-			if( g_emulate == 0 && sendCommandAndWaitForResponse(fd, command) < 0 ) {
+			if( g_simulate == 0 && sendCommandAndWaitForResponse(fd, command) < 0 ) {
 				return -1;
 			}
 			
 			puts("OK");
+			
+			sleep(0);
 			
 			if( g_verbose ) {
 				dumpHex(command, HEADER_LENGTH + command[LENGTH_OFFSET]);
@@ -470,16 +551,16 @@ int configurePort(int fd, unsigned long baudrate)
 
 	return (int)hCom;
 #else
-	
 	struct termios g_new_tio;
 	
-	bzero(&g_new_tio, sizeof(g_new_tio));
+	memset(&g_new_tio, 0x00 , sizeof(g_new_tio));
+	cfmakeraw(&g_new_tio);
 	
-	g_new_tio.c_cflag = CLOCAL | CREAD ;
-	g_new_tio.c_cflag &= ~(PARENB | CSTOPB | CSIZE | CRTSCTS);
-	g_new_tio.c_cflag |= CS8;
+	g_new_tio.c_cflag &= ~(PARENB | CSTOPB | CSIZE);
+	g_new_tio.c_cflag |=  (CS8 | CLOCAL | CREAD);
 	g_new_tio.c_oflag = 0;
 	g_new_tio.c_lflag = 0;
+	
 	
 	g_new_tio.c_cc[VTIME] = 0;
 	g_new_tio.c_cc[VMIN] = 1;
@@ -488,7 +569,7 @@ int configurePort(int fd, unsigned long baudrate)
 	cfsetospeed (&g_new_tio, baudrate);
 	
 	tcflush(fd, TCIOFLUSH);
-	printf("   ... configured\n");	
+	
 	return tcsetattr(fd, TCSANOW, &g_new_tio);
 #endif
 }
@@ -502,16 +583,14 @@ void set_rts(int fd, int rts)
 	int status;
 
 	ioctl(fd, TIOCMGET, &status);
-
 	if (rts)
 		status |= TIOCM_RTS;
 	else
-		status &= ~TIOCM_RTS;
+	status &= ~TIOCM_RTS;
 
 	ioctl(fd, TIOCMSET, &status);
 }
 #endif
-
 
 int openPort(const char* dev, unsigned long flags)
 {
@@ -529,19 +608,19 @@ int parseCommandLine(int argc, const char** argv)
 			g_hexfile_path = argv[i] + 6;
 		} else if ( !strncmp(argv[i], "--dev=", 6) ) {
 			g_device_path = argv[i] + 6;
-		} else if ( !strcmp(argv[i], "--reset_rts") ) {
-			g_reset_rts = 1;
+                } else if ( !strcmp(argv[i], "--reset_rts") ) {
+                        g_reset_rts = 1;
 		} else if ( !strcmp(argv[i], "--verbose") ) {
 			g_verbose = 1;
 		} else if ( !strcmp(argv[i], "--hello") ) {
 			g_hello_only = 1;
-		} else if ( !strcmp(argv[i], "--emulate") ) {
-			g_emulate = 1;
+		} else if ( !strcmp(argv[i], "--simulate") ) {
+			g_simulate = 1;
 		} else if ( !strcmp(argv[i], "--help") ) {
 			argc = 1; //that's not pretty, but it works :)
 			break;
 		} else {
-			fprintf(stderr, "Unknown parameter %s, please use ds30client --help for usage\n", argv[i]);
+			fprintf(stderr, "Unknown parameter %s, please use pirate-loader --help for usage\n", argv[i]);
 			return -1;
 		}
 	}
@@ -549,9 +628,11 @@ int parseCommandLine(int argc, const char** argv)
 	if( argc == 1 )
 	{
 		//print usage
-		puts("ds30client usage:\n");
-		puts(" ./ds30client --dev=/path/to/device --hello");
-		puts(" ./ds30client --dev=/path/to/device --hex=/path/to/hexfile.hex [ --verbose");
+		puts("pirate-loader usage:\n");
+		puts(" ./pirate-loader --dev=/path/to/device --hello");
+		puts(" ./pirate-loader --dev=/path/to/device --hex=/path/to/hexfile.hex [ --verbose");
+		puts(" ./pirate-loader --simulate --hex=/path/to/hexfile.hex [ --verbose");
+		puts("");
 		
 		return 0;
 	}
@@ -563,10 +644,16 @@ int parseCommandLine(int argc, const char** argv)
 
 int main (int argc, const char** argv)
 {
-	int		dev_fd = -1, res = -1;
+	int	dev_fd = -1, res = -1;
 	uint8	buffer[256] = {0};
 	uint8	pages_used[PIC_NUM_PAGES] = {0};
 	uint8*	bin_buff = NULL;
+	
+	
+	puts("+++++++++++++++++++++++++++++++++++++++++++");
+	puts("  Pirate-Loader for BP with Bootloader v4+  ");
+	puts("  Loader version: " PIRATE_LOADER_VERSION "  OS: " OS_NAME(OS));
+	puts("+++++++++++++++++++++++++++++++++++++++++++\n");
 	
 	if( (res = parseCommandLine(argc, argv)) < 0 ) {
 		return -1;
@@ -574,10 +661,6 @@ int main (int argc, const char** argv)
 		return 0;
 	}
 	
-	puts("+++++++++++++++++++++++++++++++++++++++++");
-	puts("+ DS30Loader client for Buspirate v2/v3 +");
-	puts("+++++++++++++++++++++++++++++++++++++++++\n");
-
 	if( !g_hello_only ) {
 		
 		if( !g_hexfile_path ) {
@@ -587,7 +670,7 @@ int main (int argc, const char** argv)
 	
 		bin_buff = (uint8*)malloc(256 << 10); //256kB
 		if( !bin_buff ) {
-			fprintf(stderr, "Could not allocate 128kB buffer\n");
+			fprintf(stderr, "Could not allocate 256kB buffer\n");
 			goto Error;
 		}
 		
@@ -608,7 +691,7 @@ int main (int argc, const char** argv)
 		// fixJumps(bin_buff, pages_used);
 	}
 	
-	if( g_emulate ) {
+	if( g_simulate ) {
 		sendFirmware(dev_fd, bin_buff, pages_used);
 		goto Finished;
 	}
@@ -636,15 +719,15 @@ int main (int argc, const char** argv)
 		fprintf(stderr, "Could not configure device, errno=%d\n", errno);
 		goto Error;
 	}
-	puts("OK"); //extra LF for spacing
-	
-	if (g_reset_rts) {
-        	printf(" pulse RTS line...\n");
-        	set_rts(dev_fd, 1);
-		usleep(200*1000);
-		set_rts(dev_fd, 0);
-		usleep(100*1000);
-	}
+	puts("OK");
+	/* reset through RTS if requested */
+        if (g_reset_rts) {
+                printf(" pulse RTS line...\n");
+                set_rts(dev_fd, 1);
+                usleep(200*1000);
+                set_rts(dev_fd, 0);
+                usleep(100*1000);
+        }
 
 	printf("Sending Hello to the Bootloader...");
 	
@@ -661,11 +744,11 @@ int main (int argc, const char** argv)
 	}
 	puts("OK\n"); //extra LF for spacing
 	
-	printf("Device ID: %s [%02x]\n", (buffer[0] == 0xD4) ? "PIC24FJ64GA002" : "UNKNOWN", buffer[0]);
+	printf("Device ID: %s [%02x]\n", (buffer[0] == 0xB4) ? "PIC18F26K80" : "UNKNOWN", buffer[0]);
 	printf("Bootloader version: %d,%02d\n", buffer[1], buffer[2]);
 	
-	if( buffer[0] != 0xD4 ) {
-		fprintf(stderr, "Unsupported device (%02x:UNKNOWN), only 0xD4 PIC24FJ64GA002 is supported\n", buffer[0]);
+	if( buffer[0] != 0xB4 ) {
+		fprintf(stderr, "Unsupported device (%02x:UNKNOWN), only 0xB4 PIC18F26K80 is supported\n", buffer[0]);
 		goto Error;
 	}
 	
