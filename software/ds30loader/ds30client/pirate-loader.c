@@ -14,7 +14,7 @@
   + 2010-01-22 - Added loader version number to the console output and source code
  
   + 2010-01-19 - Fixed BigEndian incompatibility
-			   - Added programming simulate switch ( --simulate ) for data verification 
+		- Added programming simulate switch ( --simulate ) for data verification 
  
   + 2010-01-18 - Initial release
  
@@ -164,29 +164,29 @@
 #define OS UNKNOWN
 #endif
 
-#define BOOTLOADER_HELLO_STR "\xC1"
-#define BOOTLOADER_OK 0x4B
-#define BOOTLOADER_PLACEMENT 1
+#define BOOTLOADER_HELLO_STR	"\xC1"
+#define BOOTLOADER_OK		0x4B
+#define BOOTLOADER_PLACEMENT	1
 
-#define PIC_FLASHSIZE 0xAC00
+#define PIC_FLASHSIZE		0x10000
 
-#define PIC_NUM_PAGES 512
-#define PIC_NUM_ROWS_IN_PAGE  8
-#define PIC_NUM_WORDS_IN_ROW 16
+#define PIC_NUM_PAGES		1024
+#define PIC_NUM_ROWS_IN_PAGE	1
+#define PIC_NUM_WORDS_IN_ROW	32
 
-#define PIC_WORD_SIZE  (2)
-#define PIC_ROW_SIZE  (PIC_NUM_WORDS_IN_ROW * PIC_WORD_SIZE)
-#define PIC_PAGE_SIZE (PIC_NUM_ROWS_IN_PAGE  * PIC_ROW_SIZE)
+#define PIC_WORD_SIZE		(2)
+#define PIC_ROW_SIZE		(PIC_NUM_WORDS_IN_ROW * PIC_WORD_SIZE)
+#define PIC_PAGE_SIZE		(PIC_NUM_ROWS_IN_PAGE * PIC_ROW_SIZE)
 
 
-#define PIC_ROW_ADDR(p,r)		(((p) * PIC_PAGE_SIZE) + ((r) * PIC_ROW_SIZE))
+#define PIC_ROW_ADDR(p,r)	(((p) * PIC_PAGE_SIZE) + ((r) * PIC_ROW_SIZE))
 #define PIC_WORD_ADDR(p,r,w)	(PIC_ROW_ADDR(p,r) + ((w) * PIC_WORD_SIZE))
-#define PIC_PAGE_ADDR(p)		(PIC_PAGE_SIZE * (p))
+#define PIC_PAGE_ADDR(p)	(PIC_PAGE_SIZE * (p))
 
-#define PAYLOAD_OFFSET 5
-#define HEADER_LENGTH PAYLOAD_OFFSET
-#define LENGTH_OFFSET 4
-#define COMMAND_OFFSET 3
+#define PAYLOAD_OFFSET		5
+#define HEADER_LENGTH		PAYLOAD_OFFSET
+#define LENGTH_OFFSET		4
+#define COMMAND_OFFSET		3
 
 /* type definitions */
 
@@ -293,7 +293,7 @@ int readHEX(const char* file, uint8* bout, unsigned long max_length, uint8* page
 	char  *pc;
 	char  *pline = line + 1;
 	int   res = 0;
-	int	  binlen = 0;
+	int   binlen = 0;
 	int   line_no = 0;
 	int   i = 0;
 	
@@ -310,6 +310,7 @@ int readHEX(const char* file, uint8* bout, unsigned long max_length, uint8* page
 		if( line[0] != ':' ) {
 			break;
 		}
+		printf("  Parsing line %s",line);
 		
 		res = strlen(pline);
 		pc  = pline + res - 1;
@@ -351,31 +352,35 @@ int readHEX(const char* file, uint8* bout, unsigned long max_length, uint8* page
 		{
 			f_addr  = (hex_base_addr | (hex_addr)) / 2; //PCU
 			
-			if( hex_len % 4 ) {
+			if( hex_len % 2 ) {
 				fprintf(stderr, "Misaligned data, line %d\n", line_no);
 				return -1;
 			} else if( f_addr >= PIC_FLASHSIZE ) {
-				fprintf(stderr, "Current record address is higher than maximum allowed, line %d\n", line_no);
-				return -1;
+				printf("Current record address 0x%4x is higher than maximum allowed, line %d\n",(unsigned int) f_addr, line_no);
+				printf("Ignoring data\n");
 			}
 			
-			hex_words = hex_len  / 4;
-			o_addr  = (f_addr / 2) * PIC_WORD_SIZE; //BYTES
-			
-			for( i=0; i<hex_words; i++)
-			{
-				bout[o_addr + 0] = data[(i*4) + 2];
-				bout[o_addr + 1] = data[(i*4) + 0];
-				bout[o_addr + 2] = data[(i*4) + 1];
+			/* TODO */
+			if (f_addr < PIC_FLASHSIZE) { 
+				hex_words = hex_len  / 4;
+				o_addr  = (f_addr / 2) * PIC_WORD_SIZE; //BYTES
+		
+				for( i=0; i<hex_words; i++)
+				{
+					bout[o_addr + 0] = data[(i*4) + 2];
+					bout[o_addr + 1] = data[(i*4) + 0];
+					bout[o_addr + 2] = data[(i*4) + 1];
 				
-				pages_used[ (o_addr / PIC_PAGE_SIZE) ] = 1;
+					pages_used[ (o_addr / PIC_PAGE_SIZE) ] = 1;
 				
-				o_addr    += PIC_WORD_SIZE;
-				num_words ++;
+					o_addr    += PIC_WORD_SIZE;
+					num_words ++;
+				}
 			}
 
 		} else if ( hex_type == 0x04 && hex_len == 2) {
 			hex_base_addr = (linebin[4] << 24) | (linebin[5] << 16);
+			printf("   hex_base_addr: 0x%4x\n",hex_base_addr);
 		} else if ( hex_type == 0x01 ) {
 			break; //EOF
 		} else {
@@ -630,8 +635,8 @@ int parseCommandLine(int argc, const char** argv)
 		//print usage
 		puts("pirate-loader usage:\n");
 		puts(" ./pirate-loader --dev=/path/to/device --hello");
-		puts(" ./pirate-loader --dev=/path/to/device --hex=/path/to/hexfile.hex [ --verbose");
-		puts(" ./pirate-loader --simulate --hex=/path/to/hexfile.hex [ --verbose");
+		puts(" ./pirate-loader --dev=/path/to/device --hex=/path/to/hexfile.hex [ --verbose]");
+		puts(" ./pirate-loader --simulate --hex=/path/to/hexfile.hex [ --verbose]");
 		puts("");
 		
 		return 0;
