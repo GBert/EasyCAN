@@ -353,7 +353,7 @@ int readHEX(const char* file, uint8* bout, unsigned long max_length, uint8* page
 			/* f_addr  = (hex_base_addr | (hex_addr)) / 2; //PCU */
 			f_addr  = (hex_base_addr | (hex_addr)); //PCU
 			
-			if( hex_len % 2 ) {
+			if( hex_len % PIC_WORD_SIZE ) {
 				fprintf(stderr, "Misaligned data, line %d\n", line_no);
 				return -1;
 			} else if( f_addr >= PIC_FLASHSIZE ) {
@@ -364,9 +364,11 @@ int readHEX(const char* file, uint8* bout, unsigned long max_length, uint8* page
 			/* TODO */
 			if (f_addr < PIC_FLASHSIZE) { 
 				/* hex_words = hex_len  / 4; */
-				hex_words = hex_len;
-				/* o_addr  = (f_addr / 2) * PIC_WORD_SIZE; //BYTES */
-				o_addr  = f_addr;
+				hex_words = hex_len / PIC_WORD_SIZE;
+				o_addr  = (f_addr / 2) * PIC_WORD_SIZE; //BYTES
+				/* o_addr  = f_addr; */
+
+				printf("o_addr : 0x%04x  hex_words : %d", (unsigned int) o_addr, (int) hex_words);
 		
 				for( i=0; i<hex_words; i++)
 				{
@@ -374,8 +376,8 @@ int readHEX(const char* file, uint8* bout, unsigned long max_length, uint8* page
 					/* bout[o_addr + 1] = data[(i*4) + 0]; */
 					/* bout[o_addr + 2] = data[(i*4) + 1]; */
 				
-					bout[o_addr +0 ] = data[i];
-					bout[o_addr +1 ] = data[i+1];
+					bout[o_addr + 0 ] = data[i];
+					bout[o_addr + 1 ] = data[i+1];
 
 					pages_used[ (o_addr / PIC_PAGE_SIZE) ] = 1;
 				
@@ -450,7 +452,7 @@ int sendFirmware(int fd, uint8* data, uint8* pages_used)
 	for( page=0; page<PIC_NUM_PAGES; page++)
 	{
 		
-		u_addr = page * ( PIC_NUM_WORDS_IN_ROW * 2 * PIC_NUM_ROWS_IN_PAGE );
+		u_addr = page * ( PIC_NUM_WORDS_IN_ROW * PIC_WORD_SIZE * PIC_NUM_ROWS_IN_PAGE );
 		/* u_addr = page * ( PIC_NUM_WORDS_IN_ROW * PIC_NUM_ROWS_IN_PAGE ); */
 		
 		if( pages_used[page] != 1 ) {
