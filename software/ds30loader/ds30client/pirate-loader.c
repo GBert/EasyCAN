@@ -170,11 +170,11 @@
 
 #define PIC_FLASHSIZE		0x10000
 
-#define PIC_NUM_PAGES		1024
+#define PIC_NUM_PAGES		1023
 #define PIC_NUM_ROWS_IN_PAGE	1
-#define PIC_NUM_WORDS_IN_ROW	64
+#define PIC_NUM_WORDS_IN_ROW	32
 
-#define PIC_WORD_SIZE		(1)
+#define PIC_WORD_SIZE		(2)
 #define PIC_ROW_SIZE		(PIC_NUM_WORDS_IN_ROW * PIC_WORD_SIZE)
 #define PIC_PAGE_SIZE		(PIC_NUM_ROWS_IN_PAGE * PIC_ROW_SIZE)
 
@@ -385,7 +385,7 @@ int readHEX(const char* file, uint8* bout, unsigned long max_length, uint8* page
 
 		} else if ( hex_type == 0x04 && hex_len == 2) {
 			hex_base_addr = (linebin[4] << 24) | (linebin[5] << 16);
-			printf("   hex_base_addr: 0x%4x\n",hex_base_addr);
+			printf("   hex_base_addr: 0x%4x\n",(unsigned int) hex_base_addr);
 		} else if ( hex_type == 0x01 ) {
 			break; //EOF
 		} else {
@@ -449,13 +449,13 @@ int sendFirmware(int fd, uint8* data, uint8* pages_used)
 	for( page=0; page<PIC_NUM_PAGES; page++)
 	{
 		
-		/* u_addr = page * ( PIC_NUM_WORDS_IN_ROW * 2 * PIC_NUM_ROWS_IN_PAGE ); */
-		u_addr = page * ( PIC_NUM_WORDS_IN_ROW * PIC_NUM_ROWS_IN_PAGE );
+		u_addr = page * ( PIC_NUM_WORDS_IN_ROW * 2 * PIC_NUM_ROWS_IN_PAGE );
+		/* u_addr = page * ( PIC_NUM_WORDS_IN_ROW * PIC_NUM_ROWS_IN_PAGE ); */
 		
 		if( pages_used[page] != 1 ) {
-			if( g_verbose && u_addr < PIC_FLASHSIZE) {
+			/* if( g_verbose && u_addr < PIC_FLASHSIZE) {
 				fprintf(stdout, "Skipping page %ld [ %06lx ], not used\n", page, u_addr);
-			}
+			} */
 			continue;
 		}
 		
@@ -519,26 +519,37 @@ int sendFirmware(int fd, uint8* data, uint8* pages_used)
 
 void fixJumps(uint8* bin_buff, uint8* pages_used)
 {
-	uint32 iGotoUserAppAdress = 0;
-	uint32 iGotoUserAppAdressB3 = 0, iIter = 0;
+	uint32 iGotoUserAppAdress = 0, iIter = 0;
+	/* uint32 iGotoUserAppAdressB3 = 0; */
 	uint32 iBLAddress = 0;
 	
-	iBLAddress = ( PIC_FLASHSIZE - (BOOTLOADER_PLACEMENT * PIC_NUM_ROWS_IN_PAGE * PIC_NUM_WORDS_IN_ROW * 2)); //PCU
+	/* iBLAddress = ( PIC_FLASHSIZE - (BOOTLOADER_PLACEMENT * PIC_NUM_ROWS_IN_PAGE * PIC_NUM_WORDS_IN_ROW * 2)); //PCU */
+	iBLAddress = ( PIC_FLASHSIZE - (BOOTLOADER_PLACEMENT * 256 * PIC_WORD_SIZE)); // PCU - PIC18F 256 Words
 	iGotoUserAppAdress = iBLAddress  - 4; 
-	iGotoUserAppAdressB3 = (iGotoUserAppAdress / 2) * 3;
+	/* iGotoUserAppAdressB3 = (iGotoUserAppAdress / 2) * 3; */
+	printf("iBLAddress          : 0x%04x\n", (unsigned int)iBLAddress);
+	printf("iGotoUserAppAdress  : 0x%04x\n", (unsigned int)iGotoUserAppAdress);
+	/* printf("iGotoUserAppAdressB3: 0x%04x\n", (unsigned int)iGotoUserAppAdressB3); */
+	printf("Page                : %d\n", (int)iGotoUserAppAdress / PIC_PAGE_SIZE);
 	
-	for ( iIter = 0; iIter < 6; iIter++ ) {
-		bin_buff[ iGotoUserAppAdressB3 + iIter ] = bin_buff[ iIter ];
+	/* for ( iIter = 0; iIter < 6; iIter++ ) { */
+	for ( iIter = 0; iIter < 4; iIter++ ) {
+		bin_buff[ iGotoUserAppAdress + iIter ] = bin_buff[ iIter ];
 	}
 	
-	pages_used[ (iGotoUserAppAdressB3 / PIC_PAGE_SIZE) ] = 1;
+	pages_used[ (iGotoUserAppAdress / PIC_PAGE_SIZE) ] = 1;
 	
-	bin_buff[0] = 0x04;
+	/* bin_buff[0] = 0x04;
 	bin_buff[1] = ( (iBLAddress & 0x0000FE) );			
 	bin_buff[2] = ( (iBLAddress & 0x00FF00) >> 8 );			
 	bin_buff[3] = 0x00;	
 	bin_buff[4] = ( (iBLAddress & 0x7F0000) >> 16 );
-	bin_buff[5] = 0x00;
+	bin_buff[5] = 0x00; */
+	/* ORG 0x000 GOTO bootldr PIC18 mnemonic */
+	bin_buff[0] = 0xe0;
+	bin_buff[1] = ((iBLAddress & 0x000000F ) >>  1 );
+	bin_buff[2] = ((iBLAddress & 0xF000000 ) >> 21 ) | 0xF0;
+	bin_buff[3] = ((iBLAddress & 0x0FF0000 ) >> 17 );
 }
 
 /* non-firmware functions */
@@ -696,10 +707,10 @@ int main (int argc, const char** argv)
 			goto Error;
 		}
 		
-		printf("Found %d words (%d bytes)\n", res, res * 3);
+		printf("Found %d words (%d bytes)\n", res, res * PIC_WORD_SIZE);
 		
-		// printf("Fixing bootloader/userprogram jumps\n");
-		// fixJumps(bin_buff, pages_used);
+		printf("Fixing bootloader/userprogram jumps\n");
+		fixJumps(bin_buff, pages_used);
 	}
 	
 	if( g_simulate ) {
@@ -769,7 +780,7 @@ int main (int argc, const char** argv)
 		
 		if( res > 0 ) {
 			puts("\nFirmware updated successfully :)!");
-			printf("Use screen %s 115200 to verify\n", g_device_path);
+			/* printf("Use screen %s 115200 to verify\n", g_device_path); */
 		} else {
 			puts("\nError updating firmware :(");
 			goto Error;

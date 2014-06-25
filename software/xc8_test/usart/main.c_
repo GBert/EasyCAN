@@ -18,12 +18,12 @@ void main(int argc, char** argv) {
 
     UART1Config = USART_TX_INT_OFF & USART_RX_INT_OFF & USART_ASYNCH_MODE & USART_EIGHT_BIT & USART_BRGH_HIGH ;
     baud = 51;
-    OpenUSART(UART1Config,baud);
+    Open1USART(UART1Config,baud);
 
    
     while(1) //infinite loop
     {
-       putsUSART(MsgFromPIC);
+       puts1USART(MsgFromPIC);
        Delay0_1Second();
     }
 }
