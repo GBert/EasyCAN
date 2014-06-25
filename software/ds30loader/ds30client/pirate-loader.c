@@ -368,16 +368,14 @@ int readHEX(const char* file, uint8* bout, unsigned long max_length, uint8* page
 				o_addr  = (f_addr / 2) * PIC_WORD_SIZE; //BYTES
 				/* o_addr  = f_addr; */
 
-				printf("o_addr : 0x%04x  hex_words : %d", (unsigned int) o_addr, (int) hex_words);
-		
 				for( i=0; i<hex_words; i++)
 				{
 					/* bout[o_addr + 0] = data[(i*4) + 2]; */
 					/* bout[o_addr + 1] = data[(i*4) + 0]; */
 					/* bout[o_addr + 2] = data[(i*4) + 1]; */
 				
-					bout[o_addr + 0 ] = data[i];
-					bout[o_addr + 1 ] = data[i+1];
+					bout[o_addr + 0 ] = data[i * PIC_WORD_SIZE];
+					bout[o_addr + 1 ] = data[i * PIC_WORD_SIZE +1];
 
 					pages_used[ (o_addr / PIC_PAGE_SIZE) ] = 1;
 				
