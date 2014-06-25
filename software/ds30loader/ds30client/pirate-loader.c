@@ -374,7 +374,8 @@ int readHEX(const char* file, uint8* bout, unsigned long max_length, uint8* page
 					/* bout[o_addr + 1] = data[(i*4) + 0]; */
 					/* bout[o_addr + 2] = data[(i*4) + 1]; */
 				
-					bout[o_addr] = data[i];
+					bout[o_addr +0 ] = data[i];
+					bout[o_addr +1 ] = data[i+1];
 
 					pages_used[ (o_addr / PIC_PAGE_SIZE) ] = 1;
 				
@@ -524,7 +525,7 @@ void fixJumps(uint8* bin_buff, uint8* pages_used)
 	uint32 iBLAddress = 0;
 	
 	/* iBLAddress = ( PIC_FLASHSIZE - (BOOTLOADER_PLACEMENT * PIC_NUM_ROWS_IN_PAGE * PIC_NUM_WORDS_IN_ROW * 2)); //PCU */
-	iBLAddress = ( PIC_FLASHSIZE - (BOOTLOADER_PLACEMENT * 256 * PIC_WORD_SIZE)); // PCU - PIC18F 256 Words
+	iBLAddress = ( PIC_FLASHSIZE - (BOOTLOADER_PLACEMENT * 9 * PIC_NUM_WORDS_IN_ROW * PIC_WORD_SIZE )); // PCU - PIC18F 256 Words
 	iGotoUserAppAdress = iBLAddress  - 4; 
 	/* iGotoUserAppAdressB3 = (iGotoUserAppAdress / 2) * 3; */
 	printf("iBLAddress          : 0x%04x\n", (unsigned int)iBLAddress);
