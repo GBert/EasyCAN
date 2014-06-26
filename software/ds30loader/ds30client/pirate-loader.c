@@ -550,7 +550,7 @@ void fixJumps(uint8* bin_buff, uint8* pages_used)
 	bin_buff[0] = ((iBLAddress & 0x00001FE ) >>  1 );
 	bin_buff[2] = 0xEF;
 	bin_buff[2] = ((iBLAddress & 0x001FE00 ) >>  9 );
-	bin_buff[3] = ((iBLAddress & 0x1FE0000 ) >> 17 ) | 0xF0;
+	bin_buff[3] = ((iBLAddress & 0x01E0000 ) >> 17 ) | 0xF0;
 }
 
 /* non-firmware functions */
