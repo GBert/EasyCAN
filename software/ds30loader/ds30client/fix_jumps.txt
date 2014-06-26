@@ -4,7 +4,7 @@
 000000                00193                 org     0x0000
 000000 EFE0 F07E      00194                 goto    blstart
 			    ;  byteorder little endian e0 ef 7e f0 
-                            ;  -> GOTO 07EE0(w<<1)  -> GOTO FDC0
+                            ;  -> GOTO 7EE0(w<<1)  -> GOTO FDC0
                       00195 
                       00196
                       00197 ;------------------------------------------------------------------------------
