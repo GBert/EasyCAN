@@ -1,34 +1,16 @@
 /*
+
+ Loader for EasyCAN module
  
- Pirate-Loader for Bootloader v4
- 
- Version  : 1.0.2
- 
- Changelog:
- +2010-06-28 - Made HEX parser case-insensative
- 
-  + 2010-02-04 - Changed polling interval to 10ms on Windows select wrapper, suggested by Michal (robots)
-  
-  + 2010-02-04 - Added sleep(0) between write instructions, patch submitted by kbulgrien
- 
-  + 2010-01-22 - Added loader version number to the console output and source code
- 
-  + 2010-01-19 - Fixed BigEndian incompatibility
-		- Added programming simulate switch ( --simulate ) for data verification 
- 
-  + 2010-01-18 - Initial release
- 
- 
- Building:
+ based on Pirate-Loader for Bootloader v4 Version 1.0.2
  
   UNIX family systems:
 	
-	gcc pirate-loader.c -o pirate-loader
+	gcc -DOS=Linux pirate-loader.c -o pirate-loader
  
-  WINDOWS:
+  WINDOWS: // untested
     
 	cl pirate-loader.c /DWIN32=1
- 
  
  Usage:
 	
@@ -168,16 +150,15 @@
 #define BOOTLOADER_OK		0x4B
 #define BOOTLOADER_PLACEMENT	1
 
+/* Values for PIC18F26K80 */
 #define PIC_FLASHSIZE		0x10000
-
 #define PIC_NUM_PAGES		1023
 #define PIC_NUM_ROWS_IN_PAGE	1
 #define PIC_NUM_WORDS_IN_ROW	32
-
 #define PIC_WORD_SIZE		(2)
+
 #define PIC_ROW_SIZE		(PIC_NUM_WORDS_IN_ROW * PIC_WORD_SIZE)
 #define PIC_PAGE_SIZE		(PIC_NUM_ROWS_IN_PAGE * PIC_ROW_SIZE)
-
 
 #define PIC_ROW_ADDR(p,r)	(((p) * PIC_PAGE_SIZE) + ((r) * PIC_ROW_SIZE))
 #define PIC_WORD_ADDR(p,r,w)	(PIC_ROW_ADDR(p,r) + ((w) * PIC_WORD_SIZE))
@@ -310,7 +291,7 @@ int readHEX(const char* file, uint8* bout, unsigned long max_length, uint8* page
 		if( line[0] != ':' ) {
 			break;
 		}
-		printf("  Parsing line %s",line);
+		/* printf("  Parsing line %s",line); */
 		
 		res = strlen(pline);
 		pc  = pline + res - 1;
@@ -357,11 +338,11 @@ int readHEX(const char* file, uint8* bout, unsigned long max_length, uint8* page
 				fprintf(stderr, "Misaligned data, line %d\n", line_no);
 				return -1;
 			} else if( f_addr >= PIC_FLASHSIZE ) {
-				printf("Current record address 0x%4x is higher than maximum allowed, line %d\n",(unsigned int) f_addr, line_no);
-				printf("Ignoring data\n");
+				printf("Current record address 0x%4x is higher than maximum allowed, line %d",(unsigned int) f_addr, line_no);
+				printf(" - ignoring data (probably CONFIG ?)\n");
 			}
 			
-			/* TODO */
+			/* FIXME: do we need the word based loop ? */
 			if (f_addr < PIC_FLASHSIZE) { 
 				/* hex_words = hex_len  / 4; */
 				hex_words = hex_len / PIC_WORD_SIZE;
@@ -386,7 +367,7 @@ int readHEX(const char* file, uint8* bout, unsigned long max_length, uint8* page
 
 		} else if ( hex_type == 0x04 && hex_len == 2) {
 			hex_base_addr = (linebin[4] << 24) | (linebin[5] << 16);
-			printf("   hex_base_addr: 0x%4x\n",(unsigned int) hex_base_addr);
+			/* printf("   hex_base_addr: 0x%4x\n",(unsigned int) hex_base_addr); */
 		} else if ( hex_type == 0x01 ) {
 			break; //EOF
 		} else {
@@ -528,10 +509,11 @@ void fixJumps(uint8* bin_buff, uint8* pages_used)
 	iBLAddress = ( PIC_FLASHSIZE - (BOOTLOADER_PLACEMENT * 9 * PIC_NUM_WORDS_IN_ROW * PIC_WORD_SIZE )); // PCU - PIC18F 256 Words
 	iGotoUserAppAdress = iBLAddress  - 4; 
 	/* iGotoUserAppAdressB3 = (iGotoUserAppAdress / 2) * 3; */
-	printf("iBLAddress          : 0x%04x\n", (unsigned int)iBLAddress);
-	printf("iGotoUserAppAdress  : 0x%04x\n", (unsigned int)iGotoUserAppAdress);
-	/* printf("iGotoUserAppAdressB3: 0x%04x\n", (unsigned int)iGotoUserAppAdressB3); */
-	printf("Page                : %d\n", (int)iGotoUserAppAdress / PIC_PAGE_SIZE);
+	if( g_verbose ) {
+		printf("iBLAddress          : 0x%04x\n", (unsigned int)iBLAddress);
+		printf("iGotoUserAppAdress  : 0x%04x\n", (unsigned int)iGotoUserAppAdress);
+		printf("Page                : %d\n", (int)iGotoUserAppAdress / PIC_PAGE_SIZE);
+	}
 	
 	/* for ( iIter = 0; iIter < 6; iIter++ ) { */
 	for ( iIter = 0; iIter < 4; iIter++ ) {
@@ -674,7 +656,7 @@ int main (int argc, const char** argv)
 	
 	
 	puts("+++++++++++++++++++++++++++++++++++++++++++");
-	puts("  Pirate-Loader for BP with Bootloader v4+  ");
+	puts("  EasyCAN-Loader (based on Pirate-Loader) ");
 	puts("  Loader version: " PIRATE_LOADER_VERSION "  OS: " OS_NAME(OS));
 	puts("+++++++++++++++++++++++++++++++++++++++++++\n");
 	
