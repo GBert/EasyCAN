@@ -1,5 +1,5 @@
 #define _XTAL_FREQ 64000000	/* required for __delay_ms, __delay_us macros */
-#define FCYC (_XTAL_FREQ/4L)		/* target device instruction clock freqency */
+#define FCYC (_XTAL_FREQ/4L)	/* target device instruction clock freqency */
 
 #include <xc.h>
 #include "HardwareProfile.h"
