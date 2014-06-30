@@ -25,7 +25,7 @@
 void interrupt ISRCode();
 
 int i = 0;
-volatile unsigned int timer_ticks=0;
+volatile unsigned char timer_ticks=0;
 void Delay1Second(void);
 
 void init_port(void) {
@@ -118,7 +118,7 @@ void interrupt ISRCode() {
             LED = 0;
         }
         // 700ms
-        if (timer_ticks==275) {
+        if (timer_ticks==250) {
             LED = 1;
             timer_ticks=0;
         }
