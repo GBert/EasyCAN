@@ -23,11 +23,11 @@ typedef unsigned int	WORD;
 typedef unsigned long	DWORD;
 
 // Board definitions
-#define LED_TRIS		(TRISAbits.TRISA0)
-#define RXD_TRIS		(TRISCbits.TRISC7)
-#define TXD_TRIS		(TRISCbits.TRISC6)
-#define LED				(LATAbits.LATA0)
-#define TXD				(LATCbits.LATC6)
+#define LED_TRIS	(TRISAbits.TRISA0)
+#define RXD_TRIS	(TRISCbits.TRISC7)
+#define TXD_TRIS	(TRISCbits.TRISC6)
+#define LED		(LATAbits.LATA0)
+#define TXD		(LATCbits.LATC6)
 
 // Function definitions
 extern void BoardInit(void);

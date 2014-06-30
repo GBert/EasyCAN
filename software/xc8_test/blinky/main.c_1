@@ -1,0 +1,27 @@
+#include <xc.h>
+#define _XTAL_FREQ 64000000 //This is the speed your controller is running at
+
+#define LED_TRIS        (TRISAbits.TRISA0)
+#define LED             (LATAbits.LATA0)
+
+int i = 0;
+void Delay1Second(void);
+
+void main(int argc, char** argv) {
+
+    LED_TRIS = 0;
+
+    while(1) //infinite loop
+    {
+        LED = 1;
+        Delay1Second();
+	LED = 0;
+        Delay1Second();
+    }
+}
+
+void Delay1Second()
+{
+    for(i=0;i<50;i++)
+        __delay_ms(10);
+}
