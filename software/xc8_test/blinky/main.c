@@ -25,7 +25,7 @@
 void interrupt ISRCode();
 
 int i = 0;
-volatile unsigned char timer_ticks=0;
+volatile unsigned int timer_ticks=0;
 void Delay1Second(void);
 
 void init_port(void) {
@@ -105,13 +105,21 @@ void interrupt ISRCode() {
     if (TMR0IF) {
         // overflow every 4.096ms
         timer_ticks++;
-        // 400ms
-        if (timer_ticks==98) {
+        // 100ms
+        if (timer_ticks==20) {
+            LED = 0;
+        }
+        // 100ms
+        if (timer_ticks==40) {
             LED = 1;
         }
-        // 800ms
-        if (timer_ticks==195) {
+        // 100ms
+        if (timer_ticks==60) {
             LED = 0;
+        }
+        // 700ms
+        if (timer_ticks==275) {
+            LED = 1;
             timer_ticks=0;
         }
         TMR0IF = 0;
