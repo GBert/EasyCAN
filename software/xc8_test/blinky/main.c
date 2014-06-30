@@ -25,6 +25,7 @@
 void interrupt ISRCode();
 
 int i = 0;
+volatile unsigned char timer_ticks=0;
 void Delay1Second(void);
 
 void init_port(void) {
@@ -32,8 +33,7 @@ void init_port(void) {
     LED_TRIS = 0;
 }
 
-void init_uart (void)
-{
+void init_uart (void) {
     // USART configuration
     TXSTAbits.TX9  = 0;    // 8-bit transmission
     TXSTAbits.TXEN = 1;    // transmit enabled
@@ -61,6 +61,9 @@ void init_uart (void)
 }
 
 void init_timer(void) {
+    // time period = 1/16MHz = 0.0625 us
+    // prescaler period = .0625us * 256 = 16us
+    // overflow period  = 16us * 256 = 4.096ms
     T0PS0=1;    //Prescaler is divide by 256
     T0PS1=1;
     T0PS2=1;
@@ -79,28 +82,38 @@ void init_timer(void) {
 
 
 void main(int argc, char** argv) {
-
     init_port();
     init_timer();
     init_uart();
 
-    while(1)    //infinite loop
-    {
-        LED = 1;
+    //infinite loop
+    while(1) {
+        /* LED = 1;
         Delay1Second();
 	LED = 0;
         Delay1Second();
+        */
     }
 }
 
-void Delay1Second()
-{
+void Delay1Second() {
     for(i=0;i<50;i++)
         __delay_ms(10);
 }
 
 void interrupt ISRCode() {
     if (TMR0IF) {
+        // overflow every 4.096ms
+        timer_ticks++;
+        // 400ms
+        if (timer_ticks==98) {
+            LED = 1;
+        }
+        // 800ms
+        if (timer_ticks==195) {
+            LED = 0;
+            timer_ticks=0;
+        }
         TMR0IF = 0;
     }
 }
