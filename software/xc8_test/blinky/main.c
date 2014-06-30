@@ -102,7 +102,7 @@ void Delay1Second() {
 }
 
 void interrupt ISRCode() {
-    if (TMR0IF) {
+    if (TMR0IE && TMR0IF) {
         // overflow every 4.096ms
         timer_ticks++;
         // 400ms
