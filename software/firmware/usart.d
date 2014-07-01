@@ -1,0 +1,1 @@
+ usart.d  usart.p1:  usart.c easycan.h usart.h

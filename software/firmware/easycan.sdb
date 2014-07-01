@@ -1,0 +1,542 @@
+[p LITE_MODE AUTOSTATIC LFSROK ]
+[d version 1.1 ]
+[d edition pro ]
+[d chip 18F26K80 ]
+[d frameptr 4065 ]
+"4 /opt/microchip/xc8/v1.30/sources/common/abdiv.c
+[v ___abdiv __abdiv `(c  1 e 1 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/common/abmod.c
+[v ___abmod __abmod `(c  1 e 1 0 ]
+"31 /opt/microchip/xc8/v1.30/sources/common/abtofl.c
+[v ___abtofl __abtofl `(d  1 e 3 0 ]
+"33 /opt/microchip/xc8/v1.30/sources/common/abtoft.c
+[v ___abtoft __abtoft `(f  1 e 3 0 ]
+"8 /opt/microchip/xc8/v1.30/sources/common/aldiv.c
+[v ___aldiv __aldiv `(l  1 e 4 0 ]
+"8 /opt/microchip/xc8/v1.30/sources/common/almod.c
+[v ___almod __almod `(l  1 e 4 0 ]
+"36 /opt/microchip/xc8/v1.30/sources/common/altofl.c
+[v ___altofl __altofl `(d  1 e 3 0 ]
+"42 /opt/microchip/xc8/v1.30/sources/common/altoft.c
+[v ___altoft __altoft `(f  1 e 3 0 ]
+"8 /opt/microchip/xc8/v1.30/sources/common/atdiv.c
+[v ___atdiv __atdiv `(m  1 e 3 0 ]
+"8 /opt/microchip/xc8/v1.30/sources/common/atmod.c
+[v ___atmod __atmod `(m  1 e 3 0 ]
+"37 /opt/microchip/xc8/v1.30/sources/common/attofl.c
+[v ___attofl __attofl `(d  1 e 3 0 ]
+"37 /opt/microchip/xc8/v1.30/sources/common/attoft.c
+[v ___attoft __attoft `(f  1 e 3 0 ]
+"8 /opt/microchip/xc8/v1.30/sources/common/awdiv.c
+[v ___awdiv __awdiv `(i  1 e 2 0 ]
+"8 /opt/microchip/xc8/v1.30/sources/common/awmod.c
+[v ___awmod __awmod `(i  1 e 2 0 ]
+"31 /opt/microchip/xc8/v1.30/sources/common/awtofl.c
+[v ___awtofl __awtofl `(d  1 e 3 0 ]
+"32 /opt/microchip/xc8/v1.30/sources/common/awtoft.c
+[v ___awtoft __awtoft `(f  1 e 3 0 ]
+"2 /opt/microchip/xc8/v1.30/sources/common/bmul.c
+[v ___bmul __bmul `(uc  1 e 1 0 ]
+"63 /opt/microchip/xc8/v1.30/sources/common/double.c
+[v ___flpack __flpack `(d  1 e 3 0 ]
+"88 /opt/microchip/xc8/v1.30/sources/common/fladd.c
+[v ___fladd __fladd `(d  1 e 3 0 ]
+"49 /opt/microchip/xc8/v1.30/sources/common/fldiv.c
+[v ___fldiv __fldiv `(d  1 e 3 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/common/flge.c
+[v ___flge __flge `(b  1 e 0 0 ]
+"50 /opt/microchip/xc8/v1.30/sources/common/flmul.c
+[v ___flmul __flmul `(d  1 e 3 0 ]
+"15 /opt/microchip/xc8/v1.30/sources/common/flneg.c
+[v ___flneg __flneg `(d  1 e 3 0 ]
+"62 /opt/microchip/xc8/v1.30/sources/common/float.c
+[v ___ftpack __ftpack `(f  1 e 3 0 ]
+"20 /opt/microchip/xc8/v1.30/sources/common/flsub.c
+[v ___flsub __flsub `(d  1 e 3 0 ]
+"43 /opt/microchip/xc8/v1.30/sources/common/fltol.c
+[v ___fltol __fltol `(l  1 e 4 0 ]
+"86 /opt/microchip/xc8/v1.30/sources/common/ftadd.c
+[v ___ftadd __ftadd `(f  1 e 3 0 ]
+"49 /opt/microchip/xc8/v1.30/sources/common/ftdiv.c
+[v ___ftdiv __ftdiv `(f  1 e 3 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/common/ftge.c
+[v ___ftge __ftge `(b  1 e 0 0 ]
+"51 /opt/microchip/xc8/v1.30/sources/common/ftmul.c
+[v ___ftmul __ftmul `(f  1 e 3 0 ]
+"15 /opt/microchip/xc8/v1.30/sources/common/ftneg.c
+[v ___ftneg __ftneg `(f  1 e 3 0 ]
+"20 /opt/microchip/xc8/v1.30/sources/common/ftsub.c
+[v ___ftsub __ftsub `(f  1 e 3 0 ]
+"44 /opt/microchip/xc8/v1.30/sources/common/fttol.c
+[v ___fttol __fttol `(l  1 e 4 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/common/lbdiv.c
+[v ___lbdiv __lbdiv `(uc  1 e 1 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/common/lbmod.c
+[v ___lbmod __lbmod `(uc  1 e 1 0 ]
+"27 /opt/microchip/xc8/v1.30/sources/common/lbtofl.c
+[v ___lbtofl __lbtofl `(d  1 e 3 0 ]
+"27 /opt/microchip/xc8/v1.30/sources/common/lbtoft.c
+[v ___lbtoft __lbtoft `(f  1 e 3 0 ]
+"8 /opt/microchip/xc8/v1.30/sources/common/lldiv.c
+[v ___lldiv __lldiv `(ul  1 e 4 0 ]
+"8 /opt/microchip/xc8/v1.30/sources/common/llmod.c
+[v ___llmod __llmod `(ul  1 e 4 0 ]
+"30 /opt/microchip/xc8/v1.30/sources/common/lltofl.c
+[v ___lltofl __lltofl `(d  1 e 3 0 ]
+"35 /opt/microchip/xc8/v1.30/sources/common/lltoft.c
+[v ___lltoft __lltoft `(f  1 e 3 0 ]
+"2 /opt/microchip/xc8/v1.30/sources/common/lmul.c
+[v ___lmul __lmul `(ul  1 e 4 0 ]
+"8 /opt/microchip/xc8/v1.30/sources/common/ltdiv.c
+[v ___ltdiv __ltdiv `(um  1 e 3 0 ]
+"8 /opt/microchip/xc8/v1.30/sources/common/ltmod.c
+[v ___ltmod __ltmod `(um  1 e 3 0 ]
+"30 /opt/microchip/xc8/v1.30/sources/common/lttofl.c
+[v ___lttofl __lttofl `(d  1 e 3 0 ]
+"30 /opt/microchip/xc8/v1.30/sources/common/lttoft.c
+[v ___lttoft __lttoft `(f  1 e 3 0 ]
+"8 /opt/microchip/xc8/v1.30/sources/common/lwdiv.c
+[v ___lwdiv __lwdiv `(ui  1 e 2 0 ]
+"8 /opt/microchip/xc8/v1.30/sources/common/lwmod.c
+[v ___lwmod __lwmod `(ui  1 e 2 0 ]
+"28 /opt/microchip/xc8/v1.30/sources/common/lwtofl.c
+[v ___lwtofl __lwtofl `(d  1 e 3 0 ]
+"28 /opt/microchip/xc8/v1.30/sources/common/lwtoft.c
+[v ___lwtoft __lwtoft `(f  1 e 3 0 ]
+"2 /opt/microchip/xc8/v1.30/sources/common/tmul.c
+[v ___tmul __tmul `(um  1 e 3 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/common/wmul.c
+[v ___wmul __wmul `(ui  1 e 2 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/pic18/asfladd.c
+[v ___asfladd __asfladd `(d  1 e 3 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/pic18/asfldiv.c
+[v ___asfldiv __asfldiv `(d  1 e 3 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/pic18/asflmul.c
+[v ___asflmul __asflmul `(d  1 e 3 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/pic18/asflsub.c
+[v ___asflsub __asflsub `(d  1 e 3 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/pic18/asftadd.c
+[v ___asftadd __asftadd `(f  1 e 3 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/pic18/asftdiv.c
+[v ___asftdiv __asftdiv `(f  1 e 3 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/pic18/asftmul.c
+[v ___asftmul __asftmul `(f  1 e 3 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/pic18/asftsub.c
+[v ___asftsub __asftsub `(f  1 e 3 0 ]
+"4 /opt/microchip/xc8/v1.30/sources/pic18/aslmul.c
+[v ___aslmul __aslmul `(ul  1 e 4 0 ]
+"13 /home/eh2be5j/projekte/EasyCAN/software/firmware/can.c
+[v _init_can init_can `(v  1 e 0 0 ]
+"24
+[v _read_can_message read_can_message `(uc  1 e 1 0 ]
+"47
+[v _write_can_message write_can_message `(uc  1 e 1 0 ]
+"16 /home/eh2be5j/projekte/EasyCAN/software/firmware/easycan.c
+[v _init_port init_port `(v  1 e 0 0 ]
+"21
+[v _init_timer init_timer `(v  1 e 0 0 ]
+"41
+[v _main main `(v  1 e 0 0 ]
+"51
+[v _ISRCode ISRCode `II(v  1 e 0 0 ]
+"13 /home/eh2be5j/projekte/EasyCAN/software/firmware/usart.c
+[v _init_usart init_usart `(v  1 e 0 0 ]
+[s S228 . 1 `uc 1 FILHIT0 1 0 :1:0 
+`uc 1 JTOFF_FILHIT1 1 0 :1:1 
+`uc 1 RB0DBEN_FILHIT2 1 0 :1:2 
+`uc 1 RXRTRRO_FILHIT3 1 0 :1:3 
+`uc 1 FILHIT4 1 0 :1:4 
+`uc 1 RXM0_RTRRO 1 0 :1:5 
+`uc 1 RXM1 1 0 :1:6 
+`uc 1 RXFUL 1 0 :1:7 
+]
+"30123 /opt/microchip/xc8/v1.30/include/pic18f26k80.h
+[s S237 . 1 `uc 1 . 1 0 :1:0 
+`uc 1 JTOFF 1 0 :1:1 
+`uc 1 RB0DBEN 1 0 :1:2 
+`uc 1 RXRTRRO 1 0 :1:3 
+`uc 1 . 1 0 :1:4 
+`uc 1 RTRRO 1 0 :1:5 
+]
+[s S244 . 1 `uc 1 . 1 0 :1:0 
+`uc 1 FILHIT1 1 0 :1:1 
+`uc 1 FILHIT2 1 0 :1:2 
+`uc 1 FILHIT3 1 0 :1:3 
+`uc 1 . 1 0 :1:4 
+`uc 1 RXM0 1 0 :1:5 
+]
+[s S251 . 1 `uc 1 RXB0FILHIT0 1 0 :1:0 
+]
+[s S253 . 1 `uc 1 . 1 0 :1:0 
+`uc 1 RXB0FILHIT1 1 0 :1:1 
+]
+[s S256 . 1 `uc 1 . 1 0 :2:0 
+`uc 1 RXB0FILHIT2 1 0 :1:2 
+]
+[s S259 . 1 `uc 1 . 1 0 :3:0 
+`uc 1 RXB0FILHIT3 1 0 :1:3 
+]
+[s S262 . 1 `uc 1 . 1 0 :4:0 
+`uc 1 RXB0FILHIT4 1 0 :1:4 
+]
+[s S265 . 1 `uc 1 . 1 0 :7:0 
+`uc 1 RXB0FUL 1 0 :1:7 
+]
+[s S268 . 1 `uc 1 . 1 0 :5:0 
+`uc 1 RXB0M0 1 0 :1:5 
+]
+[s S271 . 1 `uc 1 . 1 0 :6:0 
+`uc 1 RXB0M1 1 0 :1:6 
+]
+[s S274 . 1 `uc 1 . 1 0 :3:0 
+`uc 1 RXB0RTRR0 1 0 :1:3 
+]
+[s S277 . 1 `uc 1 . 1 0 :5:0 
+`uc 1 RXB0RTRRO 1 0 :1:5 
+]
+[u S280 . 1 `S228 1 . 1 0 `S237 1 . 1 0 `S244 1 . 1 0 `S251 1 . 1 0 `S253 1 . 1 0 `S256 1 . 1 0 `S259 1 . 1 0 `S262 1 . 1 0 `S265 1 . 1 0 `S268 1 . 1 0 `S271 1 . 1 0 `S274 1 . 1 0 `S277 1 . 1 0 ]
+[v _RXB0CONbits RXB0CONbits `VES280  1 e 1 @3936 ]
+"30257
+[v _RXB0SIDH RXB0SIDH `VEuc  1 e 1 @3937 ]
+"30397
+[v _RXB0SIDL RXB0SIDL `VEuc  1 e 1 @3938 ]
+"30530
+[v _RXB0EIDH RXB0EIDH `VEuc  1 e 1 @3939 ]
+"30670
+[v _RXB0EIDL RXB0EIDL `VEuc  1 e 1 @3940 ]
+"30810
+[v _RXB0DLC RXB0DLC `VEuc  1 e 1 @3941 ]
+"30941
+[v _RXB0D0 RXB0D0 `VEuc  1 e 1 @3942 ]
+"31010
+[v _RXB0D1 RXB0D1 `VEuc  1 e 1 @3943 ]
+"31079
+[v _RXB0D2 RXB0D2 `VEuc  1 e 1 @3944 ]
+"31148
+[v _RXB0D3 RXB0D3 `VEuc  1 e 1 @3945 ]
+"31217
+[v _RXB0D4 RXB0D4 `VEuc  1 e 1 @3946 ]
+"31286
+[v _RXB0D5 RXB0D5 `VEuc  1 e 1 @3947 ]
+"31355
+[v _RXB0D6 RXB0D6 `VEuc  1 e 1 @3948 ]
+"31424
+[v _RXB0D7 RXB0D7 `VEuc  1 e 1 @3949 ]
+[s S159 . 1 `uc 1 EICODE0 1 0 :1:0 
+`uc 1 EICODE1_ICODE0 1 0 :1:1 
+`uc 1 EICODE2_ICODE1 1 0 :1:2 
+`uc 1 EICODE3_ICODE2 1 0 :1:3 
+`uc 1 EICODE4 1 0 :1:4 
+`uc 1 OPMODE 1 0 :3:5 
+]
+"31524
+[s S166 . 1 `uc 1 . 1 0 :1:0 
+`uc 1 EICODE1 1 0 :1:1 
+`uc 1 EICODE2 1 0 :1:2 
+`uc 1 EICODE3 1 0 :1:3 
+`uc 1 . 1 0 :1:4 
+`uc 1 OPMODE0 1 0 :1:5 
+`uc 1 OPMODE1 1 0 :1:6 
+`uc 1 OPMODE2 1 0 :1:7 
+]
+[s S175 . 1 `uc 1 . 1 0 :1:0 
+`uc 1 ICODE0 1 0 :1:1 
+`uc 1 ICODE1 1 0 :1:2 
+`uc 1 ICODE2 1 0 :1:3 
+]
+[u S180 . 1 `S159 1 . 1 0 `S166 1 . 1 0 `S175 1 . 1 0 ]
+[v _CANSTATbits CANSTATbits `VES180  1 e 1 @3950 ]
+"31603
+[v _CANCON CANCON `VEuc  1 e 1 @3951 ]
+"31844
+[v _ECANCON ECANCON `VEuc  1 e 1 @3954 ]
+[s S58 . 1 `uc 1 LATA0 1 0 :1:0 
+`uc 1 LATA1 1 0 :1:1 
+`uc 1 LATA2 1 0 :1:2 
+`uc 1 LATA3 1 0 :1:3 
+`uc 1 . 1 0 :1:4 
+`uc 1 LATA5 1 0 :1:5 
+`uc 1 LATA6 1 0 :1:6 
+`uc 1 LATA7 1 0 :1:7 
+]
+"33056
+[s S67 . 1 `uc 1 LA0 1 0 :1:0 
+]
+"33056
+[s S69 . 1 `uc 1 . 1 0 :1:0 
+`uc 1 LA1 1 0 :1:1 
+]
+"33056
+[s S72 . 1 `uc 1 . 1 0 :2:0 
+`uc 1 LA2 1 0 :1:2 
+]
+"33056
+[s S75 . 1 `uc 1 . 1 0 :3:0 
+`uc 1 LA3 1 0 :1:3 
+]
+"33056
+[s S78 . 1 `uc 1 . 1 0 :4:0 
+`uc 1 LA4 1 0 :1:4 
+]
+"33056
+[s S81 . 1 `uc 1 . 1 0 :5:0 
+`uc 1 LA5 1 0 :1:5 
+]
+"33056
+[s S84 . 1 `uc 1 . 1 0 :6:0 
+`uc 1 LA6 1 0 :1:6 
+]
+"33056
+[s S87 . 1 `uc 1 . 1 0 :7:0 
+`uc 1 LA7 1 0 :1:7 
+]
+"33056
+[u S90 . 1 `S58 1 . 1 0 `S67 1 . 1 0 `S69 1 . 1 0 `S72 1 . 1 0 `S75 1 . 1 0 `S78 1 . 1 0 `S81 1 . 1 0 `S84 1 . 1 0 `S87 1 . 1 0 ]
+"33056
+"33056
+[v _LATAbits LATAbits `VES90  1 e 1 @3977 ]
+[s S22 . 1 `uc 1 TRISA0 1 0 :1:0 
+`uc 1 TRISA1 1 0 :1:1 
+`uc 1 TRISA2 1 0 :1:2 
+`uc 1 TRISA3 1 0 :1:3 
+`uc 1 . 1 0 :1:4 
+`uc 1 TRISA5 1 0 :1:5 
+`uc 1 TRISA6 1 0 :1:6 
+`uc 1 TRISA7 1 0 :1:7 
+]
+"33508
+[u S31 . 1 `S22 1 . 1 0 ]
+"33508
+"33508
+[v _TRISAbits TRISAbits `VES31  1 e 1 @3986 ]
+"33625
+"33625
+[v _TRISCbits TRISCbits `VES31  1 e 1 @3988 ]
+[s S656 . 1 `uc 1 TMR1IF 1 0 :1:0 
+`uc 1 TMR2IF 1 0 :1:1 
+`uc 1 TMR1GIF 1 0 :1:2 
+`uc 1 SSPIF 1 0 :1:3 
+`uc 1 TX1IF 1 0 :1:4 
+`uc 1 RC1IF 1 0 :1:5 
+`uc 1 ADIF 1 0 :1:6 
+]
+"34001
+[s S664 . 1 `uc 1 . 1 0 :4:0 
+`uc 1 TXIF 1 0 :1:4 
+`uc 1 RCIF 1 0 :1:5 
+]
+"34001
+[u S668 . 1 `S656 1 . 1 0 `S664 1 . 1 0 ]
+"34001
+"34001
+[v _PIR1bits PIR1bits `VES668  1 e 1 @3998 ]
+[s S517 . 1 `uc 1 ABDEN 1 0 :1:0 
+`uc 1 WUE 1 0 :1:1 
+`uc 1 . 1 0 :1:2 
+`uc 1 BRG16 1 0 :1:3 
+`uc 1 TXCKP 1 0 :1:4 
+`uc 1 RXDTP 1 0 :1:5 
+`uc 1 RCIDL 1 0 :1:6 
+`uc 1 ABDOVF 1 0 :1:7 
+]
+"34710
+[s S526 . 1 `uc 1 . 1 0 :6:0 
+`uc 1 RCMT 1 0 :1:6 
+]
+"34710
+[s S529 . 1 `uc 1 ABDEN1 1 0 :1:0 
+]
+"34710
+[s S531 . 1 `uc 1 . 1 0 :7:0 
+`uc 1 ABDOVF1 1 0 :1:7 
+]
+"34710
+[s S534 . 1 `uc 1 . 1 0 :3:0 
+`uc 1 BRG161 1 0 :1:3 
+]
+"34710
+[s S537 . 1 `uc 1 . 1 0 :4:0 
+`uc 1 CKTXP 1 0 :1:4 
+]
+"34710
+[s S540 . 1 `uc 1 . 1 0 :5:0 
+`uc 1 DTRXP 1 0 :1:5 
+]
+"34710
+[s S543 . 1 `uc 1 . 1 0 :5:0 
+`uc 1 DTRXP1 1 0 :1:5 
+]
+"34710
+[s S546 . 1 `uc 1 . 1 0 :6:0 
+`uc 1 RCIDL1 1 0 :1:6 
+]
+"34710
+[s S549 . 1 `uc 1 . 1 0 :6:0 
+`uc 1 RCMT1 1 0 :1:6 
+]
+"34710
+[s S552 . 1 `uc 1 . 1 0 :5:0 
+`uc 1 RXDTP1 1 0 :1:5 
+]
+"34710
+[s S555 . 1 `uc 1 . 1 0 :4:0 
+`uc 1 SCKP 1 0 :1:4 
+]
+"34710
+[s S558 . 1 `uc 1 . 1 0 :4:0 
+`uc 1 SCKP1 1 0 :1:4 
+]
+"34710
+[s S561 . 1 `uc 1 . 1 0 :4:0 
+`uc 1 TXCKP1 1 0 :1:4 
+]
+"34710
+[s S564 . 1 `uc 1 . 1 0 :1:0 
+`uc 1 WUE1 1 0 :1:1 
+]
+"34710
+[u S567 . 1 `S517 1 . 1 0 `S526 1 . 1 0 `S529 1 . 1 0 `S531 1 . 1 0 `S534 1 . 1 0 `S537 1 . 1 0 `S540 1 . 1 0 `S543 1 . 1 0 `S546 1 . 1 0 `S549 1 . 1 0 `S552 1 . 1 0 `S555 1 . 1 0 `S558 1 . 1 0 `S561 1 . 1 0 `S564 1 . 1 0 ]
+"34710
+"34710
+[v _BAUDCON1bits BAUDCON1bits `VES567  1 e 1 @4007 ]
+[s S436 . 1 `uc 1 RX9D 1 0 :1:0 
+`uc 1 OERR 1 0 :1:1 
+`uc 1 FERR 1 0 :1:2 
+`uc 1 ADDEN 1 0 :1:3 
+`uc 1 CREN 1 0 :1:4 
+`uc 1 SREN 1 0 :1:5 
+`uc 1 RX9 1 0 :1:6 
+`uc 1 SPEN 1 0 :1:7 
+]
+"35228
+[s S445 . 1 `uc 1 RCD8 1 0 :1:0 
+`uc 1 . 1 0 :2:1 
+`uc 1 ADEN 1 0 :1:3 
+`uc 1 . 1 0 :2:4 
+`uc 1 RC9 1 0 :1:6 
+]
+"35228
+[s S451 . 1 `uc 1 . 1 0 :6:0 
+`uc 1 NOT_RC8 1 0 :1:6 
+]
+"35228
+[s S454 . 1 `uc 1 . 1 0 :6:0 
+`uc 1 nRC8 1 0 :1:6 
+]
+"35228
+[s S457 . 1 `uc 1 . 1 0 :6:0 
+`uc 1 RC8_9 1 0 :1:6 
+]
+"35228
+[s S460 . 1 `uc 1 RX9D1 1 0 :1:0 
+`uc 1 OERR1 1 0 :1:1 
+`uc 1 FERR1 1 0 :1:2 
+`uc 1 ADDEN1 1 0 :1:3 
+`uc 1 CREN1 1 0 :1:4 
+`uc 1 SREN1 1 0 :1:5 
+`uc 1 RX91 1 0 :1:6 
+`uc 1 SPEN1 1 0 :1:7 
+]
+"35228
+[s S469 . 1 `uc 1 . 1 0 :5:0 
+`uc 1 SRENA 1 0 :1:5 
+]
+"35228
+[u S472 . 1 `S436 1 . 1 0 `S445 1 . 1 0 `S451 1 . 1 0 `S454 1 . 1 0 `S457 1 . 1 0 `S460 1 . 1 0 `S469 1 . 1 0 ]
+"35228
+"35228
+[v _RCSTAbits RCSTAbits `VES472  1 e 1 @4011 ]
+[s S373 . 1 `uc 1 TX9D 1 0 :1:0 
+`uc 1 TRMT 1 0 :1:1 
+`uc 1 BRGH 1 0 :1:2 
+`uc 1 SENDB 1 0 :1:3 
+`uc 1 SYNC 1 0 :1:4 
+`uc 1 TXEN 1 0 :1:5 
+`uc 1 TX9 1 0 :1:6 
+`uc 1 CSRC 1 0 :1:7 
+]
+"35530
+[s S382 . 1 `uc 1 TXD8 1 0 :1:0 
+`uc 1 . 1 0 :5:1 
+`uc 1 TX8_9 1 0 :1:6 
+]
+"35530
+[s S386 . 1 `uc 1 . 1 0 :6:0 
+`uc 1 NOT_TX8 1 0 :1:6 
+]
+"35530
+[s S389 . 1 `uc 1 . 1 0 :6:0 
+`uc 1 nTX8 1 0 :1:6 
+]
+"35530
+[s S392 . 1 `uc 1 TX9D1 1 0 :1:0 
+`uc 1 TRMT1 1 0 :1:1 
+`uc 1 BRGH1 1 0 :1:2 
+`uc 1 SENDB1 1 0 :1:3 
+`uc 1 SYNC1 1 0 :1:4 
+`uc 1 TXEN1 1 0 :1:5 
+`uc 1 TX91 1 0 :1:6 
+`uc 1 CSRC1 1 0 :1:7 
+]
+"35530
+[u S401 . 1 `S373 1 . 1 0 `S382 1 . 1 0 `S386 1 . 1 0 `S389 1 . 1 0 `S392 1 . 1 0 ]
+"35530
+"35530
+[v _TXSTAbits TXSTAbits `VES401  1 e 1 @4012 ]
+"35713
+[v _SPBRG SPBRG `VEuc  1 e 1 @4015 ]
+"37159
+[v _ADCON1 ADCON1 `VEuc  1 e 1 @4033 ]
+"42288
+[v _GIE GIE `VEb  1 e 0 @32663 ]
+"42686
+[v _PEIE PEIE `VEb  1 e 0 @32662 ]
+"42704
+[v _PSA PSA `VEb  1 e 0 @32427 ]
+"44618
+[v _T08BIT T08BIT `VEb  1 e 0 @32430 ]
+"44620
+[v _T0CS T0CS `VEb  1 e 0 @32429 ]
+"44628
+[v _T0PS0 T0PS0 `VEb  1 e 0 @32424 ]
+"44630
+[v _T0PS1 T0PS1 `VEb  1 e 0 @32425 ]
+"44632
+[v _T0PS2 T0PS2 `VEb  1 e 0 @32426 ]
+"44728
+[v _TMR0IE TMR0IE `VEb  1 e 0 @32661 ]
+"44730
+[v _TMR0IF TMR0IF `VEb  1 e 0 @32658 ]
+"44736
+[v _TMR0ON TMR0ON `VEb  1 e 0 @32431 ]
+"12 /home/eh2be5j/projekte/EasyCAN/software/firmware/easycan.c
+[v _i i `i  1 e 2 0 ]
+"13
+[v _timer_ticks timer_ticks `VEuc  1 e 1 0 ]
+"41
+[v _main main `(v  1 e 0 0 ]
+{
+[v main@argc argc `i  1 p 2 14 ]
+[v main@argv argv `*.2*.2uc  1 p 3 16 ]
+"49
+} 0
+"13 /home/eh2be5j/projekte/EasyCAN/software/firmware/usart.c
+[v _init_usart init_usart `(v  1 e 0 0 ]
+{
+"38
+} 0
+"21 /home/eh2be5j/projekte/EasyCAN/software/firmware/easycan.c
+[v _init_timer init_timer `(v  1 e 0 0 ]
+{
+"39
+} 0
+"16
+[v _init_port init_port `(v  1 e 0 0 ]
+{
+"19
+} 0
+"51
+[v _ISRCode ISRCode `II(v  1 e 0 0 ]
+{
+"74
+} 0
