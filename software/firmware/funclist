@@ -1,7 +1,0 @@
-_init_port: CODE, 250 0 8
-_main: CODE, 224 0 14
-__initialization: CODE, 238 0 6
-_init_timer: CODE, 202 0 22
-_init_usart: CODE, 174 0 28
-_ISRCode: CODE, 8 0 162
-Total: 240
