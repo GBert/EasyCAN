@@ -7,8 +7,8 @@
 # ----------------------------------------------------------------------------
 
 PROJ_DIR	= .
-# XC8DIR		= /opt/microchip/xc8/v1.30
-XC8DIR		= /Applications/microchip/xc8/v1.30
+XC8DIR		= /opt/microchip/xc8/v1.30
+# XC8DIR		= /Applications/microchip/xc8/v1.30
 CC_INCLUDE	= -I$(XC8DIR)/include
 
 PROCESSOR	= 18F26K80

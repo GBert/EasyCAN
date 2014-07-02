@@ -8,6 +8,7 @@
  */
 
 #include "main.h"
+#include "usart.h"
 
 volatile unsigned char timer_ticks=0;
 
@@ -36,13 +37,30 @@ void init_timer(void) {
     TMR0ON=1;   //Now start the timer!
 }
 
-void main(int argc, char** argv) {
+void main(void) {
+    struct serial_buffer tx_fifo, rx_fifo;
+    char do_print=0;
+    char ret;
     init_port();
     init_timer();
     init_usart();
 
+    /* empty circular buffers */
+    tx_fifo.head=0;
+    tx_fifo.tail=0;
+    rx_fifo.head=0;
+    rx_fifo.tail=0;
+
     //infinite loop
     while(1) {
+	if ((do_print == 0) && (timer_ticks == 10)) {
+	    do_print = 1;
+	}
+	if ((do_print == 1) && (timer_ticks == 100)) {
+	    ret=print_fifo("circular buffer is working!\n",&tx_fifo);
+	    do_print = 0;
+	}
+	ret=fifo_putchar(&tx_fifo);
     }
 }
 

@@ -18,8 +18,10 @@
 #define LED_TRIS        (TRISAbits.TRISA0)
 #define LED             (LATAbits.LATA0)
 
-void interrupt ISRCode(void);
-void init_usart(void);
+extern void interrupt ISRCode(void);
+extern void init_usart(void);
+extern char fifo_putchar(struct serial_buffer *fifo);
+extern char print_fifo(const unsigned char *s, struct serial_buffer *fifo);
 
 #endif /* _MAIN_H_ */
 

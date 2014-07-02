@@ -7,10 +7,9 @@
  * ----------------------------------------------------------------------------
  */
 
-#include "main.h"
 #include "usart.h"
 
-void init_usart(void) {
+void init_usart (void) {
     // USART configuration
     TXSTAbits.TX9  = 0;		// 8-bit transmission
     TXSTAbits.TXEN = 1;		// transmit enabled
@@ -38,17 +37,52 @@ void init_usart(void) {
 }
 
 char putchar(unsigned char c) {
-    if ( !PIE1_TXIE ) {
+    if ( !PIE1bits.TX1IE ) {
 	TXREG = c;
-	PIE1.TX1IE = 1; // we are sending /* TODO */
+	PIE1bits.TX1IE = 1; // we are sending /* TODO */
         return 0;
     }
     return 1;
 }
 
 void puts(unsigned char *s) {
-	char c;
-	while ( ( c = *s++ ) ) {
-		putchar( c );
-	}
+    char c;
+    while ( ( c = *s++ ) ) {
+	putchar( c );
+    }
 }
+
+/* put next char onto USART */
+/* TODO: check if local var tail speed up function */
+char fifo_putchar(struct serial_buffer *fifo) {
+    unsigned char tail=fifo->tail;
+    if (fifo->head != tail) {
+	if (!putchar(fifo->data[tail])) {
+	    tail++;
+	    tail&=SERIAL_BUFFER_SIZE_MASK;	/* wrap around if neededd */
+	    fifo->tail=tail;
+	    return 0;
+	}
+    }
+    return -1;
+}
+
+/* print into circular buffer */
+/* TODO: check if local var head speed up function */
+
+char print_fifo(const unsigned char *s, struct serial_buffer *fifo) {
+    unsigned char head=fifo->head;
+    char c;
+    while ( ( c = *s++ ) ) {
+	head++;
+	head&=SERIAL_BUFFER_SIZE_MASK;		/* wrap around if neededd */
+	if (head != fifo->tail) {		/* space left ? */ 
+	    fifo->data[head]=c;
+	} else {
+	    return -1;
+	}
+    }
+    fifo->head=head;				/* only store new pointer if all is OK */
+    return 0;
+}
+

@@ -11,7 +11,6 @@
 
 int i = 0;
 volatile unsigned char timer_ticks=0;
-void Delay1Second(void);
 
 void init_port(void) {
     ADCON1 = 0x0F;		// Default all pins to digital
