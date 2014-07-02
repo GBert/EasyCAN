@@ -40,9 +40,9 @@ char putchar(unsigned char c) {
     if ( !PIE1bits.TX1IE ) {
 	TXREG = c;
 	PIE1bits.TX1IE = 1; // we are sending /* TODO */
-        return 0;
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 void puts(unsigned char *s) {
@@ -53,23 +53,20 @@ void puts(unsigned char *s) {
 }
 
 /* put next char onto USART */
-/* TODO: check if local var tail speed up function */
 char fifo_putchar(struct serial_buffer *fifo) {
     unsigned char tail=fifo->tail;
     if (fifo->head != tail) {
-	if (!putchar(fifo->data[tail])) {
-	    tail++;
-	    tail&=SERIAL_BUFFER_SIZE_MASK;	/* wrap around if neededd */
+	tail++;
+	tail&=SERIAL_BUFFER_SIZE_MASK;	/* wrap around if neededd */
+	if (putchar(fifo->data[tail])) {
 	    fifo->tail=tail;
-	    return 0;
+	    return 1;
 	}
     }
-    return -1;
+    return 0;
 }
 
 /* print into circular buffer */
-/* TODO: check if local var head speed up function */
-
 char print_fifo(const unsigned char *s, struct serial_buffer *fifo) {
     unsigned char head=fifo->head;
     char c;
