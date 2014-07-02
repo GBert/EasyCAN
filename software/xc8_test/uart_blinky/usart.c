@@ -80,6 +80,6 @@ char print_fifo(const unsigned char *s, struct serial_buffer *fifo) {
 	}
     }
     fifo->head=head;				/* only store new pointer if all is OK */
-    return 0;
+    return 1;
 }
 
