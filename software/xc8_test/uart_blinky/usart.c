@@ -37,9 +37,8 @@ void init_usart (void) {
 }
 
 char putchar(unsigned char c) {
-    if ( !PIE1bits.TX1IE ) {
+    if ( !TRMT1 ) {
 	TXREG = c;
-	PIE1bits.TX1IE = 1; // we are sending /* TODO */
         return 1;
     }
     return 0;
