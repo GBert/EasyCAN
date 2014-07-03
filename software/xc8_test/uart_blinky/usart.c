@@ -13,17 +13,20 @@ void init_usart (void) {
     // USART configuration
     TRISCbits.TRISC6 = 0;	// make the TX pin a digital output
     TRISCbits.TRISC7 = 1;	// make the RX pin a digital input
-    TXSTAbits.BRGH = 1;		// high speed
-    BAUDCON1bits.BRG16 = USE_BRG16; // 8-bit baud rate generator
+    TXSTA1bits.BRGH = USE_BRGH;		// high speed
+    BAUDCON1bits.BRG16 = USE_BRG16; 	// 8-bit baud rate generator
     SPBRG = SBRG_VAL;		// calculated by defines
-    
-    TXSTAbits.SYNC = 0;		// asynchronous mode
-    RCSTAbits.RX9  = 0;		// 8-bit reception
-    RCSTAbits.CREN = 1;		// enable receiver
+ 
+    PIE1bits.RC1IE = 0;		// disbale RX interrupt
+    PIE1bits.TX1IE = 0;		// disbale TX interrupt
+ 
+    RCSTA1bits.RX9  = 0;	// 8-bit reception
+    RCSTA1bits.SPEN = 1;	// enable serial port (configures RX/DT and TX/CK pins as serial port pins)
+    RCSTA1bits.CREN = 1;	// enable receiver
 
-    TXSTAbits.TX9  = 0;		// 8-bit transmission
-    TXSTAbits.TXEN = 1;		// transmit enabled
-    RCSTAbits.SPEN = 1;		// enable serial port (configures RX/DT and TX/CK pins as serial port pins)
+    TXSTA1bits.TX9  = 0;	// 8-bit transmission
+    TXSTA1bits.SYNC = 0;	// asynchronous mode
+    TXSTA1bits.TXEN = 1;	// transmit enabled
 
     /* don' use interrupts at the moment 
     // interrupts / USART interrupts configuration
@@ -37,8 +40,8 @@ void init_usart (void) {
 }
 
 char putchar(unsigned char c) {
-    if ( !TRMT1 ) {
-	TXREG = c;
+    if ( !TXSTA1bits.TRMT1 ) {
+	TXREG1 = c;
         return 1;
     }
     return 0;
