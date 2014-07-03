@@ -59,10 +59,11 @@ void main(void) {
 	}
 	if ((do_print == 1) && (timer_ticks == 100)) {
 	    putchar(0x55);
-	    ret=print_fifo("circular buffer is working!\n",&tx_fifo);
+	    //ret=print_fifo("circular buffer is working!\n",&tx_fifo);
+	    puts("USART is working!\n");
 	    do_print = 0;
 	}
-	ret=fifo_putchar(&tx_fifo);
+	//ret=fifo_putchar(&tx_fifo);
     }
 }
 

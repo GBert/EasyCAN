@@ -39,6 +39,7 @@ void init_usart (void) {
     */
 }
 
+/* prints char on USART if pssible */
 char putchar(unsigned char c) {
     if ( TXSTA1bits.TRMT1 ) {
 	TXREG1 = c;
@@ -47,11 +48,22 @@ char putchar(unsigned char c) {
     return 0;
 }
 
-void puts(unsigned char *s) {
+/* prints char on USART */
+void putchar_wait(unsigned char c) {
+   while (!TXSTA1bits.TRMT1);
+   TXREG1 = c;
+}
+
+void puts(const char *s) {
     char c;
     while ( ( c = *s++ ) ) {
-	putchar( c );
+	putchar_wait( c );
     }
+}
+
+void print_hex_wait(unsigned char c) {
+    putchar_wait(((c & 0xf0) >> 8) + '0');
+    putchar_wait(( c & 0x0f)       + '0');
 }
 
 /* put next char onto USART */
