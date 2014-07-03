@@ -63,7 +63,7 @@ void main(void) {
 	if ((do_print == 1) && (timer_ticks == 100)) {
 	    putchar(0x55);
 	    //ret=print_fifo(s1,&tx_fifo);
-	    puts(s2);
+	    puts_rom(s2);
 	    do_print = 0;
 	}
 	//ret=fifo_putchar(&tx_fifo);

@@ -54,7 +54,7 @@ void putchar_wait(unsigned char c) {
    TXREG1 = c;
 }
 
-void puts(const char *s) {
+void puts_rom(const char *s) {
     char c;
     while ( ( c = *s++ ) ) {
 	putchar_wait( c );
