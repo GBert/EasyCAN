@@ -57,10 +57,11 @@ void main(void) {
 	    do_print = 1;
 	}
 	if ((do_print == 1) && (timer_ticks == 100)) {
-	    ret=print_fifo("circular buffer is working!\n",&tx_fifo);
+	    putchar(0x55);
+	    // ret=print_fifo("circular buffer is working!\n",&tx_fifo);
 	    do_print = 0;
 	}
-	ret=fifo_putchar(&tx_fifo);
+	// ret=fifo_putchar(&tx_fifo);
     }
 }
 

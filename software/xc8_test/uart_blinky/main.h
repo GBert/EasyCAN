@@ -19,6 +19,7 @@
 #define LED             (LATAbits.LATA0)
 
 extern void interrupt ISRCode(void);
+extern char putchar(unsigned char c);
 extern void init_usart(void);
 extern char fifo_putchar(struct serial_buffer *fifo);
 extern char print_fifo(const unsigned char *s, struct serial_buffer *fifo);
