@@ -12,6 +12,9 @@
 
 volatile unsigned char timer_ticks=0;
 
+unsigned char s1[]="circular buffer is working!\n";
+unsigned char s2[]="USART is working!\n";
+
 void init_port(void) {
     ADCON1 = 0x0F;		// Default all pins to digital
     LED_TRIS = 0;
@@ -59,8 +62,8 @@ void main(void) {
 	}
 	if ((do_print == 1) && (timer_ticks == 100)) {
 	    putchar(0x55);
-	    //ret=print_fifo("circular buffer is working!\n",&tx_fifo);
-	    puts("USART is working!\n");
+	    //ret=print_fifo(s1,&tx_fifo);
+	    puts(s2);
 	    do_print = 0;
 	}
 	//ret=fifo_putchar(&tx_fifo);
