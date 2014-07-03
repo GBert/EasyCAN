@@ -10,10 +10,10 @@
 #include "main.h"
 #include "usart.h"
 
-volatile unsigned char timer_ticks=0;
+const char *s1 = "circular buffer is working!\n";
+const char *s2 = "USART is working!\n";
 
-unsigned char s1[]="circular buffer is working!\n";
-unsigned char s2[]="USART is working!\n";
+volatile unsigned char timer_ticks=0;
 
 void init_port(void) {
     ADCON1 = 0x0F;		// Default all pins to digital
