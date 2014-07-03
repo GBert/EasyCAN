@@ -62,7 +62,7 @@ void puts_rom(const char *s) {
 }
 
 void print_hex_wait(unsigned char c) {
-    putchar_wait(((c & 0xf0) >> 8) + '0');
+    putchar_wait(((c & 0xf0) >> 4) + '0');
     putchar_wait(( c & 0x0f)       + '0');
 }
 
