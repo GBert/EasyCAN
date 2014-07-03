@@ -40,7 +40,7 @@ void init_usart (void) {
 }
 
 char putchar(unsigned char c) {
-    if ( !TXSTA1bits.TRMT1 ) {
+    if ( TXSTA1bits.TRMT1 ) {
 	TXREG1 = c;
         return 1;
     }

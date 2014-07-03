@@ -52,10 +52,10 @@ forever loop              -- continue forever
       x = serial_hw_data            -- get the data
       for x loop                    -- loop "x" number of times
          led = on                   -- turn the led on
-         serial_hw_data = 170    -- send 65 via serial port
-         _usec_delay(25000)        -- 250ms delay
+         serial_hw_data = 66    -- send 65 via serial port
+         _usec_delay(250000)        -- 250ms delay
          led = off                  -- turn the led off
-         _usec_delay(25000)        -- 250ms delay
+         _usec_delay(250000)        -- 250ms delay
          serial_hw_data = 85    -- send 65 via serial port
       end loop                      -- loop
    end if                           -- end the if statement
