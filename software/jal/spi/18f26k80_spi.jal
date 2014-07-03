@@ -1,0 +1,65 @@
+-- Title: CAN to UART adapter example
+-- Author: William Welch Copyright (c) 2009, all rights reserved.
+--   slightly modified by Gerhard Bertelsmann
+--   adapted to PIC18F26K80
+-- Sponsored by: Fiwihex www.fiwihex.com
+-- Compiler: 2.4
+-- Revision: $Revision: 2760 $
+-- 
+-- This file is part of jallib (http://jallib.googlecode.com)
+-- Released under the ZLIB license (http://www.opensource.org/licenses/zlib-license.html)
+--
+-- Description: gateway between RS232 and CAN bus. Uses ASCII encapsulation, 
+--          compatible with the Socket-CAN SLCAN API.
+-- 
+-- Sources: Socket-CAN, in particular the SLCAN API. http://developer.berlios.de/projects/socketcan/ 
+--          also, the LAWICEL CAN-USB adapter.
+--
+-- For this example, the UART is only running at 460800.
+--
+
+include 18f26k80
+pragma target clock 64_000_000
+pragma target OSC  HS_HIGH
+pragma target PLLEN P4                                           
+pragma target WDT  disabled
+pragma target DEBUG disabled
+pragma target MCLR external
+include delay
+include format
+include print
+
+enable_digital_io()
+
+var bit led is pin_A0
+pin_A0_direction =  output
+
+const usart_hw_serial = true
+const serial_hw_baudrate = 115_200
+include serial_hardware
+serial_hw_init()
+
+-- setup SPI
+include spi_master_hw         -- first include the library
+
+-- define SPI inputs/outputs
+pin_sdi_direction = input    -- spi data input
+pin_sdo_direction = output   -- spi data output
+pin_sck_direction = output   -- spi data clock
+
+-- choose your SPI chip select pin
+-- pin_SS is the PIC's slave select (or chip select) pin.
+ALIAS device_chip_select_direction   is pin_SS_direction
+ALIAS device_chip_select             is pin_SS
+device_chip_select_direction = output    -- chip select/slave select pin
+device_chip_select = low                -- disable the device
+
+spi_init(SPI_MODE_11,SPI_RATE_FOSC_16) -- choose spi mode and speed
+device_chip_select = high -- enable the device
+
+forever loop
+--  spi_master_hw = 0x55
+  spi_master_hw = 0xAA
+  spi_master_hw = 0xCC
+end loop
+
