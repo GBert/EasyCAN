@@ -55,6 +55,11 @@ void print_status(int fd) {
 	int status;
 	unsigned int arg;
 	status = ioctl(fd, TIOCMGET, &arg);
+
+        /* modify RTS for EasyCAN */
+	arg &= ~TIOCM_RTS;
+	ioctl(fd, TIOCMSET, &arg);
+
 	fprintf(stderr, "[STATUS]: ");
 	if(arg & TIOCM_RTS) fprintf(stderr, "RTS ");
 	if(arg & TIOCM_CTS) fprintf(stderr, "CTS ");
