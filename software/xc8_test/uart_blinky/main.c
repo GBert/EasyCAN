@@ -43,7 +43,7 @@ void init_timer(void) {
 
 void main(void) {
     char do_print=0;
-    char ret;
+    char ret=0;
     init_port();
     init_timer();
     init_usart();
@@ -54,15 +54,22 @@ void main(void) {
     rx_fifo.head=0;
     rx_fifo.tail=0;
 
+    //print_debug_fifo(&tx_fifo);
     //infinite loop
     while(1) {
 	if ((do_print == 0) && (timer_ticks == 10)) {
 	    do_print = 1;
 	}
 	if ((do_print == 1) && (timer_ticks == 100)) {
-	    //ret=print_fifo(s1,&tx_fifo);
+	    //ret=print_rom_fifo(s1,&tx_fifo);
 	    puts_rom(s2);
+	    ret++;
+            print_debug_value('r',ret);
+            putchar_wait('\n');
+            putchar_wait('\r');
 	    do_print = 0;
+            
+    	    // print_debug_fifo(&tx_fifo);
 	}
 	//ret=fifo_putchar(&tx_fifo);
     }

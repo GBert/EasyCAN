@@ -9,6 +9,8 @@
 
 #include "usart.h"
 
+const char * sData = " Data: ";
+
 void init_usart (void) {
     // USART configuration
     TRISCbits.TRISC6 = 0;	// make the TX pin a digital output
@@ -62,16 +64,58 @@ void puts_rom(const char *s) {
 }
 
 void print_hex_wait(unsigned char c) {
-    putchar_wait(((c & 0xf0) >> 4) + '0');
-    putchar_wait(( c & 0x0f)       + '0');
+    unsigned char nibble;
+    nibble=((c & 0xf0) >> 4 ) + '0';
+    if (nibble>=0x3a) nibble+=7;
+    putchar_wait(nibble);
+
+    nibble=(c & 0x0f) + '0';
+    if (nibble>=0x3a) nibble+=7;
+    putchar_wait(nibble);
 }
+
+void print_debug_value(char c, unsigned char value) {
+    putchar_wait(c);
+    putchar_wait(':');
+    print_hex_wait(value);
+}
+
+void print_debug_fifo(struct serial_buffer *fifo) {
+    unsigned char i;
+    print_debug_value('S',SERIAL_BUFFER_SIZE);
+    putchar_wait(' ');
+    print_debug_value('M',SERIAL_BUFFER_SIZE_MASK);
+    putchar_wait(' ');
+    print_debug_value('H',fifo->head);
+    putchar_wait(' ');
+    print_debug_value('T',fifo->tail);
+    putchar_wait(' ');
+    puts_rom(sData);
+/*    for (i=0; i<SERIAL_BUFFER_SIZE; i++) {
+        print_hex_wait(fifo->data[i]);
+        putchar_wait(' ');
+    }*/
+    putchar_wait('\r');
+    putchar_wait('\n');
+}
+
 
 /* put next char onto USART */
 char fifo_putchar(struct serial_buffer *fifo) {
-    unsigned char tail=fifo->tail;
+    unsigned char tail;
+    tail=fifo->tail;
+    print_debug_fifo(fifo);
     if (fifo->head != tail) {
 	tail++;
-	tail&=SERIAL_BUFFER_SIZE_MASK;	/* wrap around if neededd */
+	tail &= SERIAL_BUFFER_SIZE_MASK;	/* wrap around if neededd */
+
+	putchar_wait('f');
+	print_debug_value('T',fifo->tail);
+	putchar_wait(' ');
+	print_debug_value('T',tail);
+	putchar_wait('\r');
+	putchar_wait('\n');
+
 	if (putchar(fifo->data[tail])) {
 	    fifo->tail=tail;
 	    return 1;
@@ -81,7 +125,7 @@ char fifo_putchar(struct serial_buffer *fifo) {
 }
 
 /* print into circular buffer */
-char print_fifo(const unsigned char *s, struct serial_buffer *fifo) {
+char print_rom_fifo(const unsigned char *s, struct serial_buffer *fifo) {
     unsigned char head=fifo->head;
     char c;
     while ( ( c = *s++ ) ) {

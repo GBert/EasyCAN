@@ -10,11 +10,12 @@ struct serial_buffer {
 };
 
 void debug_print_fifo( struct serial_buffer *fifo) {
-    int head;
-    int tail;
-    head = fifo->head;
-    tail = fifo->tail;
-    printf("\nhead: %2d tail %2d\n",head,tail);
+    unsigned char i;
+    printf("\nhead: %2d tail %2d Data:",fifo->head,fifo->tail);
+    for (i=0 ; i < SERIAL_BUFFER_SIZE ; i++) {
+       printf(" %02x", fifo->data[i]);
+    }
+    printf("\n");
 }
 
 char fifo_putchar(struct serial_buffer *fifo) {
@@ -58,8 +59,9 @@ int main( int argc,const char* argv[]) {
     char ret;
     fifo.head=0;
     fifo.tail=0;
+    debug_print_fifo(&fifo);
     ret=print_fifo("Hello world !\n",&fifo);
-    // debug_print_fifo(&fifo);
+    debug_print_fifo(&fifo);
     ret=fifo_putchar(&fifo);
     ret=fifo_putchar(&fifo);
     ret=fifo_putchar(&fifo);
