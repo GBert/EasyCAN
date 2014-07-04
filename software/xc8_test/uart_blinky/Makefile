@@ -19,6 +19,7 @@ OPTIMISATION	= --opt=default,+asm,-asmfile,+speed,-space,-debug,9 --runtime=+pli
 CC		= $(XC8DIR)/bin/xc8
 DEFINES		= -DBAUDRATE=500000
 BOOTLOADER	= pirate-loader
+TERMINAL	= com
 # CC		= sdcc
 
 all: $(MAIN).hex
@@ -28,6 +29,9 @@ $(MAIN).hex: $(SRC)
 
 flash: 
 	$(BOOTLOADER) --reset_rts --dev=/dev/ttyUSB0 --hex=$(MAIN).hex
+
+terminal:
+	$(TERMINAL) /dev/ttyUSB0 500000	
 
 clean:
 	rm -f $(MAIN).hex funclist $(MAIN).cof $(MAIN).hxl *.p1 $(MAIN).sdb startup.* *.cmf *.rlf *.map *.as *.d *.obj *.lst *.pre $(MAIN).sym

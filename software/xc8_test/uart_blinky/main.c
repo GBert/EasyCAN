@@ -10,10 +10,11 @@
 #include "main.h"
 #include "usart.h"
 
-const char *s1 = "circular buffer is working!\n";
-const char *s2 = "USART is working!\n";
+const char * s1 = "circular buffer is working!\r\n";
+const char * s2 = "USART is working!\r\n";
 
 volatile unsigned char timer_ticks=0;
+struct serial_buffer tx_fifo, rx_fifo;
 
 void init_port(void) {
     ADCON1 = 0x0F;		// Default all pins to digital
@@ -41,7 +42,6 @@ void init_timer(void) {
 }
 
 void main(void) {
-    struct serial_buffer tx_fifo, rx_fifo;
     char do_print=0;
     char ret;
     init_port();
@@ -57,11 +57,9 @@ void main(void) {
     //infinite loop
     while(1) {
 	if ((do_print == 0) && (timer_ticks == 10)) {
-	    putchar(0x66);
 	    do_print = 1;
 	}
 	if ((do_print == 1) && (timer_ticks == 100)) {
-	    putchar(0x55);
 	    //ret=print_fifo(s1,&tx_fifo);
 	    puts_rom(s2);
 	    do_print = 0;
