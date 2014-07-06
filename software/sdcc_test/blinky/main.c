@@ -44,7 +44,7 @@ void main(void) {
     }
 }
 
-void interrupt () {
+void isr() __interrupt 1 {
     if (INTCONbits.TMR0IE && INTCONbits.TMR0IF) {
         // overflow every 4.096ms
         timer_ticks++;

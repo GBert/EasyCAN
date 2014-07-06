@@ -2,7 +2,7 @@ SYSTEM:=$(shell uname -s)
 
 MCU=18f26k80
 CC=sdcc
-CFLAGS=--use-non-free --fomit-frame-pointer --pstack-model=small -mpic16 -p$(MCU) #-DDEBUG=1
+CFLAGS=--use-non-free --use-crt=crt0.o -mpic16 -p$(MCU) #-DDEBUG=1
 CLIB=-llibc18f.lib
 
 MAIN=main
