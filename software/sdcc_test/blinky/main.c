@@ -48,23 +48,20 @@ void isr() __interrupt 1 {
     if (INTCONbits.TMR0IE && INTCONbits.TMR0IF) {
         // overflow every 4.096ms
         timer_ticks++;
-        // 80ms
-        if (timer_ticks==20) {
-            LED = 0;		//LED OFF
+        if (timer_ticks==20) {  // 80 ms
+            LED = 0;            // LED OFF
         }
-        // 80ms
-        if (timer_ticks==40) {
-            LED = 1;		//LED ON
+        if (timer_ticks==40) {  // 80 ms
+            LED = 1;            // LED ON
         }
-        // 80ms
-        if (timer_ticks==60) {
-            LED = 0;		//LED OFF
+        if (timer_ticks==60) {  // 80 ms
+            LED = 0;            // LED OFF
         }
-        // 800ms
-        if (timer_ticks==250) {
-            LED = 1;		//LED ON
+        if (timer_ticks==250) { // 720 ms
+            LED = 1;            // LED OFF
             timer_ticks=0;
         }
         INTCONbits.TMR0IF = 0;
     }
 }
+
