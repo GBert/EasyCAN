@@ -58,7 +58,7 @@ void isr() __interrupt 1 {
             LED = 0;            // LED OFF
         }
         if (timer_ticks==250) { // 720 ms
-            LED = 1;            // LED OFF
+            LED = 1;            // LED ON
             timer_ticks=0;
         }
         INTCONbits.TMR0IF = 0;
