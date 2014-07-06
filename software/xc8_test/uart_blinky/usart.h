@@ -13,10 +13,6 @@
 #include <xc.h>
 #include "main.h"
 
-/* BUFFER_SIZE must be power of two (16,32,64...) */
-#define SERIAL_BUFFER_SIZE	64
-#define SERIAL_BUFFER_SIZE_MASK	(SERIAL_BUFFER_SIZE -1)
-
 #ifndef BAUDRATE
 #define BAUDRATE	500000
 #endif
@@ -37,10 +33,5 @@
 
 
 /* circular buffer */
-typedef struct serial_buffer {
-    unsigned char head;
-    unsigned char tail;
-    unsigned char data[SERIAL_BUFFER_SIZE];
-};
 
 #endif		/* _USART_H_ */

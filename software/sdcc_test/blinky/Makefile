@@ -7,9 +7,9 @@ CLIB=-llibc18f.lib
 
 MAIN=main
 TARGET=main.hex
-SOURCE=main.c usart.c
+SOURCE=main.c
 OBJECT=$(SOURCE:.c=.o)
-HEADER=$(SOURCE:.c=.h) prototypes.h
+HEADER=$(SOURCE:.c=.h)
 
 BOOTLOADER	= pirate-loader
 TERMINAL	= com
@@ -27,8 +27,8 @@ install:build
 uninstall:clean
 
 clean:
-#	find -E . -regex ".*\.(o|asm|cod|err|hex|log|lst)" -delete
 	find . -regextype posix-extended -regex ".*\.(o|asm|cod|err|hex|log|lst)" -delete
+	
 %.o:%.c
 	@echo -n "[CC]   "
 	$(CC) $(CFLAGS) -c $< -o $@
