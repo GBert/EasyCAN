@@ -36,7 +36,7 @@ var bit led is pin_A0
 pin_A0_direction =  output
 
 const usart_hw_serial = true
-const serial_hw_baudrate = 460_800
+const serial_hw_baudrate = 500_000
 include serial_hardware
 serial_hw_init()
 
@@ -50,29 +50,26 @@ include can_ascii
 
 can_reset()
 
---    calculated with: http://www.kvaser.com/en/support/bit-timing-calculator.html
---      CAN controller is clocked with 64 MHz
+-- % can-calc-bit-timing -c 64000000 mcp251x
 --
--- T1	T2	BTQ	SP%	SJW	Bit Rate	Err% 	CNF1	CNF2	CNF3
--- ------------------------------------------------------------------------------------
--- 17 	3 	20 	85 	1 	25 		0 	3f 	bf 	02
--- 14 	2 	16 	87.5 	1 	50 		0 	27 	b5 	01
--- 14 	2 	16 	87.5 	1 	100 		0 	13 	b5 	01
--- 14 	2 	16 	87.5 	1 	125 		0 	0f 	b5 	01
--- 14 	2 	16 	87.5 	1 	250 		0 	07 	b5 	01
--- 14 	2 	16 	87.5 	1 	500 		0 	03 	b5 	01
--- 14 	2 	16 	87.5 	1 	1000 		0 	01 	b5 	01
+-- Bit timing parameters for mcp251x with 64.000000 MHz ref clock
+-- nominal                                 real Bitrt   nom  real SampP
+-- Bitrate TQ[ns] PrS PhS1 PhS2 SJW BRP Bitrate Error SampP SampP Error CNF1 CNF2 CNF3
+-- 1000000     62   5    6    4   1   4 1000000  0.0% 75.0% 75.0%  0.0% 0x03 0xac 0x03
+--  800000     62   7    8    4   1   4  800000  0.0% 80.0% 80.0%  0.0% 0x03 0xbe 0x03
+--  500000    125   6    7    2   1   8  500000  0.0% 87.5% 87.5%  0.0% 0x07 0xb5 0x01
+--  250000    250   6    7    2   1  16  250000  0.0% 87.5% 87.5%  0.0% 0x0f 0xb5 0x01
+--  125000    500   6    7    2   1  32  125000  0.0% 87.5% 87.5%  0.0% 0x1f 0xb5 0x01
+--  100000    625   6    7    2   1  40  100000  0.0% 87.5% 87.5%  0.0% 0x27 0xb5 0x01
+--   50000   1000   8    8    3   1  64   50000  0.0% 87.5% 85.0%  2.9% 0x3f 0xbf 0x02
+--   20000 ***bitrate not possible***
+--   10000 ***bitrate not possible***
+--
+--   where BRGCONx is CNFx
+--
 
--- 15 	5 	20 	75 	1 	25 		0 	3f 	b6 	04
--- 15 	5 	20 	75 	1 	50 		0 	1f 	b6 	04
--- 15 	5 	20 	75 	1 	100 		0 	0f 	b6 	04
--- 12 	4 	16 	75 	1 	125 		0 	0f 	ac 	03
--- 12 	4 	16 	75 	1 	250 		0 	07 	ac 	03
--- 12 	4 	16 	75 	1 	500 		0 	03 	ac 	03
--- 12 	4 	16 	75 	1 	1000 		0 	01 	ac 	03
-
--- 250K bps sample point 75%
-can_set_config(0x07, 0xAC, 0x03)
+-- 250K bps sample point 87.5%
+can_set_config(0x0f, 0xb5, 0x01)
 CIOCON = 0x20; -- TXCAN, high when recessive
 
 -- in this example we combine the hardware buffers.

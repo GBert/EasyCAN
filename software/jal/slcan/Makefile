@@ -1,4 +1,4 @@
-MAIN		= ser1
+MAIN		= 18f26k80_slcan_uart1
 SOURCE		= $(MAIN).jal
 
 SYSTEM:=$(shell uname -s)
