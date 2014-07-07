@@ -29,7 +29,7 @@ endif
 
 
 flash:
-	$(BOOTLOADER) --reset_rts --dev=/dev/ttyUSB0 --hex=$(OBJECT).hex
+	$(BOOTLOADER) --reset_rts --dev=/dev/ttyUSB0 --hex=$(MAIN).hex
 
 terminal:
 
