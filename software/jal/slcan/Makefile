@@ -4,7 +4,7 @@ SOURCE		= $(MAIN).jal
 SYSTEM:=$(shell uname -s)
 
 JAL		= jalv2
-JALFLAGS	= -long-start 
+JALFLAGS	= -long-start
 
 BOOTLOADER      = pirate-loader
 TERMINAL        = com

@@ -30,6 +30,14 @@ include delay
 include format
 include print
 
+const VERSION_HARDWARE = 0x31
+          
+const VERSION_FIRMWARE_MAJOR = 0x30
+const VERSION_FIRMWARE_MINOR = 0x31
+
+const byte VERSION_HARDWARE_STRING[] = "v1.0\r\n"
+const byte VERSION_FIRMWARE_STRING[] = "0.1 \r\n"
+
 enable_digital_io()
 
 var bit led is pin_A0
@@ -114,6 +122,20 @@ forever loop
          s_rxcnt = 0
       end if
       if c == 13 then
+         if s_rxbuf[0] == "V" then
+            serial_hw_data = VERSION_HARDWARE
+            serial_hw_data = 0x0d
+            serial_hw_data = 0x0a
+            s_rxcnt = 0
+         end if
+         if s_rxbuf[0] == "v" then
+            serial_hw_data = VERSION_FIRMWARE_MAJOR
+            serial_hw_data = VERSION_FIRMWARE_MINOR
+            serial_hw_data = 0x0d
+            serial_hw_data = 0x0a
+            s_rxcnt = 0
+         end if
+ 
          if ascii_to_can(s_rxbuf, can_id, can_data, data_len) then
             -- FIXME: should retry can_send if busy
             txstat = can_send(0, can_id, can_data, data_len)
