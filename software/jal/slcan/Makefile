@@ -21,7 +21,7 @@ install:build
 uninstall:clean
 
 clean:
-ifneq (,($(findstring Linux,$(SYSTEM))))
+ifneq (,$(findstring Linux,$(SYSTEM)))
 	find . -regextype posix-extended -regex ".*\.(o|asm|cod|err|hex|log|lst)" -delete
 else
 	find -E . -regex ".*\.(o|asm|cod|err|hex|log|lst)" -delete
