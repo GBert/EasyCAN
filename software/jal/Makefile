@@ -4,7 +4,7 @@ SOURCE		= $(MAIN).jal
 SYSTEM:=$(shell uname -s)
 
 JAL		= jalv2
-JALFLAGS	= -long-start 
+JALFLAGS	= -long-start
 
 BOOTLOADER      = pirate-loader
 TERMINAL        = com
@@ -21,7 +21,7 @@ install:build
 uninstall:clean
 
 clean:
-ifneq (,($(findstring Linux,$(SYSTEM))))
+ifneq (,$(findstring Linux,$(SYSTEM)))
 	find . -regextype posix-extended -regex ".*\.(o|asm|cod|err|hex|log|lst)" -delete
 else
 	find -E . -regex ".*\.(o|asm|cod|err|hex|log|lst)" -delete
