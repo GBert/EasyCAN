@@ -46,7 +46,7 @@ var byte x
 
 forever loop              -- continue forever
    _usec_delay(1_000_000) -- one second delay
-   serial_hw_data = 85    -- send 65 via serial port
+   serial_hw_data = 65    -- send 65 via serial port
    
    if serial_hw_data_available then -- check if data is ready for us
       x = serial_hw_data            -- get the data
