@@ -1,5 +1,5 @@
-ds30loader firmaware for PIC18F26K80
-====================================
+ds30loader firmware for PIC18F26K80
+===================================
 
 compile with:
 ```
