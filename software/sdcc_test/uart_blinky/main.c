@@ -91,6 +91,7 @@ void main(void) {
 	}
 	//ret=fifo_putchar(&tx_fifo);
     }
+    putchar_wait('X');
 }
 
 void isr() __interrupt 1 {

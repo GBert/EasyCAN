@@ -35,8 +35,8 @@ const VERSION_HARDWARE = 0x31
 const VERSION_FIRMWARE_MAJOR = 0x30
 const VERSION_FIRMWARE_MINOR = 0x31
 
-const byte VERSION_HARDWARE_STRING[] = "v1.0\r\n"
-const byte VERSION_FIRMWARE_STRING[] = "0.1 \r\n"
+const byte VERSION_HARDWARE_STRING[] = " Hardware Version v1.0 "
+const byte VERSION_FIRMWARE_STRING[] = " Software Version 0.1 "
 
 enable_digital_io()
 
@@ -98,6 +98,10 @@ CANCON = 0; -- normal mode
 var byte s_rxcnt, s_rxbuf[32]
 var byte s_txcnt, s_txbuf[32]
 s_rxcnt = 0
+
+print_string(serial_hw_data, VERSION_HARDWARE_STRING)
+print_string(serial_hw_data, VERSION_FIRMWARE_STRING)
+print_crlf(serial_hw_data)
 
 forever loop
    var bit got_msg, txstat
