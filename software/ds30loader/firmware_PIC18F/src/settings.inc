@@ -99,7 +99,7 @@
 		config	RETEN 			= OFF       	;Ultra low-power regulator is Disabled (Controlled by REGSLP bit)
 		config	INTOSCSEL 		= HIGH		;LF-INTOSC in Low-power mode during Sleep
 		config	SOSCSEL 		= HIGH		;Low Power SOSC circuit selected
-		config	XINST 			= ON		;Disabled
+		config	XINST 			= OFF		;Disabled
 		config	FOSC 			= HS2       	;HS oscillator
 		config	PLLCFG 			= ON       	;Enabled 
 		config	FCMEN 			= OFF       	;Disabled
@@ -108,7 +108,7 @@
 		config  BOREN 			= SBORDIS	;Brown Out Detect
 		config	BORV 			= 3         	;1.8V
 		config	BORPWR			= ZPBORMV   	;BORMV set to medium power level
-		config	WDTEN 			= ON      	;WDT disabled in hardware; SWDTEN bit disabled
+		config	WDTEN 			= OFF     	;WDT disabled in hardware; SWDTEN bit disabled
  		config	WDTPS 			= 1048576     	;1:32768
 		config	CANMX 			= PORTB     	;ECAN TX and RX pins are located on RE5 and RE4, respectively
 		;config	T0CKMX 			= PORTG		;Timer0 gets its clock input from the RG4/T0CKI pin on 64-pin packages
