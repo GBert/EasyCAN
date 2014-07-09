@@ -11,8 +11,8 @@
 #include "usart.h"
 #include "prototypes.h"
 
-const char * s1 = "circular buffer is working!\r\n";
-const char * s2 = "USART is working!\r\n";
+const char s1[] = "circular buffer is working!\r\n";
+const char s2[] = "USART is working!\r\n";
 
 volatile unsigned char timer_ticks=0;
 struct serial_buffer tx_fifo, rx_fifo;
@@ -66,25 +66,14 @@ void main(void) {
     while(1) {
 	if ((do_print == 0) && (timer_ticks == 10)) {
 	    do_print = 1;
-            putchar_wait('A');
-            putchar_wait('\r');
-            putchar_wait('\n');
 	}
 	if ((do_print == 1) && (timer_ticks == 100)) {
 	    do_print = 0;
-            putchar_wait('B');
-            putchar_wait('\r');
-            putchar_wait('\n');
-	    //ret=print_rom_fifo(s1,&tx_fifo);
-	    //puts_rom(s2);
-	    // ret++;
-            //print_debug_value('r',ret);
-            
-    	    print_debug_fifo(&tx_fifo);
+	    puts_rom(s2);
+	    ret=print_rom_fifo(s1,&tx_fifo);
 	}
-	// ret=fifo_putchar(&tx_fifo);
+	ret=fifo_putchar(&tx_fifo);
     }
-    putchar_wait('X');
 }
 
 void isr() __interrupt 1 {

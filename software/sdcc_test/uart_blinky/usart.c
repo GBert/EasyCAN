@@ -9,7 +9,7 @@
 
 #include "usart.h"
 
-const char * sData = " Data: ";
+const char sData[] = " Data: ";
 
 void init_usart (void) {
     // USART configuration
@@ -45,6 +45,7 @@ void init_usart (void) {
 char putchar(unsigned char c) {
     if ( TXSTA1bits.TRMT1 ) {
 	TXREG1 = c;
+	return 1;
     }
     return 0;
 }
@@ -53,13 +54,6 @@ char putchar(unsigned char c) {
 void putchar_wait(unsigned char c) {
    while (!TXSTA1bits.TRMT1);
    TXREG1 = c;
-}
-
-void puts_rom(const char *s) {
-    char c;
-    while ( ( c = *s++ ) ) {
-	putchar_wait( c );
-    }
 }
 
 void print_hex_wait(unsigned char c) {
@@ -71,6 +65,13 @@ void print_hex_wait(unsigned char c) {
     nibble=(c & 0x0f) + '0';
     if (nibble>=0x3a) nibble+=7;
     putchar_wait(nibble);
+}
+
+void puts_rom(const char * s) {
+    char c;
+    while ( ( c = *s++ ) ) {
+	putchar_wait( c );
+    }
 }
 
 void print_debug_value(char c, unsigned char value) {
@@ -105,18 +106,9 @@ void print_debug_fifo(struct serial_buffer *fifo) {
 char fifo_putchar(struct serial_buffer *fifo) {
     unsigned char tail;
     tail=fifo->tail;
-    print_debug_fifo(fifo);
     if (fifo->head != tail) {
 	tail++;
 	tail &= SERIAL_BUFFER_SIZE_MASK;	/* wrap around if neededd */
-
-	putchar_wait('f');
-	print_debug_value('T',fifo->tail);
-	putchar_wait(' ');
-	print_debug_value('T',tail);
-	putchar_wait('\r');
-	putchar_wait('\n');
-
 	if (putchar(fifo->data[tail])) {
 	    fifo->tail=tail;
 	    return 1;
@@ -126,7 +118,7 @@ char fifo_putchar(struct serial_buffer *fifo) {
 }
 
 /* print into circular buffer */
-char print_rom_fifo(const unsigned char *s, struct serial_buffer *fifo) {
+char print_rom_fifo(const unsigned char * s, struct serial_buffer * fifo) {
     unsigned char head=fifo->head;
     char c;
     while ( ( c = *s++ ) ) {
