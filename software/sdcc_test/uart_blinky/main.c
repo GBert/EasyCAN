@@ -15,7 +15,7 @@ const char * s1 = "circular buffer is working!\r\n";
 const char * s2 = "USART is working!\r\n";
 
 volatile unsigned char timer_ticks=0;
-// struct serial_buffer tx_fifo, rx_fifo;
+struct serial_buffer tx_fifo, rx_fifo;
 
 char fifo_putchar(struct serial_buffer * fifo);
 char print_rom_fifo(const unsigned char * s, struct serial_buffer * fifo);
@@ -56,40 +56,33 @@ void main(void) {
     init_usart();
 
     /* empty circular buffers */
-    /* tx_fifo.head=0;
+    tx_fifo.head=0;
     tx_fifo.tail=0;
     rx_fifo.head=0;
     rx_fifo.tail=0;
-    */
+    
     //print_debug_fifo(&tx_fifo);
     //infinite loop
     while(1) {
 	if ((do_print == 0) && (timer_ticks == 10)) {
 	    do_print = 1;
-            ret++;
-            putchar_wait(TaskB);
-            putchar_wait(TaskB+ret);
             putchar_wait('A');
-            putchar_wait(' ');
-            putchar_wait('.');
             putchar_wait('\r');
             putchar_wait('\n');
-	    TaskB='A';
 	}
 	if ((do_print == 1) && (timer_ticks == 100)) {
 	    do_print = 0;
+            putchar_wait('B');
+            putchar_wait('\r');
+            putchar_wait('\n');
 	    //ret=print_rom_fifo(s1,&tx_fifo);
 	    //puts_rom(s2);
 	    // ret++;
             //print_debug_value('r',ret);
-            putchar_wait('A');
-            putchar_wait('c');
-            putchar_wait('i');
-            putchar_wait('d');
             
-    	    // print_debug_fifo(&tx_fifo);
+    	    print_debug_fifo(&tx_fifo);
 	}
-	//ret=fifo_putchar(&tx_fifo);
+	// ret=fifo_putchar(&tx_fifo);
     }
     putchar_wait('X');
 }

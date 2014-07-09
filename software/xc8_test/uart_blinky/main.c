@@ -58,6 +58,7 @@ void main(void) {
     //infinite loop
     while(1) {
 	if ((do_print == 0) && (timer_ticks == 10)) {
+	    puts_rom(s1);
 	    do_print = 1;
 	}
 	if ((do_print == 1) && (timer_ticks == 100)) {

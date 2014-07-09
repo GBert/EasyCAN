@@ -80,7 +80,7 @@ void print_debug_value(char c, unsigned char value) {
 }
 
 void print_debug_fifo(struct serial_buffer *fifo) {
-    // unsigned char i;
+    unsigned char i;
     print_debug_value('S',SERIAL_BUFFER_SIZE);
     putchar_wait(' ');
     print_debug_value('M',SERIAL_BUFFER_SIZE_MASK);
@@ -89,11 +89,13 @@ void print_debug_fifo(struct serial_buffer *fifo) {
     putchar_wait(' ');
     print_debug_value('T',fifo->tail);
     putchar_wait(' ');
+    putchar_wait(' ');
+    putchar_wait(' ');
     puts_rom(sData);
-/*    for (i=0; i<SERIAL_BUFFER_SIZE; i++) {
+    for (i=0; i<SERIAL_BUFFER_SIZE; i++) {
         print_hex_wait(fifo->data[i]);
         putchar_wait(' ');
-    }*/
+    }
     putchar_wait('\r');
     putchar_wait('\n');
 }

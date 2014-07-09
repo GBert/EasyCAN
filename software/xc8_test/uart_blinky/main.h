@@ -19,7 +19,7 @@
 #define LED             (LATAbits.LATA0)
 
 /* BUFFER_SIZE must be power of two (16,32,64...) */
-#define SERIAL_BUFFER_SIZE      64
+#define SERIAL_BUFFER_SIZE      32
 #define SERIAL_BUFFER_SIZE_MASK (SERIAL_BUFFER_SIZE -1)
 
 void interrupt ISRCode(void);
