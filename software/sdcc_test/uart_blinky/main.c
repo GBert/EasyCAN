@@ -11,6 +11,8 @@
 #include "usart.h"
 #include "prototypes.h"
 
+#pragma config XINST=OFF
+
 const char s1[] = "circular buffer is working!\r\n";
 const char s2[] = "USART is working!\r\n";
 
