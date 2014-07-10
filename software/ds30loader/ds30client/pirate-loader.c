@@ -333,8 +333,8 @@ int readHEX(const char* file, uint8* bout, unsigned long max_length, uint8* page
 		{
 			/* f_addr  = (hex_base_addr | (hex_addr)) / 2; //PCU */
 			f_addr  = (hex_base_addr | (hex_addr)); //PCU
-			
-			if( hex_len % PIC_WORD_SIZE ) {
+			/* TODO : ignoring  PIC_WORD_SIZE for CONFIG registers */
+			if(( hex_len % PIC_WORD_SIZE ) && (f_addr < PIC_FLASHSIZE)) {
 				fprintf(stderr, "Misaligned data, line %d\n", line_no);
 				return -1;
 			} else if( f_addr >= PIC_FLASHSIZE ) {
