@@ -1,33 +1,47 @@
-# ----------------------------------------------------------------------------
-# "THE BEER-WARE LICENSE" (Revision 42):
-# <info@gerhard-bertelsmann.de> wrote this file. As long as you retain this
-# notice you can do whatever you want with this stuff. If we meet some day,
-# and you think this stuff is worth it, you can buy me a beer in return
-# Gerhard Bertelsmann
-# ----------------------------------------------------------------------------
+SYSTEM:=$(shell uname -s)
 
-PROJ_DIR	= .
-XC8DIR		= /opt/microchip/xc8/v1.30
-CC_INCLUDE	= -I$(XC8DIR)/include
+MCU=18f26k80
+CC=sdcc
+CFLAGS=--use-non-free --use-crt=crt0iz.o --pstack-model=small -mpic16 -p$(MCU) #-DDEBUG=1
+CLIB=-llibc18f.lib
 
-PROCESSOR	= 18F26K80
-MAIN		= easycan
-SRC		= easycan.c can.c usart.c
-CC_FLAGS	= -P -N255 --warn=0 --addrqual=ignore --mode=free# --echo
-OPTIMISATION	= --opt=default,+asm,-asmfile,+speed,-space,-debug,9 --runtime=+plib
-CC		= $(XC8DIR)/bin/xc8
-DEFINES		= -DBAUDRATE=500000
+MAIN=main
+TARGET=main.hex
+SOURCE=main.c usart.c
+OBJECT=$(SOURCE:.c=.o)
+HEADER=$(SOURCE:.c=.h) prototypes.h
+
 BOOTLOADER	= pirate-loader
-# CC		= sdcc
+TERMINAL	= com
 
-all: $(MAIN).hex
+build:$(TARGET)
 
-$(MAIN).hex: $(SRC)
-	$(CC) $(SRC) $(CC_FLAGS) $(OPTIMISATION) $(DEFINES) --ROM=default,-fc00-ffff --chip=$(PROCESSOR) $(CC_INCLUDE) --ASMLIST -M
+$(TARGET):$(OBJECT)
+	@echo -n "[LINK] "
+	$(CC) $(CFLAGS) $(OBJECT) -o $(TARGET) $(CLIB) -m$(MCU)
 
-flash: 
-	$(BOOTLOADER) --reset_rts --dev=/dev/ttyUSB0 --hex=$(MAIN).hex
+$(OBJECT):$(HEADER) Makefile
+
+install:build
+
+uninstall:clean
 
 clean:
-	rm -f $(MAIN).hex funclist $(MAIN).cof $(MAIN).hxl *.p1 $(MAIN).sdb startup.* *.cmf *.rlf *.map *.as *.d *.obj *.lst *.pre $(MAIN).sym
+ifneq (,$(findstring Linux,$(SYSTEM)))
+	find . -regextype posix-extended -regex ".*\.(o|asm|cod|err|hex|log|lst)" -delete
+else
+	find -E . -regex ".*\.(o|asm|cod|err|hex|log|lst)" -delete
+endif
 
+%.o:%.c
+	@echo -n "[CC]   "
+	$(CC) $(CFLAGS) -c $< -o $@
+
+flash:
+	$(BOOTLOADER) --reset_rts --dev=/dev/ttyUSB0 --hex=$(MAIN).hex
+
+com:
+	$(TERMINAL) /dev/ttyUSB0 500000
+
+terminal:
+	$(TERMINAL) /dev/ttyUSB0 500000
