@@ -102,6 +102,26 @@ void print_debug_fifo(struct serial_buffer *fifo) {
 }
 
 
+/* get next char from USART put into fifo*/
+char fifo_getchar(struct serial_buffer *fifo) {
+    unsigned char head;
+    char c;
+
+    if (PIR1bits.RCIF) {
+	head=fifo->head;
+        head++;
+	if (head != fifo->tail) {
+	    head &= SERIAL_BUFFER_SIZE_MASK;	/* wrap around if neededd */
+            c=RCREG1;
+            fifo->data[head]=c;
+            fifo->head=head;
+	    print_debug_fifo(fifo);
+	    return c;
+	}
+    }
+    return 0;
+}
+
 /* put next char onto USART */
 char fifo_putchar(struct serial_buffer *fifo) {
     unsigned char tail;
@@ -131,6 +151,32 @@ char print_rom_fifo(const unsigned char * s, struct serial_buffer * fifo) {
 	}
     }
     fifo->head=head;				/* only store new pointer if all is OK */
+    return 1;
+}
+
+char copy_char_fifo(struct serial_buffer * source_fifo, struct serial_buffer * destination_fifo) {
+    unsigned char source_tail;
+    unsigned char destination_head;
+    char c;
+    source_tail=(source_fifo->tail + 1) & SERIAL_BUFFER_SIZE_MASK;
+    destination_head=destination_fifo->head;
+    source_tail++;
+    if (source_tail == source_fifo->head) {
+        /* there is nothing todo */
+        return 0;
+    } else {
+        source_tail++;
+    }
+    while ( ( c = source_fifo->data[source_tail] ) ) {
+	destination_head++;
+	destination_head &= SERIAL_BUFFER_SIZE_MASK;		/* wrap around if neededd */
+	if (destination_head != destination_fifo->tail) {		/* space left ? */ 
+	    destination_fifo->data[destination_head]=c;
+	} else {
+	    return -1;
+	}
+    }
+    destination_fifo->head=destination_head;				/* only store new pointer if all is OK */
     return 1;
 }
 

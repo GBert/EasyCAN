@@ -53,6 +53,8 @@ void main(void) {
     unsigned char do_print=0;
     unsigned char ret=0;
     unsigned char TaskB='A';
+    char c;
+
     init_port();
     init_timer();
     init_usart();
@@ -75,6 +77,9 @@ void main(void) {
 	    ret=print_rom_fifo(s1,&tx_fifo);
 	}
 	ret=fifo_putchar(&tx_fifo);
+        if (c=fifo_getchar(&rx_fifo)) {
+	    putchar_wait(c);
+	}
     }
 }
 
