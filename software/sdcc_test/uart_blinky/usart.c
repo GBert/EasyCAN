@@ -82,6 +82,8 @@ void print_debug_value(char c, unsigned char value) {
 
 void print_debug_fifo(struct serial_buffer *fifo) {
     unsigned char i;
+    putchar_wait('\r');
+    putchar_wait('\n');
     print_debug_value('S',SERIAL_BUFFER_SIZE);
     putchar_wait(' ');
     print_debug_value('M',SERIAL_BUFFER_SIZE_MASK);
@@ -115,7 +117,6 @@ char fifo_getchar(struct serial_buffer *fifo) {
             c=RCREG1;
             fifo->data[head]=c;
             fifo->head=head;
-	    print_debug_fifo(fifo);
 	    return c;
 	}
     }
@@ -157,25 +158,25 @@ char print_rom_fifo(const unsigned char * s, struct serial_buffer * fifo) {
 char copy_char_fifo(struct serial_buffer * source_fifo, struct serial_buffer * destination_fifo) {
     unsigned char source_tail;
     unsigned char destination_head;
-    char c;
-    source_tail=(source_fifo->tail + 1) & SERIAL_BUFFER_SIZE_MASK;
-    destination_head = destination_fifo->head;
-    if (source_tail == source_fifo->head) {
-        /* there is nothing todo */
+    source_tail=source_fifo->tail;
+    /* check if there is nothing todo first
+     * because this will happen most of the time */
+    if ( source_tail == source_fifo->head) {
         return 0;
     } else {
-        source_tail++;
-    }
-    while ( ( c = source_fifo->data[source_tail] ) ) {
+	destination_head = destination_fifo->head;
 	destination_head++;
-	destination_head &= SERIAL_BUFFER_SIZE_MASK;		/* wrap around if neededd */
-	if (destination_head != destination_fifo->tail) {	/* space left ? */ 
-	    destination_fifo->data[destination_head]=c;
-	} else {
-	    return -1;
-	}
+	destination_head &= SERIAL_BUFFER_SIZE_MASK;
+        while ((destination_head !=  destination_fifo->tail) && (source_tail != source_fifo->head)) {
+	    source_tail++;
+            source_tail &= SERIAL_BUFFER_SIZE_MASK;
+            destination_fifo->data[destination_head] = source_fifo->data[source_tail];
+	    destination_fifo->head = destination_head;		/* store new pointer destination head before increment*/
+            destination_head++;
+            destination_head &= SERIAL_BUFFER_SIZE_MASK;
+        }
+	source_fifo->tail      = source_tail;			/* store new pointer source tail */
+	return source_fifo->data[source_tail];
     }
-    destination_fifo->head=destination_head;			/* only store new pointer if all is OK */
-    return 1;
 }
 

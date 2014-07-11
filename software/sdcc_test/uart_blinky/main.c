@@ -78,7 +78,7 @@ void main(void) {
 	}
 	ret=fifo_putchar(&tx_fifo);
         if (c=fifo_getchar(&rx_fifo)) {
-	    putchar_wait(c);
+	    copy_char_fifo(&rx_fifo,&tx_fifo);
 	}
     }
 }
