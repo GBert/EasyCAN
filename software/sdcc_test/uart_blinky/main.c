@@ -77,8 +77,13 @@ void main(void) {
 	    ret=print_rom_fifo(s1,&tx_fifo);
 	}
 	ret=fifo_putchar(&tx_fifo);
+	// copy_char_fifo(&rx_fifo,&tx_fifo);
         if (c=fifo_getchar(&rx_fifo)) {
-	    copy_char_fifo(&rx_fifo,&tx_fifo);
+            //print_hex_wait(c);   
+	    if (c==0x0d) {
+	        copy_char_fifo(&rx_fifo,&tx_fifo);
+		putchar_fifo(0x0a,&tx_fifo);
+	    }
 	}
     }
 }

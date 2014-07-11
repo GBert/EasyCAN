@@ -1,10 +1,12 @@
 #ifndef _PROTOTYPES_H_
 #define _PROTOTYPES_H_
 
+void init_usart(void);
 char putchar(unsigned char c);
 void putchar_wait(unsigned char c);
 void puts_rom(const char * c);
-void init_usart(void);
+void print_hex_wait(unsigned char c);
+char putchar_fifo(char c, struct serial_buffer * fifo);
 char fifo_getchar(struct serial_buffer * fifo);
 char fifo_putchar(struct serial_buffer * fifo);
 char print_rom_fifo(const unsigned char * s, struct serial_buffer * fifo);

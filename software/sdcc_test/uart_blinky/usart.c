@@ -103,6 +103,20 @@ void print_debug_fifo(struct serial_buffer *fifo) {
     putchar_wait('\n');
 }
 
+/* place char into fifo */
+char putchar_fifo(char c, struct serial_buffer * fifo) {
+    unsigned char head;
+    head=fifo->head;
+    head++;
+    head &= SERIAL_BUFFER_SIZE_MASK;		/* wrap around if needed */
+    if (head != fifo->tail) {
+	fifo->head = head;
+	fifo->data[head] = c;
+        return 1;
+    };
+    return 0;
+}
+
 
 /* get next char from USART put into fifo*/
 char fifo_getchar(struct serial_buffer *fifo) {
