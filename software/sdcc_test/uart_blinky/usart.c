@@ -80,7 +80,7 @@ void print_debug_value(char c, unsigned char value) {
     print_hex_wait(value);
 }
 
-void print_debug_fifo(struct serial_buffer *fifo) {
+void print_debug_fifo(struct serial_buffer * fifo) {
     unsigned char i;
     putchar_wait('\r');
     putchar_wait('\n');
@@ -119,7 +119,7 @@ char putchar_fifo(char c, struct serial_buffer * fifo) {
 
 
 /* get next char from USART put into fifo*/
-char fifo_getchar(struct serial_buffer *fifo) {
+char fifo_getchar(struct serial_buffer * fifo) {
     unsigned char head;
     char c;
 
@@ -138,7 +138,7 @@ char fifo_getchar(struct serial_buffer *fifo) {
 }
 
 /* put next char onto USART */
-char fifo_putchar(struct serial_buffer *fifo) {
+char fifo_putchar(struct serial_buffer * fifo) {
     unsigned char tail;
     tail=fifo->tail;
     if (fifo->head != tail) {
@@ -153,7 +153,7 @@ char fifo_putchar(struct serial_buffer *fifo) {
 }
 
 /* print into circular buffer */
-char print_rom_fifo(const unsigned char * s, struct serial_buffer * fifo) {
+char puts_rom_fifo(const char * s, struct serial_buffer * fifo) {
     unsigned char head=fifo->head;
     char c;
     while ( ( c = *s++ ) ) {

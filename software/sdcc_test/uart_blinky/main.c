@@ -19,11 +19,6 @@ const char s2[] = "USART is working!\r\n";
 volatile unsigned char timer_ticks=0;
 struct serial_buffer tx_fifo, rx_fifo;
 
-char fifo_putchar(struct serial_buffer * fifo);
-char print_rom_fifo(const unsigned char * s, struct serial_buffer * fifo);
-void print_debug_value(char c, unsigned char value);
-void print_debug_fifo(struct serial_buffer * fifo);
-
 void init_port(void) {
     ADCON1 = 0x0F;		// Default all pins to digital
     LED_TRIS = 0;
@@ -65,7 +60,6 @@ void main(void) {
     rx_fifo.head=0;
     rx_fifo.tail=0;
     
-    //print_debug_fifo(&tx_fifo);
     //infinite loop
     while(1) {
 	if ((do_print == 0) && (timer_ticks == 10)) {
@@ -74,12 +68,10 @@ void main(void) {
 	if ((do_print == 1) && (timer_ticks == 100)) {
 	    do_print = 0;
 	    puts_rom(s2);
-	    ret=print_rom_fifo(s1,&tx_fifo);
+	    ret=puts_rom_fifo(s1,&tx_fifo);
 	}
 	ret=fifo_putchar(&tx_fifo);
-	// copy_char_fifo(&rx_fifo,&tx_fifo);
         if (c=fifo_getchar(&rx_fifo)) {
-            //print_hex_wait(c);   
 	    if (c==0x0d) {
 	        copy_char_fifo(&rx_fifo,&tx_fifo);
 		putchar_fifo(0x0a,&tx_fifo);
