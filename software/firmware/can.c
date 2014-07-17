@@ -55,8 +55,8 @@ void init_can(const char brgcon1, unsigned char brgcon2, unsigned char brgcon3) 
     CANSTATbits.OPMODE == 0x00;
 
     // disable interrupts as of today
-    INTCONbits.GIE = 0;
-    INTCONbits.PEIE = 0;
+    //INTCONbits.GIE = 0;
+    //INTCONbits.PEIE = 0;
 }
 
 char can_sendmsg(unsigned long id, char * data, char dlc, char flags) {
@@ -108,7 +108,7 @@ char can_sendmsg(unsigned long id, char * data, char dlc, char flags) {
      bsf RXB0CON, 3, 0
      __endasm
     */
-    RXB0CONbits.FILHIT4=0;
+    RXB0CON |= 0x08;
 
    /* Restore CAN buffer mapping so that subsequent access to RXB0
     * buffers are to the real RXB0 buffer. */
