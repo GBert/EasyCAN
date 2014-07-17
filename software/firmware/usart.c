@@ -75,7 +75,7 @@ void puts_rom(const char * s) {
     }
 }
 
-void print_sfr(const char * s, __sfr * sfr, unsigned char length) {
+void print_sfr_n(const char * s, __sfr * sfr, unsigned char length) {
     unsigned char i;
     puts_rom(s);
     for (i=0 ; i<length ; i++ ) {
@@ -85,7 +85,14 @@ void print_sfr(const char * s, __sfr * sfr, unsigned char length) {
     putchar_wait('\r');
     putchar_wait('\n');
 }
-  
+
+void print_sfr(const char * s, unsigned char c) {
+    puts_rom(s);
+    putchar_wait(' ');
+    print_hex_wait(c);
+    putchar_wait('\r');
+    putchar_wait('\n');
+}
 
 void print_debug_value(char c, unsigned char value) {
     putchar_wait(c);

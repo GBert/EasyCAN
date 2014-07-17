@@ -24,7 +24,7 @@ void init_can(const char * brgcon) {
     BRGCON1 = *brgcon++;
     BRGCON2 = *brgcon++;
     BRGCON3 = *brgcon;
-    while(!(CANSTATbits.OPMODE == 0x04));
+    CANSTATbits.OPMODE == 0x00;
 }
  
     
