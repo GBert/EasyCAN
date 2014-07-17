@@ -20,6 +20,6 @@ char copy_char_fifo(struct serial_buffer * source_fifo, struct serial_buffer * d
 void init_timer(void);
 
 /* CAN specific */
-void init_can(char * brgcon);
+void init_can(const char brgcon1, unsigned char brgcon2, unsigned char brgcon3);
 
 #endif /* _PROTOTYPES_H_ */

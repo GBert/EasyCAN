@@ -9,7 +9,7 @@
 
 #include "can.h"
 
-void init_can(const char * brgcon) {
+void init_can(const char brgcon1, unsigned char brgcon2, unsigned char brgcon3) {
     // enter CAN config mode
     //CANCONbits.REQOP2 = 1;
     CANCON = 0x80;
@@ -21,9 +21,10 @@ void init_can(const char * brgcon) {
     //CANCONbits.REQOP2 = 0;
     CANCON = 0x00;
 
-    BRGCON1 = *brgcon++;
-    BRGCON2 = *brgcon++;
-    BRGCON3 = *brgcon;
+    BRGCON1 = brgcon1;
+    BRGCON2 = brgcon2;
+    BRGCON3 = brgcon3;
+
     CANSTATbits.OPMODE == 0x00;
 }
  

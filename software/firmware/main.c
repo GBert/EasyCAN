@@ -35,10 +35,8 @@ void main(void) {
     init_port();
     init_timer();
     init_usart();
-    init_can(&BRGCON_64MHZ[6][0]);
-    print_sfr("BRGCON1:",BRGCON1);
-    print_sfr("BRGCON2:",BRGCON1);
-    print_sfr("BRGCON3:",BRGCON1);
+    init_can(BRGCON_64MHZ[5][0],BRGCON_64MHZ[5][1],BRGCON_64MHZ[5][2]);
+    print_sfr_n("BRGCON:",&(BRGCON1),3);
 
     /* empty circular buffers */
     tx_fifo.head=0;
