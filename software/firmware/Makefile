@@ -7,7 +7,7 @@ CLIB=-llibc18f.lib
 
 MAIN=main
 TARGET=main.hex
-SOURCE=main.c usart.c
+SOURCE=main.c timer.c usart.c can.c
 OBJECT=$(SOURCE:.c=.o)
 HEADER=$(SOURCE:.c=.h) prototypes.h
 
