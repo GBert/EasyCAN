@@ -52,11 +52,13 @@ void init_can(const char brgcon1, unsigned char brgcon2, unsigned char brgcon3) 
     /* leaving CAN config mode */
     //CANCONbits.REQOP2 = 0;
     CANCON = 0x00;
-    CANSTATbits.OPMODE == 0x00;
+    // TODO do we need to wait ?
+    while(CANSTATbits.OPMODE==0x00);
 
-    // disable interrupts as of today
-    //INTCONbits.GIE = 0;
-    //INTCONbits.PEIE = 0;
+    // Set Receive Mode for buffers
+    RXB0CON = 0x00;
+    RXB1CON = 0x00;
+
 }
 
 char can_sendmsg(unsigned long id, char * data, char dlc, char flags) {
