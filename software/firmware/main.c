@@ -21,9 +21,11 @@ extern const char BRGCON_64MHZ[][3];
 volatile unsigned char timer_ticks=0;
 struct serial_buffer tx_fifo, rx_fifo;
 
-void init_port(void) {
+void init_ports(void) {
     ADCON1 = 0x0F;		// Default all pins to digital
     LED_TRIS = 0;
+    TRISBbits.TRISB2 = 0;	// make the CAN TX pin a digital output
+    TRISBbits.TRISB3 = 1;	// make the CAN RX pin a digital input
 }
 
 void main(void) {
@@ -32,7 +34,7 @@ void main(void) {
     unsigned char TaskB='A';
     char c;
 
-    init_port();
+    init_ports();
     init_timer();
     init_usart();
     init_can(BRGCON_64MHZ[5][0],BRGCON_64MHZ[5][1],BRGCON_64MHZ[5][2]);
