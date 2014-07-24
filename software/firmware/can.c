@@ -24,10 +24,10 @@ void init_can_filter(void) {
      RXF4SIDL = 0;
      RXF5SIDH = 0;
      RXF5SIDL = 0;
-     RXM0SIDH = 0xFF;
-     RXM0SIDL = 0xFF;
-     RXM1SIDH = 0xFF;
-     RXM1SIDL = 0xFF;
+     RXM0SIDH = 0;
+     RXM0SIDL = 0;
+     RXM1SIDH = 0;
+     RXM1SIDL = 0;
 }
 
 void init_can(const char brgcon1, unsigned char brgcon2, unsigned char brgcon3) {
