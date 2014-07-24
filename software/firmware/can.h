@@ -12,8 +12,21 @@
 
 #include "main.h"
 
-#define CAN_TX_NO_RTR_FRAME	0b11111111
-#define CAN_TX_RTR_FRAME	0b10111111 
+#define CAN_TX_XTD_FRAME	0b00001000
+#define CAN_TX_RTR_FRAME	0b01000000
+
+#define CAN_RX_OVERFLOW		0b00001000
+#define CAN_RX_INVALID_MSG	0b00010000
+#define CAN_RX_XTD_FRAME	0b00100000
+#define CAN_RX_RTR_FRAME	0b01000000
+#define CAN_RX_DBL_BUFFERED	0b10000000
+
+typedef struct CAN_MSG {
+    unsigned long id;
+    char flags;
+    char dlc;
+    char data[8];
+};
 
 /* % can-calc-bit-timing -c 64000000 mcp251x
  *
