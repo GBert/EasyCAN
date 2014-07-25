@@ -108,7 +108,7 @@ char can_readmsg(void) {
    return ReturnValue;  
 }
 
-char putCAN(void){
+char can_writemsg(void){
     char ReturnValue = 0;
     
     // find emtpy transmitter buffer

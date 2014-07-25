@@ -39,9 +39,6 @@ void main(void) {
     init_usart();
     init_can(BRGCON_64MHZ[5][0],BRGCON_64MHZ[5][1],BRGCON_64MHZ[5][2]);
     print_sfr_n("BRGCON:",&(BRGCON1),3);
-    print_sfr_n("PIR5:",&(PIR5),1);
-    print_sfr_n("RXB0CON:",&(RXB0CON),16);
-    print_sfr_n("RXB1CON:",&(RXB1CON),16);
 
     /* empty circular buffers */
     tx_fifo.head=0;
@@ -59,6 +56,17 @@ void main(void) {
 	    puts_rom(s2);
 	    ret=puts_rom_fifo(s1,&tx_fifo);
 	}
+        ret=can_readmsg();
+        if (ret&1) {
+            print_sfr_n("PIR5:",&(PIR5),1);
+            print_sfr_n("RXB0CON:",&(RXB0CON),16);
+        }
+        if (ret&2) {
+            print_sfr_n("PIR5:",&(PIR5),1);
+            print_sfr_n("RXB1CON:",&(RXB1CON),16);
+        }
+
+        //ret=can_writemsg();
 	ret=fifo_putchar(&tx_fifo);
         if (c=fifo_getchar(&rx_fifo)) {
 	    if (c==0x0d) {

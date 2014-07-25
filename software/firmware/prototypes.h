@@ -21,5 +21,6 @@ void init_timer(void);
 
 /* CAN specific */
 void init_can(const char brgcon1, unsigned char brgcon2, unsigned char brgcon3);
-
+char can_readmsg(void);
+char can_writemsg(void);
 #endif /* _PROTOTYPES_H_ */
