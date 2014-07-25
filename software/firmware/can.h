@@ -22,10 +22,13 @@
 #define CAN_RX_DBL_BUFFERED	0b10000000
 
 typedef struct CAN_MSG {
-    unsigned long id;
-    char flags;
-    char dlc;
-    char data[8];
+    unsigned char EIDH;
+    unsigned char EIDL;
+    unsigned char SIDH;
+    unsigned char SIDL;
+    unsigned char DLC;
+    unsigned char Data[8];
+    unsigned char Priority;
 };
 
 /* % can-calc-bit-timing -c 64000000 mcp251x

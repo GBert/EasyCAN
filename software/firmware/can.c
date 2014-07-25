@@ -9,6 +9,10 @@
 
 #include "can.h"
 
+volatile struct CAN_MSG TX_CANMessage;
+volatile struct CAN_MSG RX_CANMessage;
+
+
 /* TODO: until now we all clear all filters */
 void init_can_filter(void) {
      // Initialize Acceptance Filters and Masks to 0x00:
@@ -61,135 +65,102 @@ void init_can(const char brgcon1, unsigned char brgcon2, unsigned char brgcon3) 
     RXB1CON = 0x00;
 }
 
-char can_readmsg(struct CAN_MSG * can_msg) {
-    // clear flags
-    char buffer0_flag = 0;
-    char i;
-    __sfr * ptr;
- 
-    can_msg->flags = 0;
-    if (RXB0CONbits.RXFUL) {
-        // buffer0 contains a message.
-        CANCON &= 0b11110001;
-        buffer0_flag = 1;
-        // clear RXB0 receive flag
-        PIR5bits.RXB0IF = 0;
-	if (COMSTATbits.RXB0OVFL) {
-            can_msg->flags |= CAN_RX_OVERFLOW;
-        }
-        if (RXB0CONbits.RB0DBEN) {
-            can_msg->flags |= RXB0CON & 0b00000111;
-            can_msg->flags &= 0x01;
-        }
-    } else if (RXB1CONbits.RXFUL) {
-        // RXBuffer1 is full
-        CANCON &= 0b11110001;
-        CANCON |= 0b00001010;
-
-        buffer0_flag = 0;
-
-        // Clear the received flag.
-        PIR5bits.RXB1IF = 0;
-        // record and forget any previous overflow
-        if (COMSTATbits.RXB0OVFL) {
-           can_msg->flags |= CAN_RX_OVERFLOW;
-           COMSTATbits.RXB1OVFL = 0;
-        }
-        can_msg->flags |= RXB1CON & 0b00000111;
-        if (can_msg->flags < 0x02) {
-            can_msg->flags |= CAN_RX_DBL_BUFFERED;
-        }
-    } else {
-        return -1;
+char can_readmsg(void) {
+     char ReturnValue = 0;  
+     // doesn't look genius but it's faster&smaller without a loop 
+     // find full receiver
+     if(RXB0CONbits.RXFUL){
+        ReturnValue|=1;
+        RX_CANMessage.EIDH=RXB0EIDH;
+        RX_CANMessage.EIDL=RXB0EIDL;  
+        RX_CANMessage.SIDH=RXB0SIDH;
+        RX_CANMessage.SIDL=RXB0SIDL;  
+        RX_CANMessage.Data[0]=RXB0D0;
+        RX_CANMessage.Data[1]=RXB0D1;
+        RX_CANMessage.Data[2]=RXB0D2;
+        RX_CANMessage.Data[3]=RXB0D3;
+        RX_CANMessage.Data[4]=RXB0D4;
+        RX_CANMessage.Data[5]=RXB0D5;
+        RX_CANMessage.Data[6]=RXB0D6;
+        RX_CANMessage.Data[7]=RXB0D7;
+        RX_CANMessage.DLC=RXB0DLC;
+        RX_CANMessage.Priority=(RXB0CON&0x03);
+        RXB0CONbits.RXFUL=0;
     }
-    // get message length
-    can_msg->dlc = RXB0DLC & 0x0f;
-    // rtr message ?
-    if ((RXB0DLC & 0x40)) {
-        can_msg->flags |= CAN_RX_RTR_FRAME;
-    }
-    // extended message ?
-    if (RXB0SIDLbits.EXID) {
-        can_msg->flags |= CAN_RX_XTD_FRAME;
-        // TODO : read extended ID
-    } else {
-        // TODO : read short ID
-    }
-    // save data
-    ptr = &(RXB0D0);
-    for (i = 0; i < can_msg->dlc; i++) {
-        can_msg->data[ i ] = ptr[ i ];
-    }
-    // Restore default RXB0 mapping.
-    CANCON &= 0b11110001;
-
-    // Record and Clear any previous invalid message bit flag.
-    if (PIR5bits.IRXIF) {
-        can_msg->flags |= CAN_RX_INVALID_MSG;
-        PIR5bits.IRXIF = 0;
-    }
-    if (buffer0_flag) {
-        RXB0CONbits.RXFUL = 0;
-    } else {
-        RXB1CONbits.RXFUL = 0;
-    }
-    return 1;
+    if(RXB1CONbits.RXFUL){
+        ReturnValue|=2;
+        RX_CANMessage.EIDH=RXB1EIDH;
+        RX_CANMessage.EIDL=RXB1EIDL;  
+        RX_CANMessage.SIDH=RXB1SIDH;
+        RX_CANMessage.SIDL=RXB1SIDL;  
+        RX_CANMessage.Data[0]=RXB1D0;
+        RX_CANMessage.Data[1]=RXB1D1;
+        RX_CANMessage.Data[2]=RXB1D2;
+        RX_CANMessage.Data[3]=RXB1D3;
+        RX_CANMessage.Data[4]=RXB1D4;
+        RX_CANMessage.Data[5]=RXB1D5;
+        RX_CANMessage.Data[6]=RXB1D6;
+        RX_CANMessage.Data[7]=RXB1D7;
+        RX_CANMessage.DLC=RXB1DLC;
+        RX_CANMessage.Priority=(RXB1CON&0x03);
+        RXB1CONbits.RXFUL=0;    
+   }
+   return ReturnValue;  
 }
 
-char can_sendmsg(struct CAN_MSG * can_msg) {
-    char i;
-    char * ptr;
-    /* TODO: check if TXB2 does have the highest prio */
-    if (TXB0CONbits.TXREQ == 0) {
-	// TxBuffer0 is available. Set WIN bits to point to TXB0
-        CANCON &= 0b11110001;
-        CANCON |= 0b00001000;
-    } else if (TXB1CONbits.TXREQ == 0) {
-        // TxBuffer1 is available. Set WIN bits to point to TXB1
-        CANCON &= 0b11110001;
-        CANCON |= 0b00000110;
-    } else if (TXB2CONbits.TXREQ == 0) {
-        // TxBuffer2 is available. Set WIN bits to point to TXB2
-        CANCON &= 0b11110001;
-        CANCON |= 0b00000100;
-    } else {
-	return -1;
+char putCAN(void){
+    char ReturnValue = 0;
+    
+    // find emtpy transmitter buffer
+    if (!(TXB0CONbits.TXREQ)) {
+        ReturnValue=1;
+        TXB0EIDH=TX_CANMessage.EIDH;
+        TXB0EIDL=TX_CANMessage.EIDL;  
+        TXB0SIDH=TX_CANMessage.SIDH;
+        TXB0SIDL=TX_CANMessage.SIDL;  
+        TXB0D0=TX_CANMessage.Data[0];
+        TXB0D1=TX_CANMessage.Data[1];
+        TXB0D2=TX_CANMessage.Data[2];
+        TXB0D3=TX_CANMessage.Data[3];
+        TXB0D4=TX_CANMessage.Data[4];
+        TXB0D5=TX_CANMessage.Data[5];
+        TXB0D6=TX_CANMessage.Data[6];
+        TXB0D7=TX_CANMessage.Data[7];
+        TXB0DLC=TX_CANMessage.DLC;
+        // TXB0CON=(8|TX_CANMessage.Priority);
+    } else if (!(TXB1CONbits.TXREQ)) {
+        ReturnValue=2;
+        TXB1EIDH=TX_CANMessage.EIDH;
+        TXB1EIDL=TX_CANMessage.EIDL;  
+        TXB1SIDH=TX_CANMessage.SIDH;
+        TXB1SIDL=TX_CANMessage.SIDL;  
+        TXB1D0=TX_CANMessage.Data[0];
+        TXB1D1=TX_CANMessage.Data[1];
+        TXB1D2=TX_CANMessage.Data[2];
+        TXB1D3=TX_CANMessage.Data[3];
+        TXB1D4=TX_CANMessage.Data[4];
+        TXB1D5=TX_CANMessage.Data[5];
+        TXB1D6=TX_CANMessage.Data[6];
+        TXB1D7=TX_CANMessage.Data[7];
+        TXB1DLC=TX_CANMessage.DLC;
+        // TXB1CON=(8|TX_CANMessage.Priority);
+    } else if (!(TXB2CONbits.TXREQ)) {
+        ReturnValue=3;
+        TXB2EIDH=TX_CANMessage.EIDH;
+        TXB2EIDL=TX_CANMessage.EIDL;  
+        TXB2SIDH=TX_CANMessage.SIDH;
+        TXB2SIDL=TX_CANMessage.SIDL;  
+        TXB2D0=TX_CANMessage.Data[0];
+        TXB2D1=TX_CANMessage.Data[1];
+        TXB2D2=TX_CANMessage.Data[2];
+        TXB2D3=TX_CANMessage.Data[3];
+        TXB2D4=TX_CANMessage.Data[4];
+        TXB2D5=TX_CANMessage.Data[5];
+        TXB2D6=TX_CANMessage.Data[6];
+        TXB2D7=TX_CANMessage.Data[7];
+        TXB2DLC=TX_CANMessage.DLC;
+        // TXB2CON=(8|TX_CANMessage.Priority);
     }
-    // Set transmit priority.
-    RXB0CON = can_msg->flags & 0b00000011;
-
-    // Populate Extended identifier information only if it is
-    // desired.
-    /* if (can_msg->flags & CAN_TX_XTD_FRAME) {
-        can_writeRegs((uint8_t*) & RXB0SIDH, id, TRUE);
-    } else {
-        can_writeRegs((uint8_t*) & RXB0SIDH, id, FALSE);
-    }
-    */
-
-    RXB0DLC = can_msg->dlc;
-
-    // RTR
-    if (can_msg->flags & CAN_TX_RTR_FRAME) {
-        RXB0DLC |= 0b01000000;
-    }
-
-    // Populate data values.
-    ptr = (__sfr *) &(RXB0D0);
-    for (i = 0; i < can_msg->dlc; i++) {
-        ptr[ i ] = can_msg->data[ i ];
-    }
-    /* remapped TX0 buffer */
-    /*
-     __asm
-     bsf RXB0CON, 3, 0
-     __endasm
-    */
-    RXB0CON |= 0x08;
-
-    /* Restore CAN buffer mapping so that subsequent access to RXB0
-     * buffers are to the real RXB0 buffer. */
-    CANCON &= 0b11110001;
-    return 1;
+    return ReturnValue;
 }
 
