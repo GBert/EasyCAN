@@ -35,6 +35,8 @@ void init_can_filter(void) {
 }
 
 void init_can(const char brgcon1, unsigned char brgcon2, unsigned char brgcon3) {
+    TRISBbits.TRISB2 = 0;       // make the CAN TX pin a digital output
+    TRISBbits.TRISB3 = 1;       // make the CAN RX pin a digital input
     /* enter CAN config mode */
     //CANCONbits.REQOP2 = 1;
     //CANSTATbits.OPMODE = 0x04
@@ -127,7 +129,7 @@ char can_writemsg(void){
         TXB0D6=TX_CANMessage.Data[6];
         TXB0D7=TX_CANMessage.Data[7];
         TXB0DLC=TX_CANMessage.DLC;
-        // TXB0CON=(8|TX_CANMessage.Priority);
+        TXB0CON=(8|TX_CANMessage.Priority);
     } else if (!(TXB1CONbits.TXREQ)) {
         ReturnValue=2;
         TXB1EIDH=TX_CANMessage.EIDH;
@@ -143,7 +145,7 @@ char can_writemsg(void){
         TXB1D6=TX_CANMessage.Data[6];
         TXB1D7=TX_CANMessage.Data[7];
         TXB1DLC=TX_CANMessage.DLC;
-        // TXB1CON=(8|TX_CANMessage.Priority);
+        TXB1CON=(8|TX_CANMessage.Priority);
     } else if (!(TXB2CONbits.TXREQ)) {
         ReturnValue=3;
         TXB2EIDH=TX_CANMessage.EIDH;
@@ -159,8 +161,28 @@ char can_writemsg(void){
         TXB2D6=TX_CANMessage.Data[6];
         TXB2D7=TX_CANMessage.Data[7];
         TXB2DLC=TX_CANMessage.DLC;
-        // TXB2CON=(8|TX_CANMessage.Priority);
+        TXB2CON=(8|TX_CANMessage.Priority);
     }
     return ReturnValue;
 }
+
+void can_send_test_frame(void) {
+    TX_CANMessage.EIDH=0x00;
+    TX_CANMessage.EIDL=0x00;  
+    TX_CANMessage.SIDH=0x6b;
+    TX_CANMessage.SIDL=0xc0;  
+    TX_CANMessage.Data[0]=0x55;
+    TX_CANMessage.Data[1]=0x55;
+    TX_CANMessage.Data[2]=0x55;
+    TX_CANMessage.Data[3]=0x55;
+    TX_CANMessage.Data[4]=0x33;
+    TX_CANMessage.Data[5]=0x33;
+    TX_CANMessage.Data[6]=0x33;
+    TX_CANMessage.Data[7]=0x33;
+    TX_CANMessage.DLC=8;
+    TX_CANMessage.Priority=0;
+    can_writemsg();
+}
+   
+
 

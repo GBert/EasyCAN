@@ -77,7 +77,7 @@ can_reset()
 --
 
 -- 250K bps sample point 87.5%
-can_set_config(0x0f, 0xb5, 0x01)
+can_set_config(0x0f, 0xbc, 0x01)
 CIOCON = 0x20; -- TXCAN, high when recessive
 
 -- in this example we combine the hardware buffers.

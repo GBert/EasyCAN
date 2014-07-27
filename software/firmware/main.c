@@ -55,6 +55,9 @@ void main(void) {
 	    do_print = 0;
 	    puts_rom(s2);
 	    ret=puts_rom_fifo(s1,&tx_fifo);
+            print_sfr_n("PIR5:",&(PIR5),1);
+            print_sfr_n("RXB0CON:",&(RXB0CON),16);
+            print_sfr_n("RXB1CON:",&(RXB1CON),16);
 	}
         ret=can_readmsg();
         if (ret&1) {
@@ -72,6 +75,10 @@ void main(void) {
 	    if (c==0x0d) {
 	        copy_char_fifo(&rx_fifo,&tx_fifo);
 		putchar_fifo(0x0a,&tx_fifo);
+                can_send_test_frame();
+                print_sfr_n("TXB0CON:",&(TXB0CON),16);
+                print_sfr_n("TXB1CON:",&(TXB1CON),16);
+                print_sfr_n("TXB2CON:",&(TXB2CON),16);
 	    }
 	}
     }
