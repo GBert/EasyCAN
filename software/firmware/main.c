@@ -53,11 +53,11 @@ void main(void) {
 	}
 	if ((do_print == 1) && (timer_ticks == 100)) {
 	    do_print = 0;
-	    puts_rom(s2);
+//	    puts_rom(s2);
 	    ret=puts_rom_fifo(s1,&tx_fifo);
             print_sfr_n("PIR5:",&(PIR5),1);
             print_sfr_n("RXB0CON:",&(RXB0CON),16);
-            print_sfr_n("RXB1CON:",&(RXB1CON),16);
+//            print_sfr_n("RXB1CON:",&(RXB1CON),16);
 	}
         ret=can_readmsg();
         if (ret&1) {
