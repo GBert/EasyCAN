@@ -78,9 +78,9 @@ void init_can(const char brgcon1, unsigned char brgcon2, unsigned char brgcon3) 
     // TODO do we need to wait ?
     while(CANSTATbits.OPMODE == 0 );
 
-    // Set Receive Mode for buffers
-    RXB0CON = 0x00;
-    RXB1CON = 0x00;
+    // Set Receive Mode for buffers -> receive all frames
+    RXB0CON = 0x60;
+    RXB1CON = 0x60;
 }
 
 char can_readmsg(void) {
