@@ -15,23 +15,39 @@ volatile struct CAN_MSG RX_CANMessage;
 
 /* TODO: until now we all clear all filters */
 void init_can_filter(void) {
-     // Initialize Acceptance Filters and Masks to 0x00:
-     RXF0SIDH = 0; // SID10 to SID3
-     RXF0SIDL = 0; // SID2 to SID0; Standard frame
+     // initialize acceptance filters and masks to 0x00:
+     RXF0SIDH = 0;
+     RXF0SIDL = 0;
+     RXF0EIDH = 0;
+     RXF0EIDL = 0;
      RXF1SIDH = 0;
      RXF1SIDL = 0;
+     RXF1EIDH = 0;
+     RXF1EIDL = 0;
      RXF2SIDH = 0;
      RXF2SIDL = 0;
+     RXF2EIDH = 0;
+     RXF2EIDL = 0;
      RXF3SIDH = 0;
      RXF3SIDL = 0;
+     RXF3EIDH = 0;
+     RXF3EIDL = 0;
      RXF4SIDH = 0;
      RXF4SIDL = 0;
+     RXF4EIDH = 0;
+     RXF4EIDL = 0;
      RXF5SIDH = 0;
      RXF5SIDL = 0;
+     RXF5EIDH = 0;
+     RXF5EIDL = 0;
      RXM0SIDH = 0;
      RXM0SIDL = 0;
+     RXM0EIDH = 0;
+     RXM0EIDL = 0;
      RXM1SIDH = 0;
      RXM1SIDL = 0;
+     RXM1EIDH = 0;
+     RXM1EIDL = 0;
 }
 
 void init_can(const char brgcon1, unsigned char brgcon2, unsigned char brgcon3) {
