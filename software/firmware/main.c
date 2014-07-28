@@ -55,8 +55,8 @@ void main(void) {
 	    do_print = 0;
 //	    puts_rom(s2);
 	    ret=puts_rom_fifo(s1,&tx_fifo);
-            print_sfr_n("PIR5:",&(PIR5),1);
-            print_sfr_n("RXB0CON:",&(RXB0CON),16);
+//            print_sfr_n("PIR5:",&(PIR5),1);
+//            print_sfr_n("RXB0CON:",&(RXB0CON),16);
 //            print_sfr_n("RXB1CON:",&(RXB1CON),16);
 	}
         ret=can_readmsg();
