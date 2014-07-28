@@ -9,9 +9,8 @@
 
 #include "can.h"
 
-volatile struct CAN_MSG TX_CANMessage;
-volatile struct CAN_MSG RX_CANMessage;
-
+extern volatile struct CAN_MSG TX_CANMessage;
+extern volatile struct CAN_MSG RX_CANMessage;
 
 /* TODO: until now we all clear all filters */
 void init_can_filter(void) {
