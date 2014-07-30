@@ -29,19 +29,26 @@ char rx_buffer_to_slcan (void) {
     } else {
         slcan_buffer[0]='t';
     }
-    id_buffer[0] = ((RX_CANMessage.SIDL & 0xc0 ) >> 5) + (RX_CANMessage.SIDH << 3);
-    id_buffer[1] = (RX_CANMessage.SIDH >> 5);
     /* extended ?
      *  RXFnSIDLbits.EXID */
     if (RX_CANMessage.SIDL & 0x08) {
-        /* 29 bit frame - change char to upper */
+        /* 29 bit id - change type to upper char */
         slcan_buffer[0] -= 0x20;
-        id_buffer[1] += RX_CANMessage.EIDL << 3;
-        id_buffer[2] = (RX_CANMessage.EIDL >> 5)  + (RX_CANMessage.EIDH << 3);
-        id_buffer[3] = (RX_CANMessage.EIDH >> 5)  + (( RX_CANMessage.SIDL & 0x03) << 3);
+        /* bits 29 - 25 */
+        id_buffer[0] = RX_CANMessage.SIDH  >> 3;
+        /* bits 24 - 17 are spread over 3 registers - wow */
+        id_buffer[1] =(RX_CANMessage.SIDL & 0x03) + ((RX_CANMessage.SIDL & 0xe0) >> 3)  + ((RX_CANMessage.SIDH & 0x07) << 5)   ;
+        /* bits 16 - 9 */
+        id_buffer[2] = RX_CANMessage.EIDH;
+        /* bits  8 - 1 */
+        id_buffer[3] = RX_CANMessage.EIDL;
         /* ... */
         ptr = &slcan_buffer[9];
     } else {
+        /* bits 11 - 9 */
+        id_buffer[0] = (RX_CANMessage.SIDH >> 5);
+        /* bits  8 - 1 */
+        id_buffer[1] = ((RX_CANMessage.SIDL & 0xc0 ) >> 5) + (RX_CANMessage.SIDH << 3);
         /* 11 bit standard frame */
         ptr = &slcan_buffer[4];
     }
