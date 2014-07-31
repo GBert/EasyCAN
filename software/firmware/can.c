@@ -79,7 +79,7 @@ void init_can(const char brgcon1, unsigned char brgcon2, unsigned char brgcon3) 
     while(CANSTATbits.OPMODE == 0 );
 
     // Set Receive Mode for buffers -> receive all frames
-    RXB0CON = 0x60;
+    RXB0CON = 0x64; // also enable rollover to RXB1CON1
     RXB1CON = 0x60;
 }
 
