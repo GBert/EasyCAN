@@ -21,15 +21,6 @@
 #define CAN_RX_RTR_FRAME	0b01000000
 #define CAN_RX_DBL_BUFFERED	0b10000000
 
-typedef struct CAN_MSG {
-    unsigned char EIDH;
-    unsigned char EIDL;
-    unsigned char SIDH;
-    unsigned char SIDL;
-    unsigned char DLC;
-    unsigned char Data[8];
-    unsigned char Priority;
-};
 
 /* http://www.port.de/cgi-scripts/tq_v1_0.cgi?ctype=pic18&CLK=32&sample_point=87.5
  * there seems to be a BUG in the script (as of 26/7/2014 -> clock must be devided by 2 */

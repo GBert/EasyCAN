@@ -19,5 +19,15 @@
 #define LED_TRIS        (TRISAbits.TRISA0)
 #define LED             (LATAbits.LATA0)
 
+typedef struct CAN_MSG {
+    unsigned char EIDH;
+    unsigned char EIDL;
+    unsigned char SIDH;
+    unsigned char SIDL;
+    unsigned char DLC;
+    unsigned char Data[8];
+    unsigned char Priority;
+};
+
 #endif /* _MAIN_H_ */
 

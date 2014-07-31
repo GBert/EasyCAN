@@ -20,6 +20,9 @@ extern const char BRGCON_64MHZ[][3];
 
 volatile unsigned char timer_ticks=0;
 struct serial_buffer tx_fifo, rx_fifo;
+volatile struct CAN_MSG TX_CANMessage;
+volatile struct CAN_MSG RX_CANMessage;
+
 
 void init_ports(void) {
     ADCON1 = 0x0F;		// Default all pins to digital
