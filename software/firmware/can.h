@@ -23,7 +23,7 @@
 
 
 /* http://www.port.de/cgi-scripts/tq_v1_0.cgi?ctype=pic18&CLK=32&sample_point=87.5
- * there seems to be a BUG in the script (as of 26/7/2014 -> clock must be devided by 2 */
+ * Fcan = 0.5 * Fosc ! */
 
 const char BRGCON_64MHZ [][3] = {
     {0x3f,0xbf,0x02},	/*   10k not possible -> 20k */
@@ -38,7 +38,7 @@ const char BRGCON_64MHZ [][3] = {
 };
 
 /* http://www.port.de/cgi-scripts/tq_v1_0.cgi?ctype=pic18&CLK=8&sample_point=87.5
- * there seems to be a BUG in the script (as of 26/7/2014 -> clock must be devided by 2 */
+ * Fcan = 0.5 * Fosc ! */
 
 const char BRGCON_16MHZ [][3] = {
     {0x31,0xbf,0x07},	/*   10k */
