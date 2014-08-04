@@ -25,7 +25,13 @@ volatile struct CAN_MSG RX_CANMessage;
 
 
 void init_ports(void) {
-    ADCON1 = 0x0F;		// Default all pins to digital
+    ANCON0 = 0;			// analog off
+    ANCON1 = 0;			// analog off
+    ADCON0 = 0;			// disable ADC
+    ADCON1 = 0;			// disable ADC
+    ADCON2 = 0;			// disable ADC
+    CM1CON = 0;			// disable comperator
+    CM2CON = 0;			// disable comperator
     LED_TRIS = 0;
     TRISBbits.TRISB2 = 0;	// make the CAN TX pin a digital output
     TRISBbits.TRISB3 = 1;	// make the CAN RX pin a digital input
