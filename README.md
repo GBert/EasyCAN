@@ -11,7 +11,7 @@ This repo contains a project of a CAN interface. Main goals are:
 Price target is 15$ - depends on galvanic isolation 
 
 [![alt text](https://github.com/GBert/EasyCAN/blob/master/pictures/easycan_board_front_t.jpg "PCB front")](https://raw.githubusercontent.com/GBert/EasyCAN/master/pictures/easycan_board_front.jpg)
-[![alt text](https://github.com/GBert/EasyCAN/blob/master/pictures/easycan_board_back_t.jpg "PCB back")](https://raw.githubusercontent.com/GBert/EasyCAN/master/pictures/easycan_board_back_II.jpg)
+[![alt text](https://github.com/GBert/EasyCAN/blob/master/pictures/easycan_board_back_II_t.jpg "PCB back")](https://raw.githubusercontent.com/GBert/EasyCAN/master/pictures/easycan_board_back_II.jpg)
 [![alt text](https://github.com/GBert/EasyCAN/blob/master/pictures/easycan_board_back_t.jpg "PCB back including CP2102")](https://raw.githubusercontent.com/GBert/EasyCAN/master/pictures/easycan_board_back.jpg)
 [![alt text](https://github.com/GBert/EasyCAN/blob/master/pictures/easycan-test_setup_t.jpg "EasyCAN test setup")](https://raw.githubusercontent.com/GBert/EasyCAN/master/pictures/easycan-test_setup.jpg)
 
