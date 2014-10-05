@@ -10,6 +10,11 @@ This repo contains a project of a CAN interface. Main goals are:
 
 Price target is 15$ - depends on galvanic isolation 
 
+![alt text](https://github.com/GBert/EasyCAN/blob/master/pictures/easy_can_board_front_t.jpg "PCB front")
+![alt text](https://github.com/GBert/EasyCAN/blob/master/pictures/easy_can_board_back_t.jpg "PCB front")
+![alt text](https://github.com/GBert/EasyCAN/blob/master/pictures/easy_can-test_setup_t.jpg "PCB front")
+
+
 ### Firmware
 
 Bootloader (ds30loader) is programmed by the cheap CP2102 board with Darron Broads [k8048](http://dev.kewl.org/k8048/Doc/). The
