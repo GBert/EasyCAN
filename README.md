@@ -24,7 +24,7 @@ firmware itself is programmed by the bootloader. So no PIC programmer needed.
 ### Status
 
 - working test PCB
-- working Wellington bootloader from darron Broad
+- working Wellington bootloader from Darron Broad
 - working easy-loader from Darron Broad
 - wip: SLCAN firmware (early stage: send test CAN frames)
 
