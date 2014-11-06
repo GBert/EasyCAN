@@ -18,13 +18,12 @@ Price target is 15$ - depends on galvanic isolation
 
 ### Firmware
 
-Bootloader (ds30loader) is programmed by the cheap CP2102 board with Darron Broads [k8048](http://dev.kewl.org/k8048/Doc/). The
-firmware itself is programmed by the bootloader. So no PIC programmer needed.
+Bootloader ([Wellington](http://dev.kewl.org/Wellington) is programmed by the cheap CP2102 board with Darron Broads [k8048](http://dev.kewl.org/k8048/Doc/). The firmware itself is programmed by the bootloader. So no PIC programmer needed.
 
 ### Status
 
 - working test PCB
-- working Wellington bootloader from Darron Broad
+- working Wellington bootloader
 - working easy-loader from Darron Broad
 - wip: SLCAN firmware (early stage: send test CAN frames)
 
