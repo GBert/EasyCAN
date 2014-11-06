@@ -1,0 +1,3363 @@
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  1
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+                      00001 ;--------------------------------------------------------
+                      00002 ; File Created by SDCC : free open source ANSI-C Compiler
+                      00003 ; Version 3.4.1 #9092 (Nov  3 2014) (Linux)
+                      00004 ; This file was generated Thu Nov  6 11:40:32 2014
+                      00005 ;--------------------------------------------------------
+                      00006 ; PIC16 port for the Microchip 16-bit core micros
+                      00007 ;--------------------------------------------------------
+                      00008         list    p=18f26k80
+                      00009         radix   dec
+                      00010 
+                      00011 
+                      00012 ;--------------------------------------------------------
+                      00013 ; public variables in this module
+                      00014 ;--------------------------------------------------------
+  0000                00015         global  _init_usart
+  0000                00016         global  _putchar
+  0000                00017         global  _putchar_wait
+  0000                00018         global  _print_hex_wait
+  0000                00019         global  _puts_rom
+  0000                00020         global  _print_debug_value
+  0000                00021         global  _print_debug_fifo
+  0000                00022         global  _putchar_fifo
+  0000                00023         global  _fifo_getchar
+  0000                00024         global  _fifo_putchar
+  0000                00025         global  _puts_rom_fifo
+  0000                00026         global  _copy_char_fifo
+  0000                00027         global  _sData
+                      00028 
+                      00029 ;--------------------------------------------------------
+                      00030 ; extern variables in this module
+                      00031 ;--------------------------------------------------------
+  0000                00032         extern  __gptrget1
+  0000                00033         extern  __gptrput1
+  0000                00034         extern  _RXERRCNTbits
+  0000                00035         extern  _TXERRCNTbits
+  0000                00036         extern  _BRGCON1bits
+  0000                00037         extern  _BRGCON2bits
+  0000                00038         extern  _BRGCON3bits
+  0000                00039         extern  _RXFCON0bits
+  0000                00040         extern  _RXFCON1bits
+  0000                00041         extern  _RXF6SIDHbits
+  0000                00042         extern  _RXF6SIDLbits
+  0000                00043         extern  _RXF6EIDHbits
+  0000                00044         extern  _RXF6EIDLbits
+  0000                00045         extern  _RXF7SIDHbits
+  0000                00046         extern  _RXF7SIDLbits
+  0000                00047         extern  _RXF7EIDHbits
+  0000                00048         extern  _RXF7EIDLbits
+  0000                00049         extern  _RXF8SIDHbits
+  0000                00050         extern  _RXF8SIDLbits
+  0000                00051         extern  _RXF8EIDHbits
+  0000                00052         extern  _RXF8EIDLbits
+  0000                00053         extern  _RXF9SIDHbits
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  2
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00054         extern  _RXF9SIDLbits
+  0000                00055         extern  _RXF9EIDHbits
+  0000                00056         extern  _RXF9EIDLbits
+  0000                00057         extern  _RXF10SIDHbits
+  0000                00058         extern  _RXF10SIDLbits
+  0000                00059         extern  _RXF10EIDHbits
+  0000                00060         extern  _RXF10EIDLbits
+  0000                00061         extern  _RXF11SIDHbits
+  0000                00062         extern  _RXF11SIDLbits
+  0000                00063         extern  _RXF11EIDHbits
+  0000                00064         extern  _RXF11EIDLbits
+  0000                00065         extern  _RXF12SIDHbits
+  0000                00066         extern  _RXF12SIDLbits
+  0000                00067         extern  _RXF12EIDHbits
+  0000                00068         extern  _RXF12EIDLbits
+  0000                00069         extern  _RXF13SIDHbits
+  0000                00070         extern  _RXF13SIDLbits
+  0000                00071         extern  _RXF13EIDHbits
+  0000                00072         extern  _RXF13EIDLbits
+  0000                00073         extern  _RXF14SIDHbits
+  0000                00074         extern  _RXF14SIDLbits
+  0000                00075         extern  _RXF14EIDHbits
+  0000                00076         extern  _RXF14EIDLbits
+  0000                00077         extern  _RXF15SIDHbits
+  0000                00078         extern  _RXF15SIDLbits
+  0000                00079         extern  _RXF15EIDHbits
+  0000                00080         extern  _RXF15EIDLbits
+  0000                00081         extern  _SDFLCbits
+  0000                00082         extern  _RXFBCON0bits
+  0000                00083         extern  _RXFBCON1bits
+  0000                00084         extern  _RXFBCON2bits
+  0000                00085         extern  _RXFBCON3bits
+  0000                00086         extern  _RXFBCON4bits
+  0000                00087         extern  _RXFBCON5bits
+  0000                00088         extern  _RXFBCON6bits
+  0000                00089         extern  _RXFBCON7bits
+  0000                00090         extern  _MSEL0bits
+  0000                00091         extern  _MSEL1bits
+  0000                00092         extern  _MSEL2bits
+  0000                00093         extern  _MSEL3bits
+  0000                00094         extern  _BSEL0bits
+  0000                00095         extern  _BIE0bits
+  0000                00096         extern  _TXBIEbits
+  0000                00097         extern  _B0CONbits
+  0000                00098         extern  _B0SIDHbits
+  0000                00099         extern  _B0SIDLbits
+  0000                00100         extern  _B0EIDHbits
+  0000                00101         extern  _B0EIDLbits
+  0000                00102         extern  _B0DLCbits
+  0000                00103         extern  _B0D0bits
+  0000                00104         extern  _B0D1bits
+  0000                00105         extern  _B0D2bits
+  0000                00106         extern  _B0D3bits
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  3
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00107         extern  _B0D4bits
+  0000                00108         extern  _B0D5bits
+  0000                00109         extern  _B0D6bits
+  0000                00110         extern  _B0D7bits
+  0000                00111         extern  _CANSTAT_RO9bits
+  0000                00112         extern  _CANCON_RO9bits
+  0000                00113         extern  _B1CONbits
+  0000                00114         extern  _B1SIDHbits
+  0000                00115         extern  _B1SIDLbits
+  0000                00116         extern  _B1EIDHbits
+  0000                00117         extern  _B1EIDLbits
+  0000                00118         extern  _B1DLCbits
+  0000                00119         extern  _B1D0bits
+  0000                00120         extern  _B1D1bits
+  0000                00121         extern  _B1D2bits
+  0000                00122         extern  _B1D3bits
+  0000                00123         extern  _B1D4bits
+  0000                00124         extern  _B1D5bits
+  0000                00125         extern  _B1D6bits
+  0000                00126         extern  _B1D7bits
+  0000                00127         extern  _CANSTAT_RO8bits
+  0000                00128         extern  _CANCON_RO8bits
+  0000                00129         extern  _B2CONbits
+  0000                00130         extern  _B2SIDHbits
+  0000                00131         extern  _B2SIDLbits
+  0000                00132         extern  _B2EIDHbits
+  0000                00133         extern  _B2EIDLbits
+  0000                00134         extern  _B2DLCbits
+  0000                00135         extern  _B2D0bits
+  0000                00136         extern  _B2D1bits
+  0000                00137         extern  _B2D2bits
+  0000                00138         extern  _B2D3bits
+  0000                00139         extern  _B2D4bits
+  0000                00140         extern  _B2D5bits
+  0000                00141         extern  _B2D6bits
+  0000                00142         extern  _B2D7bits
+  0000                00143         extern  _CANSTAT_RO7bits
+  0000                00144         extern  _CANCON_RO7bits
+  0000                00145         extern  _B3CONbits
+  0000                00146         extern  _B3SIDHbits
+  0000                00147         extern  _B3SIDLbits
+  0000                00148         extern  _B3EIDHbits
+  0000                00149         extern  _B3EIDLbits
+  0000                00150         extern  _B3DLCbits
+  0000                00151         extern  _B3D0bits
+  0000                00152         extern  _B3D1bits
+  0000                00153         extern  _B3D2bits
+  0000                00154         extern  _B3D3bits
+  0000                00155         extern  _B3D4bits
+  0000                00156         extern  _B3D5bits
+  0000                00157         extern  _B3D6bits
+  0000                00158         extern  _B3D7bits
+  0000                00159         extern  _CANSTAT_RO6bits
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  4
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00160         extern  _CANCON_RO6bits
+  0000                00161         extern  _B4CONbits
+  0000                00162         extern  _B4SIDHbits
+  0000                00163         extern  _B4SIDLbits
+  0000                00164         extern  _B4EIDHbits
+  0000                00165         extern  _B4EIDLbits
+  0000                00166         extern  _B4DLCbits
+  0000                00167         extern  _B4D0bits
+  0000                00168         extern  _B4D1bits
+  0000                00169         extern  _B4D2bits
+  0000                00170         extern  _B4D3bits
+  0000                00171         extern  _B4D4bits
+  0000                00172         extern  _B4D5bits
+  0000                00173         extern  _B4D6bits
+  0000                00174         extern  _B4D7bits
+  0000                00175         extern  _CANSTAT_RO5bits
+  0000                00176         extern  _CANCON_RO5bits
+  0000                00177         extern  _B5CONbits
+  0000                00178         extern  _B5SIDHbits
+  0000                00179         extern  _B5SIDLbits
+  0000                00180         extern  _B5EIDHbits
+  0000                00181         extern  _B5EIDLbits
+  0000                00182         extern  _B5DLCbits
+  0000                00183         extern  _B5D0bits
+  0000                00184         extern  _B5D1bits
+  0000                00185         extern  _B5D2bits
+  0000                00186         extern  _B5D3bits
+  0000                00187         extern  _B5D4bits
+  0000                00188         extern  _B5D5bits
+  0000                00189         extern  _B5D6bits
+  0000                00190         extern  _B5D7bits
+  0000                00191         extern  _CANSTAT_RO4bits
+  0000                00192         extern  _CANCON_RO4bits
+  0000                00193         extern  _RXF0SIDHbits
+  0000                00194         extern  _RXF0SIDLbits
+  0000                00195         extern  _RXF0EIDHbits
+  0000                00196         extern  _RXF0EIDLbits
+  0000                00197         extern  _RXF1SIDHbits
+  0000                00198         extern  _RXF1SIDLbits
+  0000                00199         extern  _RXF1EIDHbits
+  0000                00200         extern  _RXF1EIDLbits
+  0000                00201         extern  _RXF2SIDHbits
+  0000                00202         extern  _RXF2SIDLbits
+  0000                00203         extern  _RXF2EIDHbits
+  0000                00204         extern  _RXF2EIDLbits
+  0000                00205         extern  _RXF3SIDHbits
+  0000                00206         extern  _RXF3SIDLbits
+  0000                00207         extern  _RXF3EIDHbits
+  0000                00208         extern  _RXF3EIDLbits
+  0000                00209         extern  _RXF4SIDHbits
+  0000                00210         extern  _RXF4SIDLbits
+  0000                00211         extern  _RXF4EIDHbits
+  0000                00212         extern  _RXF4EIDLbits
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  5
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00213         extern  _RXF5SIDHbits
+  0000                00214         extern  _RXF5SIDLbits
+  0000                00215         extern  _RXF5EIDHbits
+  0000                00216         extern  _RXF5EIDLbits
+  0000                00217         extern  _RXM0SIDHbits
+  0000                00218         extern  _RXM0SIDLbits
+  0000                00219         extern  _RXM0EIDHbits
+  0000                00220         extern  _RXM0EIDLbits
+  0000                00221         extern  _RXM1SIDHbits
+  0000                00222         extern  _RXM1SIDLbits
+  0000                00223         extern  _RXM1EIDHbits
+  0000                00224         extern  _RXM1EIDLbits
+  0000                00225         extern  _TXB2CONbits
+  0000                00226         extern  _TXB2SIDHbits
+  0000                00227         extern  _TXB2SIDLbits
+  0000                00228         extern  _TXB2EIDHbits
+  0000                00229         extern  _TXB2EIDLbits
+  0000                00230         extern  _TXB2DLCbits
+  0000                00231         extern  _TXB2D0bits
+  0000                00232         extern  _TXB2D1bits
+  0000                00233         extern  _TXB2D2bits
+  0000                00234         extern  _TXB2D3bits
+  0000                00235         extern  _TXB2D4bits
+  0000                00236         extern  _TXB2D5bits
+  0000                00237         extern  _TXB2D6bits
+  0000                00238         extern  _TXB2D7bits
+  0000                00239         extern  _CANSTAT_RO3bits
+  0000                00240         extern  _CANCON_RO3bits
+  0000                00241         extern  _TXB1CONbits
+  0000                00242         extern  _TXB1SIDHbits
+  0000                00243         extern  _TXB1SIDLbits
+  0000                00244         extern  _TXB1EIDHbits
+  0000                00245         extern  _TXB1EIDLbits
+  0000                00246         extern  _TXB1DLCbits
+  0000                00247         extern  _TXB1D0bits
+  0000                00248         extern  _TXB1D1bits
+  0000                00249         extern  _TXB1D2bits
+  0000                00250         extern  _TXB1D3bits
+  0000                00251         extern  _TXB1D4bits
+  0000                00252         extern  _TXB1D5bits
+  0000                00253         extern  _TXB1D6bits
+  0000                00254         extern  _TXB1D7bits
+  0000                00255         extern  _CANSTAT_RO2bits
+  0000                00256         extern  _CANCON_RO2bits
+  0000                00257         extern  _TXB0CONbits
+  0000                00258         extern  _TXB0SIDHbits
+  0000                00259         extern  _TXB0SIDLbits
+  0000                00260         extern  _TXB0EIDHbits
+  0000                00261         extern  _TXB0EIDLbits
+  0000                00262         extern  _TXB0DLCbits
+  0000                00263         extern  _TXB0D0bits
+  0000                00264         extern  _TXB0D1bits
+  0000                00265         extern  _TXB0D2bits
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  6
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00266         extern  _TXB0D3bits
+  0000                00267         extern  _TXB0D4bits
+  0000                00268         extern  _TXB0D5bits
+  0000                00269         extern  _TXB0D6bits
+  0000                00270         extern  _TXB0D7bits
+  0000                00271         extern  _CANSTAT_RO1bits
+  0000                00272         extern  _CANCON_RO1bits
+  0000                00273         extern  _RXB1CONbits
+  0000                00274         extern  _RXB1SIDHbits
+  0000                00275         extern  _RXB1SIDLbits
+  0000                00276         extern  _RXB1EIDHbits
+  0000                00277         extern  _RXB1EIDLbits
+  0000                00278         extern  _RXB1DLCbits
+  0000                00279         extern  _RXB1D0bits
+  0000                00280         extern  _RXB1D1bits
+  0000                00281         extern  _RXB1D2bits
+  0000                00282         extern  _RXB1D3bits
+  0000                00283         extern  _RXB1D4bits
+  0000                00284         extern  _RXB1D5bits
+  0000                00285         extern  _RXB1D6bits
+  0000                00286         extern  _RXB1D7bits
+  0000                00287         extern  _CANSTAT_RO0bits
+  0000                00288         extern  _CANCON_RO0bits
+  0000                00289         extern  _CCP5CONbits
+  0000                00290         extern  _CCP4CONbits
+  0000                00291         extern  _CCP3CONbits
+  0000                00292         extern  _CCP2CONbits
+  0000                00293         extern  _ECCP2CONbits
+  0000                00294         extern  _CTMUICONbits
+  0000                00295         extern  _CTMUCONLbits
+  0000                00296         extern  _CTMUCONHbits
+  0000                00297         extern  _PADCFG1bits
+  0000                00298         extern  _PMD2bits
+  0000                00299         extern  _PMD1bits
+  0000                00300         extern  _PMD0bits
+  0000                00301         extern  _IOCBbits
+  0000                00302         extern  _WPUBbits
+  0000                00303         extern  _ANCON1bits
+  0000                00304         extern  _ANCON0bits
+  0000                00305         extern  _CM2CONbits
+  0000                00306         extern  _CM2CON1bits
+  0000                00307         extern  _CM1CONbits
+  0000                00308         extern  _CM1CON1bits
+  0000                00309         extern  _RXB0CONbits
+  0000                00310         extern  _RXB0SIDHbits
+  0000                00311         extern  _RXB0SIDLbits
+  0000                00312         extern  _RXB0EIDHbits
+  0000                00313         extern  _RXB0EIDLbits
+  0000                00314         extern  _RXB0DLCbits
+  0000                00315         extern  _RXB0D0bits
+  0000                00316         extern  _RXB0D1bits
+  0000                00317         extern  _RXB0D2bits
+  0000                00318         extern  _RXB0D3bits
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  7
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00319         extern  _RXB0D4bits
+  0000                00320         extern  _RXB0D5bits
+  0000                00321         extern  _RXB0D6bits
+  0000                00322         extern  _RXB0D7bits
+  0000                00323         extern  _CANSTATbits
+  0000                00324         extern  _CANCONbits
+  0000                00325         extern  _CIOCONbits
+  0000                00326         extern  _COMSTATbits
+  0000                00327         extern  _ECANCONbits
+  0000                00328         extern  _PIE5bits
+  0000                00329         extern  _PIR5bits
+  0000                00330         extern  _IPR5bits
+  0000                00331         extern  _EECON1bits
+  0000                00332         extern  _PORTAbits
+  0000                00333         extern  _PORTBbits
+  0000                00334         extern  _PORTCbits
+  0000                00335         extern  _PORTEbits
+  0000                00336         extern  _T4CONbits
+  0000                00337         extern  _LATAbits
+  0000                00338         extern  _LATBbits
+  0000                00339         extern  _LATCbits
+  0000                00340         extern  _SLRCONbits
+  0000                00341         extern  _ODCONbits
+  0000                00342         extern  _TRISAbits
+  0000                00343         extern  _TRISBbits
+  0000                00344         extern  _TRISCbits
+  0000                00345         extern  _CCPTMRSbits
+  0000                00346         extern  _REFOCONbits
+  0000                00347         extern  _OSCTUNEbits
+  0000                00348         extern  _PSTR1CONbits
+  0000                00349         extern  _PIE1bits
+  0000                00350         extern  _PIR1bits
+  0000                00351         extern  _IPR1bits
+  0000                00352         extern  _PIE2bits
+  0000                00353         extern  _PIR2bits
+  0000                00354         extern  _IPR2bits
+  0000                00355         extern  _PIE3bits
+  0000                00356         extern  _PIR3bits
+  0000                00357         extern  _IPR3bits
+  0000                00358         extern  _RCSTA2bits
+  0000                00359         extern  _BAUDCON1bits
+  0000                00360         extern  _HLVDCONbits
+  0000                00361         extern  _T1GCONbits
+  0000                00362         extern  _RCSTAbits
+  0000                00363         extern  _RCSTA1bits
+  0000                00364         extern  _TXSTAbits
+  0000                00365         extern  _TXSTA1bits
+  0000                00366         extern  _T3GCONbits
+  0000                00367         extern  _T3CONbits
+  0000                00368         extern  _CMSTATbits
+  0000                00369         extern  _CMSTATUSbits
+  0000                00370         extern  _CVRCONbits
+  0000                00371         extern  _PIE4bits
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  8
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00372         extern  _PIR4bits
+  0000                00373         extern  _IPR4bits
+  0000                00374         extern  _BAUDCON2bits
+  0000                00375         extern  _TXSTA2bits
+  0000                00376         extern  _CCP1CONbits
+  0000                00377         extern  _ECCP1CONbits
+  0000                00378         extern  _ECCP1DELbits
+  0000                00379         extern  _PWM1CONbits
+  0000                00380         extern  _ECCP1ASbits
+  0000                00381         extern  _ADCON2bits
+  0000                00382         extern  _ADCON1bits
+  0000                00383         extern  _ADCON0bits
+  0000                00384         extern  _SSPCON2bits
+  0000                00385         extern  _SSPCON1bits
+  0000                00386         extern  _SSPSTATbits
+  0000                00387         extern  _SSPADDbits
+  0000                00388         extern  _T2CONbits
+  0000                00389         extern  _T1CONbits
+  0000                00390         extern  _RCONbits
+  0000                00391         extern  _WDTCONbits
+  0000                00392         extern  _OSCCON2bits
+  0000                00393         extern  _OSCCONbits
+  0000                00394         extern  _T0CONbits
+  0000                00395         extern  _STATUSbits
+  0000                00396         extern  _INTCON3bits
+  0000                00397         extern  _INTCON2bits
+  0000                00398         extern  _INTCONbits
+  0000                00399         extern  _INTCON1bits
+  0000                00400         extern  _STKPTRbits
+  0000                00401         extern  _RXERRCNT
+  0000                00402         extern  _TXERRCNT
+  0000                00403         extern  _BRGCON1
+  0000                00404         extern  _BRGCON2
+  0000                00405         extern  _BRGCON3
+  0000                00406         extern  _RXFCON0
+  0000                00407         extern  _RXFCON1
+  0000                00408         extern  _RXF6SIDH
+  0000                00409         extern  _RXF6SIDL
+  0000                00410         extern  _RXF6EIDH
+  0000                00411         extern  _RXF6EIDL
+  0000                00412         extern  _RXF7SIDH
+  0000                00413         extern  _RXF7SIDL
+  0000                00414         extern  _RXF7EIDH
+  0000                00415         extern  _RXF7EIDL
+  0000                00416         extern  _RXF8SIDH
+  0000                00417         extern  _RXF8SIDL
+  0000                00418         extern  _RXF8EIDH
+  0000                00419         extern  _RXF8EIDL
+  0000                00420         extern  _RXF9SIDH
+  0000                00421         extern  _RXF9SIDL
+  0000                00422         extern  _RXF9EIDH
+  0000                00423         extern  _RXF9EIDL
+  0000                00424         extern  _RXF10SIDH
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  9
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00425         extern  _RXF10SIDL
+  0000                00426         extern  _RXF10EIDH
+  0000                00427         extern  _RXF10EIDL
+  0000                00428         extern  _RXF11SIDH
+  0000                00429         extern  _RXF11SIDL
+  0000                00430         extern  _RXF11EIDH
+  0000                00431         extern  _RXF11EIDL
+  0000                00432         extern  _RXF12SIDH
+  0000                00433         extern  _RXF12SIDL
+  0000                00434         extern  _RXF12EIDH
+  0000                00435         extern  _RXF12EIDL
+  0000                00436         extern  _RXF13SIDH
+  0000                00437         extern  _RXF13SIDL
+  0000                00438         extern  _RXF13EIDH
+  0000                00439         extern  _RXF13EIDL
+  0000                00440         extern  _RXF14SIDH
+  0000                00441         extern  _RXF14SIDL
+  0000                00442         extern  _RXF14EIDH
+  0000                00443         extern  _RXF14EIDL
+  0000                00444         extern  _RXF15SIDH
+  0000                00445         extern  _RXF15SIDL
+  0000                00446         extern  _RXF15EIDH
+  0000                00447         extern  _RXF15EIDL
+  0000                00448         extern  _SDFLC
+  0000                00449         extern  _RXFBCON0
+  0000                00450         extern  _RXFBCON1
+  0000                00451         extern  _RXFBCON2
+  0000                00452         extern  _RXFBCON3
+  0000                00453         extern  _RXFBCON4
+  0000                00454         extern  _RXFBCON5
+  0000                00455         extern  _RXFBCON6
+  0000                00456         extern  _RXFBCON7
+  0000                00457         extern  _MSEL0
+  0000                00458         extern  _MSEL1
+  0000                00459         extern  _MSEL2
+  0000                00460         extern  _MSEL3
+  0000                00461         extern  _BSEL0
+  0000                00462         extern  _BIE0
+  0000                00463         extern  _TXBIE
+  0000                00464         extern  _B0CON
+  0000                00465         extern  _B0SIDH
+  0000                00466         extern  _B0SIDL
+  0000                00467         extern  _B0EIDH
+  0000                00468         extern  _B0EIDL
+  0000                00469         extern  _B0DLC
+  0000                00470         extern  _B0D0
+  0000                00471         extern  _B0D1
+  0000                00472         extern  _B0D2
+  0000                00473         extern  _B0D3
+  0000                00474         extern  _B0D4
+  0000                00475         extern  _B0D5
+  0000                00476         extern  _B0D6
+  0000                00477         extern  _B0D7
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 10
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00478         extern  _CANSTAT_RO9
+  0000                00479         extern  _CANCON_RO9
+  0000                00480         extern  _B1CON
+  0000                00481         extern  _B1SIDH
+  0000                00482         extern  _B1SIDL
+  0000                00483         extern  _B1EIDH
+  0000                00484         extern  _B1EIDL
+  0000                00485         extern  _B1DLC
+  0000                00486         extern  _B1D0
+  0000                00487         extern  _B1D1
+  0000                00488         extern  _B1D2
+  0000                00489         extern  _B1D3
+  0000                00490         extern  _B1D4
+  0000                00491         extern  _B1D5
+  0000                00492         extern  _B1D6
+  0000                00493         extern  _B1D7
+  0000                00494         extern  _CANSTAT_RO8
+  0000                00495         extern  _CANCON_RO8
+  0000                00496         extern  _B2CON
+  0000                00497         extern  _B2SIDH
+  0000                00498         extern  _B2SIDL
+  0000                00499         extern  _B2EIDH
+  0000                00500         extern  _B2EIDL
+  0000                00501         extern  _B2DLC
+  0000                00502         extern  _B2D0
+  0000                00503         extern  _B2D1
+  0000                00504         extern  _B2D2
+  0000                00505         extern  _B2D3
+  0000                00506         extern  _B2D4
+  0000                00507         extern  _B2D5
+  0000                00508         extern  _B2D6
+  0000                00509         extern  _B2D7
+  0000                00510         extern  _CANSTAT_RO7
+  0000                00511         extern  _CANCON_RO7
+  0000                00512         extern  _B3CON
+  0000                00513         extern  _B3SIDH
+  0000                00514         extern  _B3SIDL
+  0000                00515         extern  _B3EIDH
+  0000                00516         extern  _B3EIDL
+  0000                00517         extern  _B3DLC
+  0000                00518         extern  _B3D0
+  0000                00519         extern  _B3D1
+  0000                00520         extern  _B3D2
+  0000                00521         extern  _B3D3
+  0000                00522         extern  _B3D4
+  0000                00523         extern  _B3D5
+  0000                00524         extern  _B3D6
+  0000                00525         extern  _B3D7
+  0000                00526         extern  _CANSTAT_RO6
+  0000                00527         extern  _CANCON_RO6
+  0000                00528         extern  _B4CON
+  0000                00529         extern  _B4SIDH
+  0000                00530         extern  _B4SIDL
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 11
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00531         extern  _B4EIDH
+  0000                00532         extern  _B4EIDL
+  0000                00533         extern  _B4DLC
+  0000                00534         extern  _B4D0
+  0000                00535         extern  _B4D1
+  0000                00536         extern  _B4D2
+  0000                00537         extern  _B4D3
+  0000                00538         extern  _B4D4
+  0000                00539         extern  _B4D5
+  0000                00540         extern  _B4D6
+  0000                00541         extern  _B4D7
+  0000                00542         extern  _CANSTAT_RO5
+  0000                00543         extern  _CANCON_RO5
+  0000                00544         extern  _B5CON
+  0000                00545         extern  _B5SIDH
+  0000                00546         extern  _B5SIDL
+  0000                00547         extern  _B5EIDH
+  0000                00548         extern  _B5EIDL
+  0000                00549         extern  _B5DLC
+  0000                00550         extern  _B5D0
+  0000                00551         extern  _B5D1
+  0000                00552         extern  _B5D2
+  0000                00553         extern  _B5D3
+  0000                00554         extern  _B5D4
+  0000                00555         extern  _B5D5
+  0000                00556         extern  _B5D6
+  0000                00557         extern  _B5D7
+  0000                00558         extern  _CANSTAT_RO4
+  0000                00559         extern  _CANCON_RO4
+  0000                00560         extern  _RXF0SIDH
+  0000                00561         extern  _RXF0SIDL
+  0000                00562         extern  _RXF0EIDH
+  0000                00563         extern  _RXF0EIDL
+  0000                00564         extern  _RXF1SIDH
+  0000                00565         extern  _RXF1SIDL
+  0000                00566         extern  _RXF1EIDH
+  0000                00567         extern  _RXF1EIDL
+  0000                00568         extern  _RXF2SIDH
+  0000                00569         extern  _RXF2SIDL
+  0000                00570         extern  _RXF2EIDH
+  0000                00571         extern  _RXF2EIDL
+  0000                00572         extern  _RXF3SIDH
+  0000                00573         extern  _RXF3SIDL
+  0000                00574         extern  _RXF3EIDH
+  0000                00575         extern  _RXF3EIDL
+  0000                00576         extern  _RXF4SIDH
+  0000                00577         extern  _RXF4SIDL
+  0000                00578         extern  _RXF4EIDH
+  0000                00579         extern  _RXF4EIDL
+  0000                00580         extern  _RXF5SIDH
+  0000                00581         extern  _RXF5SIDL
+  0000                00582         extern  _RXF5EIDH
+  0000                00583         extern  _RXF5EIDL
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 12
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00584         extern  _RXM0SIDH
+  0000                00585         extern  _RXM0SIDL
+  0000                00586         extern  _RXM0EIDH
+  0000                00587         extern  _RXM0EIDL
+  0000                00588         extern  _RXM1SIDH
+  0000                00589         extern  _RXM1SIDL
+  0000                00590         extern  _RXM1EIDH
+  0000                00591         extern  _RXM1EIDL
+  0000                00592         extern  _TXB2CON
+  0000                00593         extern  _TXB2SIDH
+  0000                00594         extern  _TXB2SIDL
+  0000                00595         extern  _TXB2EIDH
+  0000                00596         extern  _TXB2EIDL
+  0000                00597         extern  _TXB2DLC
+  0000                00598         extern  _TXB2D0
+  0000                00599         extern  _TXB2D1
+  0000                00600         extern  _TXB2D2
+  0000                00601         extern  _TXB2D3
+  0000                00602         extern  _TXB2D4
+  0000                00603         extern  _TXB2D5
+  0000                00604         extern  _TXB2D6
+  0000                00605         extern  _TXB2D7
+  0000                00606         extern  _CANSTAT_RO3
+  0000                00607         extern  _CANCON_RO3
+  0000                00608         extern  _TXB1CON
+  0000                00609         extern  _TXB1SIDH
+  0000                00610         extern  _TXB1SIDL
+  0000                00611         extern  _TXB1EIDH
+  0000                00612         extern  _TXB1EIDL
+  0000                00613         extern  _TXB1DLC
+  0000                00614         extern  _TXB1D0
+  0000                00615         extern  _TXB1D1
+  0000                00616         extern  _TXB1D2
+  0000                00617         extern  _TXB1D3
+  0000                00618         extern  _TXB1D4
+  0000                00619         extern  _TXB1D5
+  0000                00620         extern  _TXB1D6
+  0000                00621         extern  _TXB1D7
+  0000                00622         extern  _CANSTAT_RO2
+  0000                00623         extern  _CANCON_RO2
+  0000                00624         extern  _TXB0CON
+  0000                00625         extern  _TXB0SIDH
+  0000                00626         extern  _TXB0SIDL
+  0000                00627         extern  _TXB0EIDH
+  0000                00628         extern  _TXB0EIDL
+  0000                00629         extern  _TXB0DLC
+  0000                00630         extern  _TXB0D0
+  0000                00631         extern  _TXB0D1
+  0000                00632         extern  _TXB0D2
+  0000                00633         extern  _TXB0D3
+  0000                00634         extern  _TXB0D4
+  0000                00635         extern  _TXB0D5
+  0000                00636         extern  _TXB0D6
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 13
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00637         extern  _TXB0D7
+  0000                00638         extern  _CANSTAT_RO1
+  0000                00639         extern  _CANCON_RO1
+  0000                00640         extern  _RXB1CON
+  0000                00641         extern  _RXB1SIDH
+  0000                00642         extern  _RXB1SIDL
+  0000                00643         extern  _RXB1EIDH
+  0000                00644         extern  _RXB1EIDL
+  0000                00645         extern  _RXB1DLC
+  0000                00646         extern  _RXB1D0
+  0000                00647         extern  _RXB1D1
+  0000                00648         extern  _RXB1D2
+  0000                00649         extern  _RXB1D3
+  0000                00650         extern  _RXB1D4
+  0000                00651         extern  _RXB1D5
+  0000                00652         extern  _RXB1D6
+  0000                00653         extern  _RXB1D7
+  0000                00654         extern  _CANSTAT_RO0
+  0000                00655         extern  _CANCON_RO0
+  0000                00656         extern  _CCP5CON
+  0000                00657         extern  _CCPR5
+  0000                00658         extern  _CCPR5L
+  0000                00659         extern  _CCPR5H
+  0000                00660         extern  _CCP4CON
+  0000                00661         extern  _CCPR4
+  0000                00662         extern  _CCPR4L
+  0000                00663         extern  _CCPR4H
+  0000                00664         extern  _CCP3CON
+  0000                00665         extern  _CCPR3
+  0000                00666         extern  _CCPR3L
+  0000                00667         extern  _CCPR3H
+  0000                00668         extern  _CCP2CON
+  0000                00669         extern  _ECCP2CON
+  0000                00670         extern  _CCPR2
+  0000                00671         extern  _CCPR2L
+  0000                00672         extern  _CCPR2H
+  0000                00673         extern  _CTMUICON
+  0000                00674         extern  _CTMUCONL
+  0000                00675         extern  _CTMUCONH
+  0000                00676         extern  _PADCFG1
+  0000                00677         extern  _PMD2
+  0000                00678         extern  _PMD1
+  0000                00679         extern  _PMD0
+  0000                00680         extern  _IOCB
+  0000                00681         extern  _WPUB
+  0000                00682         extern  _ANCON1
+  0000                00683         extern  _ANCON0
+  0000                00684         extern  _CM2CON
+  0000                00685         extern  _CM2CON1
+  0000                00686         extern  _CM1CON
+  0000                00687         extern  _CM1CON1
+  0000                00688         extern  _RXB0CON
+  0000                00689         extern  _RXB0SIDH
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 14
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00690         extern  _RXB0SIDL
+  0000                00691         extern  _RXB0EIDH
+  0000                00692         extern  _RXB0EIDL
+  0000                00693         extern  _RXB0DLC
+  0000                00694         extern  _RXB0D0
+  0000                00695         extern  _RXB0D1
+  0000                00696         extern  _RXB0D2
+  0000                00697         extern  _RXB0D3
+  0000                00698         extern  _RXB0D4
+  0000                00699         extern  _RXB0D5
+  0000                00700         extern  _RXB0D6
+  0000                00701         extern  _RXB0D7
+  0000                00702         extern  _CANSTAT
+  0000                00703         extern  _CANCON
+  0000                00704         extern  _CIOCON
+  0000                00705         extern  _COMSTAT
+  0000                00706         extern  _ECANCON
+  0000                00707         extern  _EEDATA
+  0000                00708         extern  _EEADR
+  0000                00709         extern  _EEADRH
+  0000                00710         extern  _PIE5
+  0000                00711         extern  _PIR5
+  0000                00712         extern  _IPR5
+  0000                00713         extern  _TXREG2
+  0000                00714         extern  _RCREG2
+  0000                00715         extern  _SPBRG2
+  0000                00716         extern  _SPBRGH2
+  0000                00717         extern  _SPBRGH1
+  0000                00718         extern  _EECON2
+  0000                00719         extern  _EECON1
+  0000                00720         extern  _PORTA
+  0000                00721         extern  _PORTB
+  0000                00722         extern  _PORTC
+  0000                00723         extern  _PORTE
+  0000                00724         extern  _TMR4
+  0000                00725         extern  _T4CON
+  0000                00726         extern  _LATA
+  0000                00727         extern  _LATB
+  0000                00728         extern  _LATC
+  0000                00729         extern  _SLRCON
+  0000                00730         extern  _ODCON
+  0000                00731         extern  _TRISA
+  0000                00732         extern  _TRISB
+  0000                00733         extern  _TRISC
+  0000                00734         extern  _CCPTMRS
+  0000                00735         extern  _REFOCON
+  0000                00736         extern  _OSCTUNE
+  0000                00737         extern  _PSTR1CON
+  0000                00738         extern  _PIE1
+  0000                00739         extern  _PIR1
+  0000                00740         extern  _IPR1
+  0000                00741         extern  _PIE2
+  0000                00742         extern  _PIR2
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 15
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00743         extern  _IPR2
+  0000                00744         extern  _PIE3
+  0000                00745         extern  _PIR3
+  0000                00746         extern  _IPR3
+  0000                00747         extern  _RCSTA2
+  0000                00748         extern  _BAUDCON1
+  0000                00749         extern  _HLVDCON
+  0000                00750         extern  _PR4
+  0000                00751         extern  _T1GCON
+  0000                00752         extern  _RCSTA
+  0000                00753         extern  _RCSTA1
+  0000                00754         extern  _TXSTA
+  0000                00755         extern  _TXSTA1
+  0000                00756         extern  _TXREG
+  0000                00757         extern  _TXREG1
+  0000                00758         extern  _RCREG
+  0000                00759         extern  _RCREG1
+  0000                00760         extern  _SPBRG
+  0000                00761         extern  _SPBRG1
+  0000                00762         extern  _T3GCON
+  0000                00763         extern  _T3CON
+  0000                00764         extern  _TMR3
+  0000                00765         extern  _TMR3L
+  0000                00766         extern  _TMR3H
+  0000                00767         extern  _CMSTAT
+  0000                00768         extern  _CMSTATUS
+  0000                00769         extern  _CVRCON
+  0000                00770         extern  _PIE4
+  0000                00771         extern  _PIR4
+  0000                00772         extern  _IPR4
+  0000                00773         extern  _BAUDCON2
+  0000                00774         extern  _TXSTA2
+  0000                00775         extern  _CCP1CON
+  0000                00776         extern  _ECCP1CON
+  0000                00777         extern  _CCPR1
+  0000                00778         extern  _CCPR1L
+  0000                00779         extern  _CCPR1H
+  0000                00780         extern  _ECCP1DEL
+  0000                00781         extern  _PWM1CON
+  0000                00782         extern  _ECCP1AS
+  0000                00783         extern  _ADCON2
+  0000                00784         extern  _ADCON1
+  0000                00785         extern  _ADCON0
+  0000                00786         extern  _ADRES
+  0000                00787         extern  _ADRESL
+  0000                00788         extern  _ADRESH
+  0000                00789         extern  _SSPCON2
+  0000                00790         extern  _SSPCON1
+  0000                00791         extern  _SSPSTAT
+  0000                00792         extern  _SSPADD
+  0000                00793         extern  _SSPBUF
+  0000                00794         extern  _T2CON
+  0000                00795         extern  _PR2
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 16
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00796         extern  _TMR2
+  0000                00797         extern  _T1CON
+  0000                00798         extern  _TMR1
+  0000                00799         extern  _TMR1L
+  0000                00800         extern  _TMR1H
+  0000                00801         extern  _RCON
+  0000                00802         extern  _WDTCON
+  0000                00803         extern  _OSCCON2
+  0000                00804         extern  _OSCCON
+  0000                00805         extern  _T0CON
+  0000                00806         extern  _TMR0
+  0000                00807         extern  _TMR0L
+  0000                00808         extern  _TMR0H
+  0000                00809         extern  _STATUS
+  0000                00810         extern  _FSR2L
+  0000                00811         extern  _FSR2H
+  0000                00812         extern  _PLUSW2
+  0000                00813         extern  _PREINC2
+  0000                00814         extern  _POSTDEC2
+  0000                00815         extern  _POSTINC2
+  0000                00816         extern  _INDF2
+  0000                00817         extern  _BSR
+  0000                00818         extern  _FSR1L
+  0000                00819         extern  _FSR1H
+  0000                00820         extern  _PLUSW1
+  0000                00821         extern  _PREINC1
+  0000                00822         extern  _POSTDEC1
+  0000                00823         extern  _POSTINC1
+  0000                00824         extern  _INDF1
+  0000                00825         extern  _WREG
+  0000                00826         extern  _FSR0L
+  0000                00827         extern  _FSR0H
+  0000                00828         extern  _PLUSW0
+  0000                00829         extern  _PREINC0
+  0000                00830         extern  _POSTDEC0
+  0000                00831         extern  _POSTINC0
+  0000                00832         extern  _INDF0
+  0000                00833         extern  _INTCON3
+  0000                00834         extern  _INTCON2
+  0000                00835         extern  _INTCON
+  0000                00836         extern  _INTCON1
+  0000                00837         extern  _PROD
+  0000                00838         extern  _PRODL
+  0000                00839         extern  _PRODH
+  0000                00840         extern  _TABLAT
+  0000                00841         extern  _TBLPTR
+  0000                00842         extern  _TBLPTRL
+  0000                00843         extern  _TBLPTRH
+  0000                00844         extern  _TBLPTRU
+  0000                00845         extern  _PC
+  0000                00846         extern  _PCL
+  0000                00847         extern  _PCLATH
+  0000                00848         extern  _PCLATU
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 17
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+  0000                00849         extern  _STKPTR
+  0000                00850         extern  _TOS
+  0000                00851         extern  _TOSL
+  0000                00852         extern  _TOSH
+  0000                00853         extern  _TOSU
+                      00854 
+                      00855 ;--------------------------------------------------------
+                      00856 ;       Equates to used internal registers
+                      00857 ;--------------------------------------------------------
+  00000FD8            00858 STATUS  equ     0xfd8
+  00000FE8            00859 WREG    equ     0xfe8
+  00000FE9            00860 FSR0L   equ     0xfe9
+  00000FE1            00861 FSR1L   equ     0xfe1
+  00000FD9            00862 FSR2L   equ     0xfd9
+  00000FE6            00863 POSTINC1        equ     0xfe6
+  00000FE5            00864 POSTDEC1        equ     0xfe5
+  00000FE4            00865 PREINC1 equ     0xfe4
+  00000FDB            00866 PLUSW2  equ     0xfdb
+  00000FF3            00867 PRODL   equ     0xff3
+                      00868 
+                      00869 
+                      00870 ; Internal registers
+                      00871 .registers      udata_ovr       0x0000
+000000                00872 r0x00   res     1
+000001                00873 r0x01   res     1
+000002                00874 r0x02   res     1
+000003                00875 r0x03   res     1
+000004                00876 r0x04   res     1
+000005                00877 r0x05   res     1
+000006                00878 r0x06   res     1
+000007                00879 r0x07   res     1
+000008                00880 r0x08   res     1
+000009                00881 r0x09   res     1
+00000A                00882 r0x0a   res     1
+00000B                00883 r0x0b   res     1
+00000C                00884 r0x0c   res     1
+00000D                00885 r0x0d   res     1
+00000E                00886 r0x0e   res     1
+00000F                00887 r0x0f   res     1
+000010                00888 r0x10   res     1
+000011                00889 r0x11   res     1
+000012                00890 r0x12   res     1
+000013                00891 r0x13   res     1
+000014                00892 r0x14   res     1
+000015                00893 r0x15   res     1
+000016                00894 r0x16   res     1
+000017                00895 r0x17   res     1
+000018                00896 r0x18   res     1
+000019                00897 r0x19   res     1
+                      00898 
+                      00899 ;--------------------------------------------------------
+                      00900 ; global & static initialisations
+                      00901 ;--------------------------------------------------------
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 18
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+                      00902 ; I code from now on!
+                      00903 ; ; Starting pCode block
+                      00904 S_usart__copy_char_fifo code
+000000                00905 _copy_char_fifo:
+                      00906 ;       .line   172; usart.c    char copy_char_fifo(struct serial_buffer * source_fifo, struct serial_bu
+                            ffer * destination_fifo) {
+000000 CFD9 FFE5      00907         MOVFF   FSR2L, POSTDEC1
+000004 CFE1 FFD9      00908         MOVFF   FSR1L, FSR2L
+000008 C??? F???      00909         MOVFF   r0x00, POSTDEC1
+00000C C??? F???      00910         MOVFF   r0x01, POSTDEC1
+000010 C??? F???      00911         MOVFF   r0x02, POSTDEC1
+000014 C??? F???      00912         MOVFF   r0x03, POSTDEC1
+000018 C??? F???      00913         MOVFF   r0x04, POSTDEC1
+00001C C??? F???      00914         MOVFF   r0x05, POSTDEC1
+000020 C??? F???      00915         MOVFF   r0x06, POSTDEC1
+000024 C??? F???      00916         MOVFF   r0x07, POSTDEC1
+000028 C??? F???      00917         MOVFF   r0x08, POSTDEC1
+00002C C??? F???      00918         MOVFF   r0x09, POSTDEC1
+000030 C??? F???      00919         MOVFF   r0x0a, POSTDEC1
+000034 C??? F???      00920         MOVFF   r0x0b, POSTDEC1
+000038 C??? F???      00921         MOVFF   r0x0c, POSTDEC1
+00003C C??? F???      00922         MOVFF   r0x0d, POSTDEC1
+000040 C??? F???      00923         MOVFF   r0x0e, POSTDEC1
+000044 C??? F???      00924         MOVFF   r0x0f, POSTDEC1
+000048 C??? F???      00925         MOVFF   r0x10, POSTDEC1
+00004C C??? F???      00926         MOVFF   r0x11, POSTDEC1
+000050 C??? F???      00927         MOVFF   r0x12, POSTDEC1
+000054 C??? F???      00928         MOVFF   r0x13, POSTDEC1
+000058 C??? F???      00929         MOVFF   r0x14, POSTDEC1
+00005C C??? F???      00930         MOVFF   r0x15, POSTDEC1
+000060 C??? F???      00931         MOVFF   r0x16, POSTDEC1
+000064 C??? F???      00932         MOVFF   r0x17, POSTDEC1
+000068 C??? F???      00933         MOVFF   r0x18, POSTDEC1
+00006C C??? F???      00934         MOVFF   r0x19, POSTDEC1
+000070 0E02           00935         MOVLW   0x02
+000072 CFDB F000      00936         MOVFF   PLUSW2, r0x00
+000076 0E03           00937         MOVLW   0x03
+000078 CFDB F000      00938         MOVFF   PLUSW2, r0x01
+00007C 0E04           00939         MOVLW   0x04
+00007E CFDB F000      00940         MOVFF   PLUSW2, r0x02
+000082 0E05           00941         MOVLW   0x05
+000084 CFDB F000      00942         MOVFF   PLUSW2, r0x03
+000088 0E06           00943         MOVLW   0x06
+00008A CFDB F000      00944         MOVFF   PLUSW2, r0x04
+00008E 0E07           00945         MOVLW   0x07
+000090 CFDB F000      00946         MOVFF   PLUSW2, r0x05
+                      00947 ;       .line   175; usart.c    source_tail=source_fifo->tail;
+000094 50??           00948         MOVF    r0x00, W
+000096 0F01           00949         ADDLW   0x01
+Message[1301]: Using default destination of 0 (Access Bank).
+000098 6E??           00950         MOVWF   r0x06
+00009A 0E00           00951         MOVLW   0x00
+00009C 20??           00952         ADDWFC  r0x01, W
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 19
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+Message[1301]: Using default destination of 0 (Access Bank).
+00009E 6E??           00953         MOVWF   r0x07
+0000A0 0E00           00954         MOVLW   0x00
+0000A2 20??           00955         ADDWFC  r0x02, W
+Message[1301]: Using default destination of 0 (Access Bank).
+0000A4 6E??           00956         MOVWF   r0x08
+0000A6 C??? F???      00957         MOVFF   r0x06, FSR0L
+0000AA C??? F???      00958         MOVFF   r0x07, PRODL
+0000AE 50??           00959         MOVF    r0x08, W
+0000B0 EC?? F0??      00960         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+0000B4 6E??           00961         MOVWF   r0x09
+                      00962 ;       .line   178; usart.c    if ( source_tail == source_fifo->head) {
+0000B6 C??? F???      00963         MOVFF   r0x00, FSR0L
+0000BA C??? F???      00964         MOVFF   r0x01, PRODL
+0000BE 50??           00965         MOVF    r0x02, W
+0000C0 EC?? F0??      00966         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+0000C4 6E??           00967         MOVWF   r0x0a
+0000C6 50??           00968         MOVF    r0x09, W
+0000C8 18??           00969         XORWF   r0x0a, W
+0000CA E1??           00970         BNZ     _00265_DS_
+                      00971 ;       .line   179; usart.c    return 0;
+Message[1301]: Using default destination of 0 (Access Bank).
+0000CC 6AE8           00972         CLRF    WREG
+0000CE D???           00973         BRA     _00267_DS_
+0000D0                00974 _00265_DS_:
+                      00975 ;       .line   181; usart.c    destination_head = destination_fifo->head;
+0000D0 C??? F???      00976         MOVFF   r0x03, FSR0L
+0000D4 C??? F???      00977         MOVFF   r0x04, PRODL
+0000D8 50??           00978         MOVF    r0x05, W
+0000DA EC?? F0??      00979         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+0000DE 6E??           00980         MOVWF   r0x0a
+                      00981 ;       .line   182; usart.c    destination_head++;
+0000E0 2A??           00982         INCF    r0x0a, F
+                      00983 ;       .line   183; usart.c    destination_head &= SERIAL_BUFFER_SIZE_MASK;
+0000E2 0E3F           00984         MOVLW   0x3f
+0000E4 16??           00985         ANDWF   r0x0a, F
+                      00986 ;       .line   184; usart.c    while ((destination_head !=  destination_fifo->tail) && (source_tail != 
+                            source_fifo->head)) {
+0000E6 50??           00987         MOVF    r0x03, W
+0000E8 0F02           00988         ADDLW   0x02
+Message[1301]: Using default destination of 0 (Access Bank).
+0000EA 6E??           00989         MOVWF   r0x0b
+0000EC 0E00           00990         MOVLW   0x00
+0000EE 20??           00991         ADDWFC  r0x04, W
+Message[1301]: Using default destination of 0 (Access Bank).
+0000F0 6E??           00992         MOVWF   r0x0c
+0000F2 0E00           00993         MOVLW   0x00
+0000F4 20??           00994         ADDWFC  r0x05, W
+Message[1301]: Using default destination of 0 (Access Bank).
+0000F6 6E??           00995         MOVWF   r0x0d
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 20
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+0000F8 50??           00996         MOVF    r0x00, W
+0000FA 0F02           00997         ADDLW   0x02
+Message[1301]: Using default destination of 0 (Access Bank).
+0000FC 6E??           00998         MOVWF   r0x0e
+0000FE 0E00           00999         MOVLW   0x00
+000100 20??           01000         ADDWFC  r0x01, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000102 6E??           01001         MOVWF   r0x0f
+000104 0E00           01002         MOVLW   0x00
+000106 20??           01003         ADDWFC  r0x02, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000108 6E??           01004         MOVWF   r0x10
+00010A 50??           01005         MOVF    r0x03, W
+00010C 0F01           01006         ADDLW   0x01
+Message[1301]: Using default destination of 0 (Access Bank).
+00010E 6E??           01007         MOVWF   r0x11
+000110 0E00           01008         MOVLW   0x00
+000112 20??           01009         ADDWFC  r0x04, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000114 6E??           01010         MOVWF   r0x12
+000116 0E00           01011         MOVLW   0x00
+000118 20??           01012         ADDWFC  r0x05, W
+Message[1301]: Using default destination of 0 (Access Bank).
+00011A 6E??           01013         MOVWF   r0x13
+00011C                01014 _00261_DS_:
+00011C C??? F???      01015         MOVFF   r0x11, FSR0L
+000120 C??? F???      01016         MOVFF   r0x12, PRODL
+000124 50??           01017         MOVF    r0x13, W
+000126 EC?? F0??      01018         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+00012A 6E??           01019         MOVWF   r0x14
+00012C 50??           01020         MOVF    r0x0a, W
+00012E 18??           01021         XORWF   r0x14, W
+000130 E1??           01022         BNZ     _00285_DS_
+000132 D???           01023         BRA     _00263_DS_
+000134                01024 _00285_DS_:
+000134 C??? F???      01025         MOVFF   r0x00, FSR0L
+000138 C??? F???      01026         MOVFF   r0x01, PRODL
+00013C 50??           01027         MOVF    r0x02, W
+00013E EC?? F0??      01028         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+000142 6E??           01029         MOVWF   r0x14
+000144 50??           01030         MOVF    r0x09, W
+000146 18??           01031         XORWF   r0x14, W
+000148 E0??           01032         BZ      _00263_DS_
+                      01033 ;       .line   185; usart.c    source_tail++;
+00014A 2A??           01034         INCF    r0x09, F
+                      01035 ;       .line   186; usart.c    source_tail &= SERIAL_BUFFER_SIZE_MASK;
+00014C 0E3F           01036         MOVLW   0x3f
+00014E 16??           01037         ANDWF   r0x09, F
+                      01038 ;       .line   187; usart.c    destination_fifo->data[destination_head] = source_fifo->data[source_tail
+                            ];
+000150 50??           01039         MOVF    r0x0a, W
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 21
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+000152 24??           01040         ADDWF   r0x0b, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000154 6E??           01041         MOVWF   r0x14
+Message[1301]: Using default destination of 0 (Access Bank).
+000156 6AE8           01042         CLRF    WREG
+000158 20??           01043         ADDWFC  r0x0c, W
+Message[1301]: Using default destination of 0 (Access Bank).
+00015A 6E??           01044         MOVWF   r0x15
+Message[1301]: Using default destination of 0 (Access Bank).
+00015C 6AE8           01045         CLRF    WREG
+00015E 20??           01046         ADDWFC  r0x0d, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000160 6E??           01047         MOVWF   r0x16
+000162 50??           01048         MOVF    r0x09, W
+000164 24??           01049         ADDWF   r0x0e, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000166 6E??           01050         MOVWF   r0x17
+Message[1301]: Using default destination of 0 (Access Bank).
+000168 6AE8           01051         CLRF    WREG
+00016A 20??           01052         ADDWFC  r0x0f, W
+Message[1301]: Using default destination of 0 (Access Bank).
+00016C 6E??           01053         MOVWF   r0x18
+Message[1301]: Using default destination of 0 (Access Bank).
+00016E 6AE8           01054         CLRF    WREG
+000170 20??           01055         ADDWFC  r0x10, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000172 6E??           01056         MOVWF   r0x19
+000174 C??? F???      01057         MOVFF   r0x17, FSR0L
+000178 C??? F???      01058         MOVFF   r0x18, PRODL
+00017C 50??           01059         MOVF    r0x19, W
+00017E EC?? F0??      01060         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+000182 6E??           01061         MOVWF   r0x17
+000184 C??? F???      01062         MOVFF   r0x17, POSTDEC1
+000188 C??? F???      01063         MOVFF   r0x14, FSR0L
+00018C C??? F???      01064         MOVFF   r0x15, PRODL
+000190 50??           01065         MOVF    r0x16, W
+000192 EC?? F0??      01066         CALL    __gptrput1
+                      01067 ;       .line   188; usart.c    destination_fifo->head = destination_head;              /* store new poi
+                            nter destination head before increment*/
+000196 C??? F???      01068         MOVFF   r0x0a, POSTDEC1
+00019A C??? F???      01069         MOVFF   r0x03, FSR0L
+00019E C??? F???      01070         MOVFF   r0x04, PRODL
+0001A2 50??           01071         MOVF    r0x05, W
+0001A4 EC?? F0??      01072         CALL    __gptrput1
+                      01073 ;       .line   189; usart.c    destination_head++;
+0001A8 2A??           01074         INCF    r0x0a, F
+                      01075 ;       .line   190; usart.c    destination_head &= SERIAL_BUFFER_SIZE_MASK;
+0001AA 0E3F           01076         MOVLW   0x3f
+0001AC 16??           01077         ANDWF   r0x0a, F
+0001AE D???           01078         BRA     _00261_DS_
+0001B0                01079 _00263_DS_:
+                      01080 ;       .line   192; usart.c    source_fifo->tail      = source_tail;                   /* store new poi
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 22
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+                            nter source tail */
+0001B0 C??? F???      01081         MOVFF   r0x09, POSTDEC1
+0001B4 C??? F???      01082         MOVFF   r0x06, FSR0L
+0001B8 C??? F???      01083         MOVFF   r0x07, PRODL
+0001BC 50??           01084         MOVF    r0x08, W
+0001BE EC?? F0??      01085         CALL    __gptrput1
+                      01086 ;       .line   193; usart.c    return source_fifo->data[source_tail];
+Message[1301]: Using default destination of 0 (Access Bank).
+0001C2 6A??           01087         CLRF    r0x00
+Message[1301]: Using default destination of 0 (Access Bank).
+0001C4 6A??           01088         CLRF    r0x01
+0001C6 50??           01089         MOVF    r0x0e, W
+0001C8 26??           01090         ADDWF   r0x09, F
+0001CA 50??           01091         MOVF    r0x0f, W
+0001CC 22??           01092         ADDWFC  r0x00, F
+0001CE 50??           01093         MOVF    r0x10, W
+0001D0 22??           01094         ADDWFC  r0x01, F
+0001D2 C??? F???      01095         MOVFF   r0x09, FSR0L
+0001D6 C??? F???      01096         MOVFF   r0x00, PRODL
+0001DA 50??           01097         MOVF    r0x01, W
+0001DC EC?? F0??      01098         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+0001E0 6E??           01099         MOVWF   r0x09
+0001E2 50??           01100         MOVF    r0x09, W
+0001E4                01101 _00267_DS_:
+0001E4 CFE4 F000      01102         MOVFF   PREINC1, r0x19
+0001E8 CFE4 F000      01103         MOVFF   PREINC1, r0x18
+0001EC CFE4 F000      01104         MOVFF   PREINC1, r0x17
+0001F0 CFE4 F000      01105         MOVFF   PREINC1, r0x16
+0001F4 CFE4 F000      01106         MOVFF   PREINC1, r0x15
+0001F8 CFE4 F000      01107         MOVFF   PREINC1, r0x14
+0001FC CFE4 F000      01108         MOVFF   PREINC1, r0x13
+000200 CFE4 F000      01109         MOVFF   PREINC1, r0x12
+000204 CFE4 F000      01110         MOVFF   PREINC1, r0x11
+000208 CFE4 F000      01111         MOVFF   PREINC1, r0x10
+00020C CFE4 F000      01112         MOVFF   PREINC1, r0x0f
+000210 CFE4 F000      01113         MOVFF   PREINC1, r0x0e
+000214 CFE4 F000      01114         MOVFF   PREINC1, r0x0d
+000218 CFE4 F000      01115         MOVFF   PREINC1, r0x0c
+00021C CFE4 F000      01116         MOVFF   PREINC1, r0x0b
+000220 CFE4 F000      01117         MOVFF   PREINC1, r0x0a
+000224 CFE4 F000      01118         MOVFF   PREINC1, r0x09
+000228 CFE4 F000      01119         MOVFF   PREINC1, r0x08
+00022C CFE4 F000      01120         MOVFF   PREINC1, r0x07
+000230 CFE4 F000      01121         MOVFF   PREINC1, r0x06
+000234 CFE4 F000      01122         MOVFF   PREINC1, r0x05
+000238 CFE4 F000      01123         MOVFF   PREINC1, r0x04
+00023C CFE4 F000      01124         MOVFF   PREINC1, r0x03
+000240 CFE4 F000      01125         MOVFF   PREINC1, r0x02
+000244 CFE4 F000      01126         MOVFF   PREINC1, r0x01
+000248 CFE4 F000      01127         MOVFF   PREINC1, r0x00
+00024C CFE4 FFD9      01128         MOVFF   PREINC1, FSR2L
+000250 0012           01129         RETURN  
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 23
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+                      01130 
+                      01131 ; ; Starting pCode block
+                      01132 S_usart__puts_rom_fifo  code
+000000                01133 _puts_rom_fifo:
+                      01134 ;       .line   156; usart.c    char puts_rom_fifo(const char * s, struct serial_buffer * fifo) {
+000000 CFD9 FFE5      01135         MOVFF   FSR2L, POSTDEC1
+000004 CFE1 FFD9      01136         MOVFF   FSR1L, FSR2L
+000008 C??? F???      01137         MOVFF   r0x00, POSTDEC1
+00000C C??? F???      01138         MOVFF   r0x01, POSTDEC1
+000010 C??? F???      01139         MOVFF   r0x02, POSTDEC1
+000014 C??? F???      01140         MOVFF   r0x03, POSTDEC1
+000018 C??? F???      01141         MOVFF   r0x04, POSTDEC1
+00001C C??? F???      01142         MOVFF   r0x05, POSTDEC1
+000020 C??? F???      01143         MOVFF   r0x06, POSTDEC1
+000024 C??? F???      01144         MOVFF   r0x07, POSTDEC1
+000028 C??? F???      01145         MOVFF   r0x08, POSTDEC1
+00002C C??? F???      01146         MOVFF   r0x09, POSTDEC1
+000030 C??? F???      01147         MOVFF   r0x0a, POSTDEC1
+000034 C??? F???      01148         MOVFF   r0x0b, POSTDEC1
+000038 C??? F???      01149         MOVFF   r0x0c, POSTDEC1
+00003C C??? F???      01150         MOVFF   r0x0d, POSTDEC1
+000040 C??? F???      01151         MOVFF   r0x0e, POSTDEC1
+000044 C??? F???      01152         MOVFF   r0x0f, POSTDEC1
+000048 C??? F???      01153         MOVFF   r0x10, POSTDEC1
+00004C 0E02           01154         MOVLW   0x02
+00004E CFDB F000      01155         MOVFF   PLUSW2, r0x00
+000052 0E03           01156         MOVLW   0x03
+000054 CFDB F000      01157         MOVFF   PLUSW2, r0x01
+000058 0E04           01158         MOVLW   0x04
+00005A CFDB F000      01159         MOVFF   PLUSW2, r0x02
+00005E 0E05           01160         MOVLW   0x05
+000060 CFDB F000      01161         MOVFF   PLUSW2, r0x03
+000064 0E06           01162         MOVLW   0x06
+000066 CFDB F000      01163         MOVFF   PLUSW2, r0x04
+00006A 0E07           01164         MOVLW   0x07
+00006C CFDB F000      01165         MOVFF   PLUSW2, r0x05
+                      01166 ;       .line   157; usart.c    unsigned char head=fifo->head;
+000070 C??? F???      01167         MOVFF   r0x03, FSR0L
+000074 C??? F???      01168         MOVFF   r0x04, PRODL
+000078 50??           01169         MOVF    r0x05, W
+00007A EC?? F0??      01170         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+00007E 6E??           01171         MOVWF   r0x06
+                      01172 ;       .line   159; usart.c    while ( ( c = *s++ ) ) {
+000080 50??           01173         MOVF    r0x03, W
+000082 0F01           01174         ADDLW   0x01
+Message[1301]: Using default destination of 0 (Access Bank).
+000084 6E??           01175         MOVWF   r0x07
+000086 0E00           01176         MOVLW   0x00
+000088 20??           01177         ADDWFC  r0x04, W
+Message[1301]: Using default destination of 0 (Access Bank).
+00008A 6E??           01178         MOVWF   r0x08
+00008C 0E00           01179         MOVLW   0x00
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 24
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+00008E 20??           01180         ADDWFC  r0x05, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000090 6E??           01181         MOVWF   r0x09
+000092 50??           01182         MOVF    r0x03, W
+000094 0F02           01183         ADDLW   0x02
+Message[1301]: Using default destination of 0 (Access Bank).
+000096 6E??           01184         MOVWF   r0x0a
+000098 0E00           01185         MOVLW   0x00
+00009A 20??           01186         ADDWFC  r0x04, W
+Message[1301]: Using default destination of 0 (Access Bank).
+00009C 6E??           01187         MOVWF   r0x0b
+00009E 0E00           01188         MOVLW   0x00
+0000A0 20??           01189         ADDWFC  r0x05, W
+Message[1301]: Using default destination of 0 (Access Bank).
+0000A2 6E??           01190         MOVWF   r0x0c
+0000A4                01191 _00238_DS_:
+0000A4 C??? F???      01192         MOVFF   r0x00, FSR0L
+0000A8 C??? F???      01193         MOVFF   r0x01, PRODL
+0000AC 50??           01194         MOVF    r0x02, W
+0000AE EC?? F0??      01195         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+0000B2 6E??           01196         MOVWF   r0x0d
+0000B4 2A??           01197         INCF    r0x00, F
+0000B6 E3??           01198         BNC     _00252_DS_
+0000B8 4A??           01199         INFSNZ  r0x01, F
+0000BA 2A??           01200         INCF    r0x02, F
+0000BC                01201 _00252_DS_:
+0000BC C??? F???      01202         MOVFF   r0x0d, r0x0e
+0000C0 50??           01203         MOVF    r0x0d, W
+0000C2 E0??           01204         BZ      _00240_DS_
+                      01205 ;       .line   160; usart.c    head++;
+0000C4 2A??           01206         INCF    r0x06, F
+                      01207 ;       .line   161; usart.c    head &= SERIAL_BUFFER_SIZE_MASK;        /* wrap around if neededd */
+0000C6 0E3F           01208         MOVLW   0x3f
+0000C8 16??           01209         ANDWF   r0x06, F
+                      01210 ;       .line   162; usart.c    if (head != fifo->tail) {               /* space left ? */ 
+0000CA C??? F???      01211         MOVFF   r0x07, FSR0L
+0000CE C??? F???      01212         MOVFF   r0x08, PRODL
+0000D2 50??           01213         MOVF    r0x09, W
+0000D4 EC?? F0??      01214         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+0000D8 6E??           01215         MOVWF   r0x0d
+0000DA 50??           01216         MOVF    r0x06, W
+0000DC 18??           01217         XORWF   r0x0d, W
+0000DE E0??           01218         BZ      _00236_DS_
+                      01219 ;       .line   163; usart.c    fifo->data[head]=c;
+0000E0 50??           01220         MOVF    r0x06, W
+0000E2 24??           01221         ADDWF   r0x0a, W
+Message[1301]: Using default destination of 0 (Access Bank).
+0000E4 6E??           01222         MOVWF   r0x0d
+Message[1301]: Using default destination of 0 (Access Bank).
+0000E6 6AE8           01223         CLRF    WREG
+0000E8 20??           01224         ADDWFC  r0x0b, W
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 25
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+Message[1301]: Using default destination of 0 (Access Bank).
+0000EA 6E??           01225         MOVWF   r0x0f
+Message[1301]: Using default destination of 0 (Access Bank).
+0000EC 6AE8           01226         CLRF    WREG
+0000EE 20??           01227         ADDWFC  r0x0c, W
+Message[1301]: Using default destination of 0 (Access Bank).
+0000F0 6E??           01228         MOVWF   r0x10
+0000F2 C??? F???      01229         MOVFF   r0x0e, POSTDEC1
+0000F6 C??? F???      01230         MOVFF   r0x0d, FSR0L
+0000FA C??? F???      01231         MOVFF   r0x0f, PRODL
+0000FE 50??           01232         MOVF    r0x10, W
+000100 EC?? F0??      01233         CALL    __gptrput1
+000104 D???           01234         BRA     _00238_DS_
+000106                01235 _00236_DS_:
+                      01236 ;       .line   165; usart.c    return -1;
+Message[1301]: Using default destination of 0 (Access Bank).
+000106 68E8           01237         SETF    WREG
+000108 D???           01238         BRA     _00241_DS_
+00010A                01239 _00240_DS_:
+                      01240 ;       .line   168; usart.c    fifo->head=head;                                /* only store new pointe
+                            r if all is OK */
+00010A C??? F???      01241         MOVFF   r0x06, POSTDEC1
+00010E C??? F???      01242         MOVFF   r0x03, FSR0L
+000112 C??? F???      01243         MOVFF   r0x04, PRODL
+000116 50??           01244         MOVF    r0x05, W
+000118 EC?? F0??      01245         CALL    __gptrput1
+                      01246 ;       .line   169; usart.c    return 1;
+00011C 0E01           01247         MOVLW   0x01
+00011E                01248 _00241_DS_:
+00011E CFE4 F000      01249         MOVFF   PREINC1, r0x10
+000122 CFE4 F000      01250         MOVFF   PREINC1, r0x0f
+000126 CFE4 F000      01251         MOVFF   PREINC1, r0x0e
+00012A CFE4 F000      01252         MOVFF   PREINC1, r0x0d
+00012E CFE4 F000      01253         MOVFF   PREINC1, r0x0c
+000132 CFE4 F000      01254         MOVFF   PREINC1, r0x0b
+000136 CFE4 F000      01255         MOVFF   PREINC1, r0x0a
+00013A CFE4 F000      01256         MOVFF   PREINC1, r0x09
+00013E CFE4 F000      01257         MOVFF   PREINC1, r0x08
+000142 CFE4 F000      01258         MOVFF   PREINC1, r0x07
+000146 CFE4 F000      01259         MOVFF   PREINC1, r0x06
+00014A CFE4 F000      01260         MOVFF   PREINC1, r0x05
+00014E CFE4 F000      01261         MOVFF   PREINC1, r0x04
+000152 CFE4 F000      01262         MOVFF   PREINC1, r0x03
+000156 CFE4 F000      01263         MOVFF   PREINC1, r0x02
+00015A CFE4 F000      01264         MOVFF   PREINC1, r0x01
+00015E CFE4 F000      01265         MOVFF   PREINC1, r0x00
+000162 CFE4 FFD9      01266         MOVFF   PREINC1, FSR2L
+000166 0012           01267         RETURN  
+                      01268 
+                      01269 ; ; Starting pCode block
+                      01270 S_usart__fifo_putchar   code
+000000                01271 _fifo_putchar:
+                      01272 ;       .line   141; usart.c    char fifo_putchar(struct serial_buffer * fifo) {
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 26
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+000000 CFD9 FFE5      01273         MOVFF   FSR2L, POSTDEC1
+000004 CFE1 FFD9      01274         MOVFF   FSR1L, FSR2L
+000008 C??? F???      01275         MOVFF   r0x00, POSTDEC1
+00000C C??? F???      01276         MOVFF   r0x01, POSTDEC1
+000010 C??? F???      01277         MOVFF   r0x02, POSTDEC1
+000014 C??? F???      01278         MOVFF   r0x03, POSTDEC1
+000018 C??? F???      01279         MOVFF   r0x04, POSTDEC1
+00001C C??? F???      01280         MOVFF   r0x05, POSTDEC1
+000020 C??? F???      01281         MOVFF   r0x06, POSTDEC1
+000024 C??? F???      01282         MOVFF   r0x07, POSTDEC1
+000028 0E02           01283         MOVLW   0x02
+00002A CFDB F000      01284         MOVFF   PLUSW2, r0x00
+00002E 0E03           01285         MOVLW   0x03
+000030 CFDB F000      01286         MOVFF   PLUSW2, r0x01
+000034 0E04           01287         MOVLW   0x04
+000036 CFDB F000      01288         MOVFF   PLUSW2, r0x02
+                      01289 ;       .line   143; usart.c    tail=fifo->tail;
+00003A 50??           01290         MOVF    r0x00, W
+00003C 0F01           01291         ADDLW   0x01
+Message[1301]: Using default destination of 0 (Access Bank).
+00003E 6E??           01292         MOVWF   r0x03
+000040 0E00           01293         MOVLW   0x00
+000042 20??           01294         ADDWFC  r0x01, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000044 6E??           01295         MOVWF   r0x04
+000046 0E00           01296         MOVLW   0x00
+000048 20??           01297         ADDWFC  r0x02, W
+Message[1301]: Using default destination of 0 (Access Bank).
+00004A 6E??           01298         MOVWF   r0x05
+00004C C??? F???      01299         MOVFF   r0x03, FSR0L
+000050 C??? F???      01300         MOVFF   r0x04, PRODL
+000054 50??           01301         MOVF    r0x05, W
+000056 EC?? F0??      01302         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+00005A 6E??           01303         MOVWF   r0x06
+                      01304 ;       .line   144; usart.c    if (fifo->head != tail) {
+00005C C??? F???      01305         MOVFF   r0x00, FSR0L
+000060 C??? F???      01306         MOVFF   r0x01, PRODL
+000064 50??           01307         MOVF    r0x02, W
+000066 EC?? F0??      01308         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+00006A 6E??           01309         MOVWF   r0x07
+00006C 50??           01310         MOVF    r0x07, W
+00006E 18??           01311         XORWF   r0x06, W
+000070 E0??           01312         BZ      _00220_DS_
+                      01313 ;       .line   145; usart.c    tail++;
+000072 2A??           01314         INCF    r0x06, F
+                      01315 ;       .line   146; usart.c    tail &= SERIAL_BUFFER_SIZE_MASK;        /* wrap around if neededd */
+000074 0E3F           01316         MOVLW   0x3f
+000076 16??           01317         ANDWF   r0x06, F
+                      01318 ;       .line   147; usart.c    if (putchar(fifo->data[tail])) {
+000078 0E02           01319         MOVLW   0x02
+00007A 26??           01320         ADDWF   r0x00, F
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 27
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+00007C 0E00           01321         MOVLW   0x00
+00007E 22??           01322         ADDWFC  r0x01, F
+000080 22??           01323         ADDWFC  r0x02, F
+000082 50??           01324         MOVF    r0x06, W
+000084 26??           01325         ADDWF   r0x00, F
+Message[1301]: Using default destination of 0 (Access Bank).
+000086 6AE8           01326         CLRF    WREG
+000088 22??           01327         ADDWFC  r0x01, F
+Message[1301]: Using default destination of 0 (Access Bank).
+00008A 6AE8           01328         CLRF    WREG
+00008C 22??           01329         ADDWFC  r0x02, F
+00008E C??? F???      01330         MOVFF   r0x00, FSR0L
+000092 C??? F???      01331         MOVFF   r0x01, PRODL
+000096 50??           01332         MOVF    r0x02, W
+000098 EC?? F0??      01333         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+00009C 6E??           01334         MOVWF   r0x00
+00009E 50??           01335         MOVF    r0x00, W
+Message[1301]: Using default destination of 0 (Access Bank).
+0000A0 6EE5           01336         MOVWF   POSTDEC1
+0000A2 EC?? F0??      01337         CALL    _putchar
+Message[1301]: Using default destination of 0 (Access Bank).
+0000A6 6E??           01338         MOVWF   r0x00
+0000A8 52E6           01339         MOVF    POSTINC1, F
+0000AA 50??           01340         MOVF    r0x00, W
+0000AC E0??           01341         BZ      _00220_DS_
+                      01342 ;       .line   148; usart.c    fifo->tail=tail;
+0000AE C??? F???      01343         MOVFF   r0x06, POSTDEC1
+0000B2 C??? F???      01344         MOVFF   r0x03, FSR0L
+0000B6 C??? F???      01345         MOVFF   r0x04, PRODL
+0000BA 50??           01346         MOVF    r0x05, W
+0000BC EC?? F0??      01347         CALL    __gptrput1
+                      01348 ;       .line   149; usart.c    return 1;
+0000C0 0E01           01349         MOVLW   0x01
+0000C2 D???           01350         BRA     _00221_DS_
+0000C4                01351 _00220_DS_:
+                      01352 ;       .line   152; usart.c    return 0;
+Message[1301]: Using default destination of 0 (Access Bank).
+0000C4 6AE8           01353         CLRF    WREG
+0000C6                01354 _00221_DS_:
+0000C6 CFE4 F000      01355         MOVFF   PREINC1, r0x07
+0000CA CFE4 F000      01356         MOVFF   PREINC1, r0x06
+0000CE CFE4 F000      01357         MOVFF   PREINC1, r0x05
+0000D2 CFE4 F000      01358         MOVFF   PREINC1, r0x04
+0000D6 CFE4 F000      01359         MOVFF   PREINC1, r0x03
+0000DA CFE4 F000      01360         MOVFF   PREINC1, r0x02
+0000DE CFE4 F000      01361         MOVFF   PREINC1, r0x01
+0000E2 CFE4 F000      01362         MOVFF   PREINC1, r0x00
+0000E6 CFE4 FFD9      01363         MOVFF   PREINC1, FSR2L
+0000EA 0012           01364         RETURN  
+                      01365 
+                      01366 ; ; Starting pCode block
+                      01367 S_usart__fifo_getchar   code
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 28
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+000000                01368 _fifo_getchar:
+                      01369 ;       .line   122; usart.c    char fifo_getchar(struct serial_buffer * fifo) {
+000000 CFD9 FFE5      01370         MOVFF   FSR2L, POSTDEC1
+000004 CFE1 FFD9      01371         MOVFF   FSR1L, FSR2L
+000008 C??? F???      01372         MOVFF   r0x00, POSTDEC1
+00000C C??? F???      01373         MOVFF   r0x01, POSTDEC1
+000010 C??? F???      01374         MOVFF   r0x02, POSTDEC1
+000014 C??? F???      01375         MOVFF   r0x03, POSTDEC1
+000018 C??? F???      01376         MOVFF   r0x04, POSTDEC1
+00001C C??? F???      01377         MOVFF   r0x05, POSTDEC1
+000020 C??? F???      01378         MOVFF   r0x06, POSTDEC1
+000024 C??? F???      01379         MOVFF   r0x07, POSTDEC1
+000028 0E02           01380         MOVLW   0x02
+00002A CFDB F000      01381         MOVFF   PLUSW2, r0x00
+00002E 0E03           01382         MOVLW   0x03
+000030 CFDB F000      01383         MOVFF   PLUSW2, r0x01
+000034 0E04           01384         MOVLW   0x04
+000036 CFDB F000      01385         MOVFF   PLUSW2, r0x02
+                      01386 ;       .line   126; usart.c    if (PIR1bits.RCIF) {
+00003A AA??           01387         BTFSS   _PIR1bits, 5
+00003C D???           01388         BRA     _00201_DS_
+                      01389 ;       .line   127; usart.c    head=fifo->head;
+00003E C??? F???      01390         MOVFF   r0x00, FSR0L
+000042 C??? F???      01391         MOVFF   r0x01, PRODL
+000046 50??           01392         MOVF    r0x02, W
+000048 EC?? F0??      01393         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+00004C 6E??           01394         MOVWF   r0x03
+                      01395 ;       .line   128; usart.c    head++;
+00004E 2A??           01396         INCF    r0x03, F
+                      01397 ;       .line   129; usart.c    head &= SERIAL_BUFFER_SIZE_MASK;        /* wrap around if neededd */
+000050 0E3F           01398         MOVLW   0x3f
+000052 16??           01399         ANDWF   r0x03, F
+                      01400 ;       .line   130; usart.c    if (head != fifo->tail) {
+000054 50??           01401         MOVF    r0x00, W
+000056 0F01           01402         ADDLW   0x01
+Message[1301]: Using default destination of 0 (Access Bank).
+000058 6E??           01403         MOVWF   r0x04
+00005A 0E00           01404         MOVLW   0x00
+00005C 20??           01405         ADDWFC  r0x01, W
+Message[1301]: Using default destination of 0 (Access Bank).
+00005E 6E??           01406         MOVWF   r0x05
+000060 0E00           01407         MOVLW   0x00
+000062 20??           01408         ADDWFC  r0x02, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000064 6E??           01409         MOVWF   r0x06
+000066 C??? F???      01410         MOVFF   r0x04, FSR0L
+00006A C??? F???      01411         MOVFF   r0x05, PRODL
+00006E 50??           01412         MOVF    r0x06, W
+000070 EC?? F0??      01413         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+000074 6E??           01414         MOVWF   r0x04
+000076 50??           01415         MOVF    r0x03, W
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 29
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+000078 18??           01416         XORWF   r0x04, W
+00007A E0??           01417         BZ      _00201_DS_
+                      01418 ;       .line   131; usart.c    c=RCREG1;
+00007C C??? F???      01419         MOVFF   _RCREG1, r0x04
+                      01420 ;       .line   132; usart.c    fifo->data[head]=c;
+000080 50??           01421         MOVF    r0x00, W
+000082 0F02           01422         ADDLW   0x02
+Message[1301]: Using default destination of 0 (Access Bank).
+000084 6E??           01423         MOVWF   r0x05
+000086 0E00           01424         MOVLW   0x00
+000088 20??           01425         ADDWFC  r0x01, W
+Message[1301]: Using default destination of 0 (Access Bank).
+00008A 6E??           01426         MOVWF   r0x06
+00008C 0E00           01427         MOVLW   0x00
+00008E 20??           01428         ADDWFC  r0x02, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000090 6E??           01429         MOVWF   r0x07
+000092 50??           01430         MOVF    r0x03, W
+000094 26??           01431         ADDWF   r0x05, F
+Message[1301]: Using default destination of 0 (Access Bank).
+000096 6AE8           01432         CLRF    WREG
+000098 22??           01433         ADDWFC  r0x06, F
+Message[1301]: Using default destination of 0 (Access Bank).
+00009A 6AE8           01434         CLRF    WREG
+00009C 22??           01435         ADDWFC  r0x07, F
+00009E C??? F???      01436         MOVFF   r0x04, POSTDEC1
+0000A2 C??? F???      01437         MOVFF   r0x05, FSR0L
+0000A6 C??? F???      01438         MOVFF   r0x06, PRODL
+0000AA 50??           01439         MOVF    r0x07, W
+0000AC EC?? F0??      01440         CALL    __gptrput1
+                      01441 ;       .line   133; usart.c    fifo->head=head;
+0000B0 C??? F???      01442         MOVFF   r0x03, POSTDEC1
+0000B4 C??? F???      01443         MOVFF   r0x00, FSR0L
+0000B8 C??? F???      01444         MOVFF   r0x01, PRODL
+0000BC 50??           01445         MOVF    r0x02, W
+0000BE EC?? F0??      01446         CALL    __gptrput1
+                      01447 ;       .line   134; usart.c    return c;
+0000C2 50??           01448         MOVF    r0x04, W
+0000C4 D???           01449         BRA     _00202_DS_
+0000C6                01450 _00201_DS_:
+                      01451 ;       .line   137; usart.c    return 0;
+Message[1301]: Using default destination of 0 (Access Bank).
+0000C6 6AE8           01452         CLRF    WREG
+0000C8                01453 _00202_DS_:
+0000C8 CFE4 F000      01454         MOVFF   PREINC1, r0x07
+0000CC CFE4 F000      01455         MOVFF   PREINC1, r0x06
+0000D0 CFE4 F000      01456         MOVFF   PREINC1, r0x05
+0000D4 CFE4 F000      01457         MOVFF   PREINC1, r0x04
+0000D8 CFE4 F000      01458         MOVFF   PREINC1, r0x03
+0000DC CFE4 F000      01459         MOVFF   PREINC1, r0x02
+0000E0 CFE4 F000      01460         MOVFF   PREINC1, r0x01
+0000E4 CFE4 F000      01461         MOVFF   PREINC1, r0x00
+0000E8 CFE4 FFD9      01462         MOVFF   PREINC1, FSR2L
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 30
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+0000EC 0012           01463         RETURN  
+                      01464 
+                      01465 ; ; Starting pCode block
+                      01466 S_usart__putchar_fifo   code
+000000                01467 _putchar_fifo:
+                      01468 ;       .line   107; usart.c    char putchar_fifo(char c, struct serial_buffer * fifo) {
+000000 CFD9 FFE5      01469         MOVFF   FSR2L, POSTDEC1
+000004 CFE1 FFD9      01470         MOVFF   FSR1L, FSR2L
+000008 C??? F???      01471         MOVFF   r0x00, POSTDEC1
+00000C C??? F???      01472         MOVFF   r0x01, POSTDEC1
+000010 C??? F???      01473         MOVFF   r0x02, POSTDEC1
+000014 C??? F???      01474         MOVFF   r0x03, POSTDEC1
+000018 C??? F???      01475         MOVFF   r0x04, POSTDEC1
+00001C C??? F???      01476         MOVFF   r0x05, POSTDEC1
+000020 C??? F???      01477         MOVFF   r0x06, POSTDEC1
+000024 C??? F???      01478         MOVFF   r0x07, POSTDEC1
+000028 0E02           01479         MOVLW   0x02
+00002A CFDB F000      01480         MOVFF   PLUSW2, r0x00
+00002E 0E03           01481         MOVLW   0x03
+000030 CFDB F000      01482         MOVFF   PLUSW2, r0x01
+000034 0E04           01483         MOVLW   0x04
+000036 CFDB F000      01484         MOVFF   PLUSW2, r0x02
+00003A 0E05           01485         MOVLW   0x05
+00003C CFDB F000      01486         MOVFF   PLUSW2, r0x03
+                      01487 ;       .line   109; usart.c    head=fifo->head;
+000040 C??? F???      01488         MOVFF   r0x01, FSR0L
+000044 C??? F???      01489         MOVFF   r0x02, PRODL
+000048 50??           01490         MOVF    r0x03, W
+00004A EC?? F0??      01491         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+00004E 6E??           01492         MOVWF   r0x04
+                      01493 ;       .line   110; usart.c    head++;
+000050 2A??           01494         INCF    r0x04, F
+                      01495 ;       .line   111; usart.c    head &= SERIAL_BUFFER_SIZE_MASK;                /* wrap around if needed
+                             */
+000052 0E3F           01496         MOVLW   0x3f
+000054 16??           01497         ANDWF   r0x04, F
+                      01498 ;       .line   112; usart.c    if (head != fifo->tail) {
+000056 50??           01499         MOVF    r0x01, W
+000058 0F01           01500         ADDLW   0x01
+Message[1301]: Using default destination of 0 (Access Bank).
+00005A 6E??           01501         MOVWF   r0x05
+00005C 0E00           01502         MOVLW   0x00
+00005E 20??           01503         ADDWFC  r0x02, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000060 6E??           01504         MOVWF   r0x06
+000062 0E00           01505         MOVLW   0x00
+000064 20??           01506         ADDWFC  r0x03, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000066 6E??           01507         MOVWF   r0x07
+000068 C??? F???      01508         MOVFF   r0x05, FSR0L
+00006C C??? F???      01509         MOVFF   r0x06, PRODL
+000070 50??           01510         MOVF    r0x07, W
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 31
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+000072 EC?? F0??      01511         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+000076 6E??           01512         MOVWF   r0x05
+000078 50??           01513         MOVF    r0x04, W
+00007A 18??           01514         XORWF   r0x05, W
+00007C E0??           01515         BZ      _00185_DS_
+                      01516 ;       .line   113; usart.c    fifo->head = head;
+00007E C??? F???      01517         MOVFF   r0x04, POSTDEC1
+000082 C??? F???      01518         MOVFF   r0x01, FSR0L
+000086 C??? F???      01519         MOVFF   r0x02, PRODL
+00008A 50??           01520         MOVF    r0x03, W
+00008C EC?? F0??      01521         CALL    __gptrput1
+                      01522 ;       .line   114; usart.c    fifo->data[head] = c;
+000090 0E02           01523         MOVLW   0x02
+000092 26??           01524         ADDWF   r0x01, F
+000094 0E00           01525         MOVLW   0x00
+000096 22??           01526         ADDWFC  r0x02, F
+000098 22??           01527         ADDWFC  r0x03, F
+Message[1301]: Using default destination of 0 (Access Bank).
+00009A 6A??           01528         CLRF    r0x05
+Message[1301]: Using default destination of 0 (Access Bank).
+00009C 6A??           01529         CLRF    r0x06
+00009E 50??           01530         MOVF    r0x01, W
+0000A0 26??           01531         ADDWF   r0x04, F
+0000A2 50??           01532         MOVF    r0x02, W
+0000A4 22??           01533         ADDWFC  r0x05, F
+0000A6 50??           01534         MOVF    r0x03, W
+0000A8 22??           01535         ADDWFC  r0x06, F
+0000AA C??? F???      01536         MOVFF   r0x00, POSTDEC1
+0000AE C??? F???      01537         MOVFF   r0x04, FSR0L
+0000B2 C??? F???      01538         MOVFF   r0x05, PRODL
+0000B6 50??           01539         MOVF    r0x06, W
+0000B8 EC?? F0??      01540         CALL    __gptrput1
+                      01541 ;       .line   115; usart.c    return 1;
+0000BC 0E01           01542         MOVLW   0x01
+0000BE D???           01543         BRA     _00186_DS_
+0000C0                01544 _00185_DS_:
+                      01545 ;       .line   117; usart.c    return 0;
+Message[1301]: Using default destination of 0 (Access Bank).
+0000C0 6AE8           01546         CLRF    WREG
+0000C2                01547 _00186_DS_:
+0000C2 CFE4 F000      01548         MOVFF   PREINC1, r0x07
+0000C6 CFE4 F000      01549         MOVFF   PREINC1, r0x06
+0000CA CFE4 F000      01550         MOVFF   PREINC1, r0x05
+0000CE CFE4 F000      01551         MOVFF   PREINC1, r0x04
+0000D2 CFE4 F000      01552         MOVFF   PREINC1, r0x03
+0000D6 CFE4 F000      01553         MOVFF   PREINC1, r0x02
+0000DA CFE4 F000      01554         MOVFF   PREINC1, r0x01
+0000DE CFE4 F000      01555         MOVFF   PREINC1, r0x00
+0000E2 CFE4 FFD9      01556         MOVFF   PREINC1, FSR2L
+0000E6 0012           01557         RETURN  
+                      01558 
+                      01559 ; ; Starting pCode block
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 32
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+                      01560 S_usart__print_debug_fifo       code
+000000                01561 _print_debug_fifo:
+                      01562 ;       .line   83; usart.c     void print_debug_fifo(struct serial_buffer * fifo) {
+000000 CFD9 FFE5      01563         MOVFF   FSR2L, POSTDEC1
+000004 CFE1 FFD9      01564         MOVFF   FSR1L, FSR2L
+000008 C??? F???      01565         MOVFF   r0x00, POSTDEC1
+00000C C??? F???      01566         MOVFF   r0x01, POSTDEC1
+000010 C??? F???      01567         MOVFF   r0x02, POSTDEC1
+000014 C??? F???      01568         MOVFF   r0x03, POSTDEC1
+000018 C??? F???      01569         MOVFF   r0x04, POSTDEC1
+00001C C??? F???      01570         MOVFF   r0x05, POSTDEC1
+000020 C??? F???      01571         MOVFF   r0x06, POSTDEC1
+000024 0E02           01572         MOVLW   0x02
+000026 CFDB F000      01573         MOVFF   PLUSW2, r0x00
+00002A 0E03           01574         MOVLW   0x03
+00002C CFDB F000      01575         MOVFF   PLUSW2, r0x01
+000030 0E04           01576         MOVLW   0x04
+000032 CFDB F000      01577         MOVFF   PLUSW2, r0x02
+                      01578 ;       .line   85; usart.c     putchar_wait('\r');
+000036 0E0D           01579         MOVLW   0x0d
+Message[1301]: Using default destination of 0 (Access Bank).
+000038 6EE5           01580         MOVWF   POSTDEC1
+00003A EC?? F0??      01581         CALL    _putchar_wait
+00003E 52E6           01582         MOVF    POSTINC1, F
+                      01583 ;       .line   86; usart.c     putchar_wait('\n');
+000040 0E0A           01584         MOVLW   0x0a
+Message[1301]: Using default destination of 0 (Access Bank).
+000042 6EE5           01585         MOVWF   POSTDEC1
+000044 EC?? F0??      01586         CALL    _putchar_wait
+000048 52E6           01587         MOVF    POSTINC1, F
+                      01588 ;       .line   87; usart.c     print_debug_value('S',SERIAL_BUFFER_SIZE);
+00004A 0E40           01589         MOVLW   0x40
+Message[1301]: Using default destination of 0 (Access Bank).
+00004C 6EE5           01590         MOVWF   POSTDEC1
+00004E 0E53           01591         MOVLW   0x53
+Message[1301]: Using default destination of 0 (Access Bank).
+000050 6EE5           01592         MOVWF   POSTDEC1
+000052 EC?? F0??      01593         CALL    _print_debug_value
+000056 52E6           01594         MOVF    POSTINC1, F
+000058 52E6           01595         MOVF    POSTINC1, F
+                      01596 ;       .line   88; usart.c     putchar_wait(' ');
+00005A 0E20           01597         MOVLW   0x20
+Message[1301]: Using default destination of 0 (Access Bank).
+00005C 6EE5           01598         MOVWF   POSTDEC1
+00005E EC?? F0??      01599         CALL    _putchar_wait
+000062 52E6           01600         MOVF    POSTINC1, F
+                      01601 ;       .line   89; usart.c     print_debug_value('M',SERIAL_BUFFER_SIZE_MASK);
+000064 0E3F           01602         MOVLW   0x3f
+Message[1301]: Using default destination of 0 (Access Bank).
+000066 6EE5           01603         MOVWF   POSTDEC1
+000068 0E4D           01604         MOVLW   0x4d
+Message[1301]: Using default destination of 0 (Access Bank).
+00006A 6EE5           01605         MOVWF   POSTDEC1
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 33
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+00006C EC?? F0??      01606         CALL    _print_debug_value
+000070 52E6           01607         MOVF    POSTINC1, F
+000072 52E6           01608         MOVF    POSTINC1, F
+                      01609 ;       .line   90; usart.c     putchar_wait(' ');
+000074 0E20           01610         MOVLW   0x20
+Message[1301]: Using default destination of 0 (Access Bank).
+000076 6EE5           01611         MOVWF   POSTDEC1
+000078 EC?? F0??      01612         CALL    _putchar_wait
+00007C 52E6           01613         MOVF    POSTINC1, F
+                      01614 ;       .line   91; usart.c     print_debug_value('H',fifo->head);
+00007E C??? F???      01615         MOVFF   r0x00, FSR0L
+000082 C??? F???      01616         MOVFF   r0x01, PRODL
+000086 50??           01617         MOVF    r0x02, W
+000088 EC?? F0??      01618         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+00008C 6E??           01619         MOVWF   r0x03
+00008E 50??           01620         MOVF    r0x03, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000090 6EE5           01621         MOVWF   POSTDEC1
+000092 0E48           01622         MOVLW   0x48
+Message[1301]: Using default destination of 0 (Access Bank).
+000094 6EE5           01623         MOVWF   POSTDEC1
+000096 EC?? F0??      01624         CALL    _print_debug_value
+00009A 52E6           01625         MOVF    POSTINC1, F
+00009C 52E6           01626         MOVF    POSTINC1, F
+                      01627 ;       .line   92; usart.c     putchar_wait(' ');
+00009E 0E20           01628         MOVLW   0x20
+Message[1301]: Using default destination of 0 (Access Bank).
+0000A0 6EE5           01629         MOVWF   POSTDEC1
+0000A2 EC?? F0??      01630         CALL    _putchar_wait
+0000A6 52E6           01631         MOVF    POSTINC1, F
+                      01632 ;       .line   93; usart.c     print_debug_value('T',fifo->tail);
+0000A8 50??           01633         MOVF    r0x00, W
+0000AA 0F01           01634         ADDLW   0x01
+Message[1301]: Using default destination of 0 (Access Bank).
+0000AC 6E??           01635         MOVWF   r0x03
+0000AE 0E00           01636         MOVLW   0x00
+0000B0 20??           01637         ADDWFC  r0x01, W
+Message[1301]: Using default destination of 0 (Access Bank).
+0000B2 6E??           01638         MOVWF   r0x04
+0000B4 0E00           01639         MOVLW   0x00
+0000B6 20??           01640         ADDWFC  r0x02, W
+Message[1301]: Using default destination of 0 (Access Bank).
+0000B8 6E??           01641         MOVWF   r0x05
+0000BA C??? F???      01642         MOVFF   r0x03, FSR0L
+0000BE C??? F???      01643         MOVFF   r0x04, PRODL
+0000C2 50??           01644         MOVF    r0x05, W
+0000C4 EC?? F0??      01645         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+0000C8 6E??           01646         MOVWF   r0x03
+0000CA 50??           01647         MOVF    r0x03, W
+Message[1301]: Using default destination of 0 (Access Bank).
+0000CC 6EE5           01648         MOVWF   POSTDEC1
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 34
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+0000CE 0E54           01649         MOVLW   0x54
+Message[1301]: Using default destination of 0 (Access Bank).
+0000D0 6EE5           01650         MOVWF   POSTDEC1
+0000D2 EC?? F0??      01651         CALL    _print_debug_value
+0000D6 52E6           01652         MOVF    POSTINC1, F
+0000D8 52E6           01653         MOVF    POSTINC1, F
+                      01654 ;       .line   94; usart.c     putchar_wait(' ');
+0000DA 0E20           01655         MOVLW   0x20
+Message[1301]: Using default destination of 0 (Access Bank).
+0000DC 6EE5           01656         MOVWF   POSTDEC1
+0000DE EC?? F0??      01657         CALL    _putchar_wait
+0000E2 52E6           01658         MOVF    POSTINC1, F
+                      01659 ;       .line   95; usart.c     putchar_wait(' ');
+0000E4 0E20           01660         MOVLW   0x20
+Message[1301]: Using default destination of 0 (Access Bank).
+0000E6 6EE5           01661         MOVWF   POSTDEC1
+0000E8 EC?? F0??      01662         CALL    _putchar_wait
+0000EC 52E6           01663         MOVF    POSTINC1, F
+                      01664 ;       .line   96; usart.c     putchar_wait(' ');
+0000EE 0E20           01665         MOVLW   0x20
+Message[1301]: Using default destination of 0 (Access Bank).
+0000F0 6EE5           01666         MOVWF   POSTDEC1
+0000F2 EC?? F0??      01667         CALL    _putchar_wait
+0000F6 52E6           01668         MOVF    POSTINC1, F
+                      01669 ;       .line   97; usart.c     puts_rom(sData);
+0000F8 0E??           01670         MOVLW   UPPER(_sData)
+Message[1301]: Using default destination of 0 (Access Bank).
+0000FA 6E??           01671         MOVWF   r0x05
+0000FC 0E??           01672         MOVLW   HIGH(_sData)
+Message[1301]: Using default destination of 0 (Access Bank).
+0000FE 6E??           01673         MOVWF   r0x04
+000100 0E??           01674         MOVLW   LOW(_sData)
+Message[1301]: Using default destination of 0 (Access Bank).
+000102 6E??           01675         MOVWF   r0x03
+000104 50??           01676         MOVF    r0x05, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000106 6EE5           01677         MOVWF   POSTDEC1
+000108 50??           01678         MOVF    r0x04, W
+Message[1301]: Using default destination of 0 (Access Bank).
+00010A 6EE5           01679         MOVWF   POSTDEC1
+00010C 50??           01680         MOVF    r0x03, W
+Message[1301]: Using default destination of 0 (Access Bank).
+00010E 6EE5           01681         MOVWF   POSTDEC1
+000110 EC?? F0??      01682         CALL    _puts_rom
+000114 0E03           01683         MOVLW   0x03
+000116 26E1           01684         ADDWF   FSR1L, F
+                      01685 ;       .line   98; usart.c     for (i=0; i<SERIAL_BUFFER_SIZE; i++) {
+000118 0E02           01686         MOVLW   0x02
+00011A 26??           01687         ADDWF   r0x00, F
+00011C 0E00           01688         MOVLW   0x00
+00011E 22??           01689         ADDWFC  r0x01, F
+000120 22??           01690         ADDWFC  r0x02, F
+Message[1301]: Using default destination of 0 (Access Bank).
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 35
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+000122 6A??           01691         CLRF    r0x03
+000124                01692 _00168_DS_:
+                      01693 ;       .line   99; usart.c     print_hex_wait(fifo->data[i]);
+000124 50??           01694         MOVF    r0x03, W
+000126 24??           01695         ADDWF   r0x00, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000128 6E??           01696         MOVWF   r0x04
+Message[1301]: Using default destination of 0 (Access Bank).
+00012A 6AE8           01697         CLRF    WREG
+00012C 20??           01698         ADDWFC  r0x01, W
+Message[1301]: Using default destination of 0 (Access Bank).
+00012E 6E??           01699         MOVWF   r0x05
+Message[1301]: Using default destination of 0 (Access Bank).
+000130 6AE8           01700         CLRF    WREG
+000132 20??           01701         ADDWFC  r0x02, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000134 6E??           01702         MOVWF   r0x06
+000136 C??? F???      01703         MOVFF   r0x04, FSR0L
+00013A C??? F???      01704         MOVFF   r0x05, PRODL
+00013E 50??           01705         MOVF    r0x06, W
+000140 EC?? F0??      01706         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+000144 6E??           01707         MOVWF   r0x04
+000146 50??           01708         MOVF    r0x04, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000148 6EE5           01709         MOVWF   POSTDEC1
+00014A EC?? F0??      01710         CALL    _print_hex_wait
+00014E 52E6           01711         MOVF    POSTINC1, F
+                      01712 ;       .line   100; usart.c    putchar_wait(' ');
+000150 0E20           01713         MOVLW   0x20
+Message[1301]: Using default destination of 0 (Access Bank).
+000152 6EE5           01714         MOVWF   POSTDEC1
+000154 EC?? F0??      01715         CALL    _putchar_wait
+000158 52E6           01716         MOVF    POSTINC1, F
+                      01717 ;       .line   98; usart.c     for (i=0; i<SERIAL_BUFFER_SIZE; i++) {
+00015A 2A??           01718         INCF    r0x03, F
+00015C 0E40           01719         MOVLW   0x40
+00015E 5C??           01720         SUBWF   r0x03, W
+000160 E3??           01721         BNC     _00168_DS_
+                      01722 ;       .line   102; usart.c    putchar_wait('\r');
+000162 0E0D           01723         MOVLW   0x0d
+Message[1301]: Using default destination of 0 (Access Bank).
+000164 6EE5           01724         MOVWF   POSTDEC1
+000166 EC?? F0??      01725         CALL    _putchar_wait
+00016A 52E6           01726         MOVF    POSTINC1, F
+                      01727 ;       .line   103; usart.c    putchar_wait('\n');
+00016C 0E0A           01728         MOVLW   0x0a
+Message[1301]: Using default destination of 0 (Access Bank).
+00016E 6EE5           01729         MOVWF   POSTDEC1
+000170 EC?? F0??      01730         CALL    _putchar_wait
+000174 52E6           01731         MOVF    POSTINC1, F
+000176 CFE4 F000      01732         MOVFF   PREINC1, r0x06
+00017A CFE4 F000      01733         MOVFF   PREINC1, r0x05
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 36
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+00017E CFE4 F000      01734         MOVFF   PREINC1, r0x04
+000182 CFE4 F000      01735         MOVFF   PREINC1, r0x03
+000186 CFE4 F000      01736         MOVFF   PREINC1, r0x02
+00018A CFE4 F000      01737         MOVFF   PREINC1, r0x01
+00018E CFE4 F000      01738         MOVFF   PREINC1, r0x00
+000192 CFE4 FFD9      01739         MOVFF   PREINC1, FSR2L
+000196 0012           01740         RETURN  
+                      01741 
+                      01742 ; ; Starting pCode block
+                      01743 S_usart__print_debug_value      code
+000000                01744 _print_debug_value:
+                      01745 ;       .line   77; usart.c     void print_debug_value(char c, unsigned char value) {
+000000 CFD9 FFE5      01746         MOVFF   FSR2L, POSTDEC1
+000004 CFE1 FFD9      01747         MOVFF   FSR1L, FSR2L
+000008 C??? F???      01748         MOVFF   r0x00, POSTDEC1
+00000C C??? F???      01749         MOVFF   r0x01, POSTDEC1
+000010 0E02           01750         MOVLW   0x02
+000012 CFDB F000      01751         MOVFF   PLUSW2, r0x00
+000016 0E03           01752         MOVLW   0x03
+000018 CFDB F000      01753         MOVFF   PLUSW2, r0x01
+                      01754 ;       .line   78; usart.c     putchar_wait(c);
+00001C 50??           01755         MOVF    r0x00, W
+Message[1301]: Using default destination of 0 (Access Bank).
+00001E 6EE5           01756         MOVWF   POSTDEC1
+000020 EC?? F0??      01757         CALL    _putchar_wait
+000024 52E6           01758         MOVF    POSTINC1, F
+                      01759 ;       .line   79; usart.c     putchar_wait(':');
+000026 0E3A           01760         MOVLW   0x3a
+Message[1301]: Using default destination of 0 (Access Bank).
+000028 6EE5           01761         MOVWF   POSTDEC1
+00002A EC?? F0??      01762         CALL    _putchar_wait
+00002E 52E6           01763         MOVF    POSTINC1, F
+                      01764 ;       .line   80; usart.c     print_hex_wait(value);
+000030 50??           01765         MOVF    r0x01, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000032 6EE5           01766         MOVWF   POSTDEC1
+000034 EC?? F0??      01767         CALL    _print_hex_wait
+000038 52E6           01768         MOVF    POSTINC1, F
+00003A CFE4 F000      01769         MOVFF   PREINC1, r0x01
+00003E CFE4 F000      01770         MOVFF   PREINC1, r0x00
+000042 CFE4 FFD9      01771         MOVFF   PREINC1, FSR2L
+000046 0012           01772         RETURN  
+                      01773 
+                      01774 ; ; Starting pCode block
+                      01775 S_usart__puts_rom       code
+000000                01776 _puts_rom:
+                      01777 ;       .line   70; usart.c     void puts_rom(const char * s) {
+000000 CFD9 FFE5      01778         MOVFF   FSR2L, POSTDEC1
+000004 CFE1 FFD9      01779         MOVFF   FSR1L, FSR2L
+000008 C??? F???      01780         MOVFF   r0x00, POSTDEC1
+00000C C??? F???      01781         MOVFF   r0x01, POSTDEC1
+000010 C??? F???      01782         MOVFF   r0x02, POSTDEC1
+000014 C??? F???      01783         MOVFF   r0x03, POSTDEC1
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 37
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+000018 C??? F???      01784         MOVFF   r0x04, POSTDEC1
+00001C 0E02           01785         MOVLW   0x02
+00001E CFDB F000      01786         MOVFF   PLUSW2, r0x00
+000022 0E03           01787         MOVLW   0x03
+000024 CFDB F000      01788         MOVFF   PLUSW2, r0x01
+000028 0E04           01789         MOVLW   0x04
+00002A CFDB F000      01790         MOVFF   PLUSW2, r0x02
+00002E                01791 _00145_DS_:
+                      01792 ;       .line   72; usart.c     while ( ( c = *s++ ) ) {
+00002E C??? F???      01793         MOVFF   r0x00, FSR0L
+000032 C??? F???      01794         MOVFF   r0x01, PRODL
+000036 50??           01795         MOVF    r0x02, W
+000038 EC?? F0??      01796         CALL    __gptrget1
+Message[1301]: Using default destination of 0 (Access Bank).
+00003C 6E??           01797         MOVWF   r0x03
+00003E 2A??           01798         INCF    r0x00, F
+000040 E3??           01799         BNC     _00157_DS_
+000042 4A??           01800         INFSNZ  r0x01, F
+000044 2A??           01801         INCF    r0x02, F
+000046                01802 _00157_DS_:
+000046 C??? F???      01803         MOVFF   r0x03, r0x04
+00004A 50??           01804         MOVF    r0x03, W
+00004C E0??           01805         BZ      _00148_DS_
+                      01806 ;       .line   73; usart.c     putchar_wait( c );
+00004E 50??           01807         MOVF    r0x04, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000050 6EE5           01808         MOVWF   POSTDEC1
+000052 EC?? F0??      01809         CALL    _putchar_wait
+000056 52E6           01810         MOVF    POSTINC1, F
+000058 D???           01811         BRA     _00145_DS_
+00005A                01812 _00148_DS_:
+00005A CFE4 F000      01813         MOVFF   PREINC1, r0x04
+00005E CFE4 F000      01814         MOVFF   PREINC1, r0x03
+000062 CFE4 F000      01815         MOVFF   PREINC1, r0x02
+000066 CFE4 F000      01816         MOVFF   PREINC1, r0x01
+00006A CFE4 F000      01817         MOVFF   PREINC1, r0x00
+00006E CFE4 FFD9      01818         MOVFF   PREINC1, FSR2L
+000072 0012           01819         RETURN  
+                      01820 
+                      01821 ; ; Starting pCode block
+                      01822 S_usart__print_hex_wait code
+000000                01823 _print_hex_wait:
+                      01824 ;       .line   59; usart.c     void print_hex_wait(unsigned char c) {
+000000 CFD9 FFE5      01825         MOVFF   FSR2L, POSTDEC1
+000004 CFE1 FFD9      01826         MOVFF   FSR1L, FSR2L
+000008 C??? F???      01827         MOVFF   r0x00, POSTDEC1
+00000C C??? F???      01828         MOVFF   r0x01, POSTDEC1
+000010 0E02           01829         MOVLW   0x02
+000012 CFDB F000      01830         MOVFF   PLUSW2, r0x00
+                      01831 ;       .line   61; usart.c     nibble=((c & 0xf0) >> 4 ) + '0';
+000016 0EF0           01832         MOVLW   0xf0
+000018 14??           01833         ANDWF   r0x00, W
+Message[1301]: Using default destination of 0 (Access Bank).
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 38
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+00001A 6E??           01834         MOVWF   r0x01
+00001C 38??           01835         SWAPF   r0x01, W
+00001E 0B0F           01836         ANDLW   0x0f
+Message[1301]: Using default destination of 0 (Access Bank).
+000020 6E??           01837         MOVWF   r0x01
+000022 0E30           01838         MOVLW   0x30
+000024 26??           01839         ADDWF   r0x01, F
+                      01840 ;       .line   62; usart.c     if (nibble>=0x3a) nibble+=7;
+000026 0E3A           01841         MOVLW   0x3a
+000028 5C??           01842         SUBWF   r0x01, W
+00002A E3??           01843         BNC     _00126_DS_
+00002C 0E07           01844         MOVLW   0x07
+00002E 26??           01845         ADDWF   r0x01, F
+000030                01846 _00126_DS_:
+                      01847 ;       .line   63; usart.c     putchar_wait(nibble);
+000030 50??           01848         MOVF    r0x01, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000032 6EE5           01849         MOVWF   POSTDEC1
+000034 EC?? F0??      01850         CALL    _putchar_wait
+000038 52E6           01851         MOVF    POSTINC1, F
+                      01852 ;       .line   65; usart.c     nibble=(c & 0x0f) + '0';
+00003A 0E0F           01853         MOVLW   0x0f
+00003C 16??           01854         ANDWF   r0x00, F
+00003E 0E30           01855         MOVLW   0x30
+000040 24??           01856         ADDWF   r0x00, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000042 6E??           01857         MOVWF   r0x01
+                      01858 ;       .line   66; usart.c     if (nibble>=0x3a) nibble+=7;
+000044 0E3A           01859         MOVLW   0x3a
+000046 5C??           01860         SUBWF   r0x01, W
+000048 E3??           01861         BNC     _00128_DS_
+00004A 0E07           01862         MOVLW   0x07
+00004C 26??           01863         ADDWF   r0x01, F
+00004E                01864 _00128_DS_:
+                      01865 ;       .line   67; usart.c     putchar_wait(nibble);
+00004E 50??           01866         MOVF    r0x01, W
+Message[1301]: Using default destination of 0 (Access Bank).
+000050 6EE5           01867         MOVWF   POSTDEC1
+000052 EC?? F0??      01868         CALL    _putchar_wait
+000056 52E6           01869         MOVF    POSTINC1, F
+000058 CFE4 F000      01870         MOVFF   PREINC1, r0x01
+00005C CFE4 F000      01871         MOVFF   PREINC1, r0x00
+000060 CFE4 FFD9      01872         MOVFF   PREINC1, FSR2L
+000064 0012           01873         RETURN  
+                      01874 
+                      01875 ; ; Starting pCode block
+                      01876 S_usart__putchar_wait   code
+000000                01877 _putchar_wait:
+                      01878 ;       .line   54; usart.c     void putchar_wait(unsigned char c) {
+000000 CFD9 FFE5      01879         MOVFF   FSR2L, POSTDEC1
+000004 CFE1 FFD9      01880         MOVFF   FSR1L, FSR2L
+000008 C??? F???      01881         MOVFF   r0x00, POSTDEC1
+00000C 0E02           01882         MOVLW   0x02
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 39
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+00000E CFDB F000      01883         MOVFF   PLUSW2, r0x00
+000012                01884 _00117_DS_:
+                      01885 ;       .line   55; usart.c     while (!TXSTA1bits.TRMT1);
+000012 A2??           01886         BTFSS   _TXSTA1bits, 1
+000014 D???           01887         BRA     _00117_DS_
+                      01888 ;       .line   56; usart.c     TXREG1 = c;
+000016 C??? F???      01889         MOVFF   r0x00, _TXREG1
+00001A CFE4 F000      01890         MOVFF   PREINC1, r0x00
+00001E CFE4 FFD9      01891         MOVFF   PREINC1, FSR2L
+000022 0012           01892         RETURN  
+                      01893 
+                      01894 ; ; Starting pCode block
+                      01895 S_usart__putchar        code
+000000                01896 _putchar:
+                      01897 ;       .line   45; usart.c     char putchar(unsigned char c) {
+000000 CFD9 FFE5      01898         MOVFF   FSR2L, POSTDEC1
+000004 CFE1 FFD9      01899         MOVFF   FSR1L, FSR2L
+000008 C??? F???      01900         MOVFF   r0x00, POSTDEC1
+00000C 0E02           01901         MOVLW   0x02
+00000E CFDB F000      01902         MOVFF   PLUSW2, r0x00
+                      01903 ;       .line   46; usart.c     if ( TXSTA1bits.TRMT1 ) {
+000012 A2??           01904         BTFSS   _TXSTA1bits, 1
+000014 D???           01905         BRA     _00111_DS_
+                      01906 ;       .line   47; usart.c     TXREG1 = c;
+000016 C??? F???      01907         MOVFF   r0x00, _TXREG1
+                      01908 ;       .line   48; usart.c     return 1;
+00001A 0E01           01909         MOVLW   0x01
+00001C D???           01910         BRA     _00112_DS_
+00001E                01911 _00111_DS_:
+                      01912 ;       .line   50; usart.c     return 0;
+Message[1301]: Using default destination of 0 (Access Bank).
+00001E 6AE8           01913         CLRF    WREG
+000020                01914 _00112_DS_:
+000020 CFE4 F000      01915         MOVFF   PREINC1, r0x00
+000024 CFE4 FFD9      01916         MOVFF   PREINC1, FSR2L
+000028 0012           01917         RETURN  
+                      01918 
+                      01919 ; ; Starting pCode block
+                      01920 S_usart__init_usart     code
+000000                01921 _init_usart:
+                      01922 ;       .line   14; usart.c     void init_usart (void) {
+000000 CFD9 FFE5      01923         MOVFF   FSR2L, POSTDEC1
+000004 CFE1 FFD9      01924         MOVFF   FSR1L, FSR2L
+                      01925 ;       .line   16; usart.c     TRISCbits.TRISC6 = 0;   // make the TX pin a digital output
+000008 9C??           01926         BCF     _TRISCbits, 6
+                      01927 ;       .line   17; usart.c     TRISCbits.TRISC7 = 1;   // make the RX pin a digital input
+00000A 8E??           01928         BSF     _TRISCbits, 7
+                      01929 ;       .line   18; usart.c     TXSTA1bits.BRGH = USE_BRGH;             // high speed
+00000C 84??           01930         BSF     _TXSTA1bits, 2
+                      01931 ;       .line   19; usart.c     BAUDCON1bits.BRG16 = USE_BRG16;         // 8-bit baud rate generator
+00000E 96??           01932         BCF     _BAUDCON1bits, 3
+                      01933 ;       .line   20; usart.c     SPBRG = SBRG_VAL;               // calculated by defines
+000010 0E07           01934         MOVLW   0x07
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 40
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
+Message[1301]: Using default destination of 0 (Access Bank).
+000012 6E??           01935         MOVWF   _SPBRG
+                      01936 ;       .line   22; usart.c     PIE1bits.RC1IE = 0;             // disbale RX interrupt
+000014 9A??           01937         BCF     _PIE1bits, 5
+                      01938 ;       .line   23; usart.c     PIE1bits.TX1IE = 0;             // disbale TX interrupt
+000016 98??           01939         BCF     _PIE1bits, 4
+                      01940 ;       .line   25; usart.c     RCSTA1bits.RX9  = 0;    // 8-bit reception
+000018 9C??           01941         BCF     _RCSTA1bits, 6
+                      01942 ;       .line   26; usart.c     RCSTA1bits.SPEN = 1;    // enable serial port (configures RX/DT and TX/C
+                            K pins as serial port pins)
+00001A 8E??           01943         BSF     _RCSTA1bits, 7
+                      01944 ;       .line   27; usart.c     RCSTA1bits.CREN = 1;    // enable receiver
+00001C 88??           01945         BSF     _RCSTA1bits, 4
+                      01946 ;       .line   29; usart.c     TXSTA1bits.TX9  = 0;    // 8-bit transmission
+00001E 9C??           01947         BCF     _TXSTA1bits, 6
+                      01948 ;       .line   30; usart.c     TXSTA1bits.SYNC = 0;    // asynchronous mode
+000020 98??           01949         BCF     _TXSTA1bits, 4
+                      01950 ;       .line   31; usart.c     TXSTA1bits.TXEN = 1;    // transmit enabled
+000022 8A??           01951         BSF     _TXSTA1bits, 5
+000024 CFE4 FFD9      01952         MOVFF   PREINC1, FSR2L
+000028 0012           01953         RETURN  
+                      01954 
+                      01955 ; ; Starting pCode block for Ival
+                      01956         code
+000000                01957 _sData:
+000000 4420 7461 3A61 01958         DB      0x20, 0x44, 0x61, 0x74, 0x61, 0x3a, 0x20, 0x00
+       0020           
+                      01959 
+                      01960 
+                      01961 ; Statistics:
+                      01962 ; code size:     2482 (0x09b2) bytes ( 1.89%)
+                      01963 ;                1241 (0x04d9) words
+                      01964 ; udata size:       0 (0x0000) bytes ( 0.00%)
+                      01965 ; access size:     26 (0x001a) bytes
+                      01966 
+                      01967 
+                      01968         end
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 41
+
+
+SYMBOL TABLE
+  LABEL                             VALUE
+
+FSR0L                             00000FE9
+FSR1L                             00000FE1
+FSR2L                             00000FD9
+PLUSW2                            00000FDB
+POSTDEC1                          00000FE5
+POSTINC1                          00000FE6
+PREINC1                           00000FE4
+PRODL                             00000FF3
+STATUS                            00000FD8
+WREG                              00000FE8
+_00111_DS_                        0000001E
+_00112_DS_                        00000020
+_00117_DS_                        00000012
+_00126_DS_                        00000030
+_00128_DS_                        0000004E
+_00145_DS_                        0000002E
+_00148_DS_                        0000005A
+_00157_DS_                        00000046
+_00168_DS_                        00000124
+_00185_DS_                        000000C0
+_00186_DS_                        000000C2
+_00201_DS_                        000000C6
+_00202_DS_                        000000C8
+_00220_DS_                        000000C4
+_00221_DS_                        000000C6
+_00236_DS_                        00000106
+_00238_DS_                        000000A4
+_00240_DS_                        0000010A
+_00241_DS_                        0000011E
+_00252_DS_                        000000BC
+_00261_DS_                        0000011C
+_00263_DS_                        000001B0
+_00265_DS_                        000000D0
+_00267_DS_                        000001E4
+_00285_DS_                        00000134
+_ADCON0                           00000000
+_ADCON0bits                       00000000
+_ADCON1                           00000000
+_ADCON1bits                       00000000
+_ADCON2                           00000000
+_ADCON2bits                       00000000
+_ADRES                            00000000
+_ADRESH                           00000000
+_ADRESL                           00000000
+_ANCON0                           00000000
+_ANCON0bits                       00000000
+_ANCON1                           00000000
+_ANCON1bits                       00000000
+_B0CON                            00000000
+_B0CONbits                        00000000
+_B0D0                             00000000
+_B0D0bits                         00000000
+_B0D1                             00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 42
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_B0D1bits                         00000000
+_B0D2                             00000000
+_B0D2bits                         00000000
+_B0D3                             00000000
+_B0D3bits                         00000000
+_B0D4                             00000000
+_B0D4bits                         00000000
+_B0D5                             00000000
+_B0D5bits                         00000000
+_B0D6                             00000000
+_B0D6bits                         00000000
+_B0D7                             00000000
+_B0D7bits                         00000000
+_B0DLC                            00000000
+_B0DLCbits                        00000000
+_B0EIDH                           00000000
+_B0EIDHbits                       00000000
+_B0EIDL                           00000000
+_B0EIDLbits                       00000000
+_B0SIDH                           00000000
+_B0SIDHbits                       00000000
+_B0SIDL                           00000000
+_B0SIDLbits                       00000000
+_B1CON                            00000000
+_B1CONbits                        00000000
+_B1D0                             00000000
+_B1D0bits                         00000000
+_B1D1                             00000000
+_B1D1bits                         00000000
+_B1D2                             00000000
+_B1D2bits                         00000000
+_B1D3                             00000000
+_B1D3bits                         00000000
+_B1D4                             00000000
+_B1D4bits                         00000000
+_B1D5                             00000000
+_B1D5bits                         00000000
+_B1D6                             00000000
+_B1D6bits                         00000000
+_B1D7                             00000000
+_B1D7bits                         00000000
+_B1DLC                            00000000
+_B1DLCbits                        00000000
+_B1EIDH                           00000000
+_B1EIDHbits                       00000000
+_B1EIDL                           00000000
+_B1EIDLbits                       00000000
+_B1SIDH                           00000000
+_B1SIDHbits                       00000000
+_B1SIDL                           00000000
+_B1SIDLbits                       00000000
+_B2CON                            00000000
+_B2CONbits                        00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 43
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_B2D0                             00000000
+_B2D0bits                         00000000
+_B2D1                             00000000
+_B2D1bits                         00000000
+_B2D2                             00000000
+_B2D2bits                         00000000
+_B2D3                             00000000
+_B2D3bits                         00000000
+_B2D4                             00000000
+_B2D4bits                         00000000
+_B2D5                             00000000
+_B2D5bits                         00000000
+_B2D6                             00000000
+_B2D6bits                         00000000
+_B2D7                             00000000
+_B2D7bits                         00000000
+_B2DLC                            00000000
+_B2DLCbits                        00000000
+_B2EIDH                           00000000
+_B2EIDHbits                       00000000
+_B2EIDL                           00000000
+_B2EIDLbits                       00000000
+_B2SIDH                           00000000
+_B2SIDHbits                       00000000
+_B2SIDL                           00000000
+_B2SIDLbits                       00000000
+_B3CON                            00000000
+_B3CONbits                        00000000
+_B3D0                             00000000
+_B3D0bits                         00000000
+_B3D1                             00000000
+_B3D1bits                         00000000
+_B3D2                             00000000
+_B3D2bits                         00000000
+_B3D3                             00000000
+_B3D3bits                         00000000
+_B3D4                             00000000
+_B3D4bits                         00000000
+_B3D5                             00000000
+_B3D5bits                         00000000
+_B3D6                             00000000
+_B3D6bits                         00000000
+_B3D7                             00000000
+_B3D7bits                         00000000
+_B3DLC                            00000000
+_B3DLCbits                        00000000
+_B3EIDH                           00000000
+_B3EIDHbits                       00000000
+_B3EIDL                           00000000
+_B3EIDLbits                       00000000
+_B3SIDH                           00000000
+_B3SIDHbits                       00000000
+_B3SIDL                           00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 44
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_B3SIDLbits                       00000000
+_B4CON                            00000000
+_B4CONbits                        00000000
+_B4D0                             00000000
+_B4D0bits                         00000000
+_B4D1                             00000000
+_B4D1bits                         00000000
+_B4D2                             00000000
+_B4D2bits                         00000000
+_B4D3                             00000000
+_B4D3bits                         00000000
+_B4D4                             00000000
+_B4D4bits                         00000000
+_B4D5                             00000000
+_B4D5bits                         00000000
+_B4D6                             00000000
+_B4D6bits                         00000000
+_B4D7                             00000000
+_B4D7bits                         00000000
+_B4DLC                            00000000
+_B4DLCbits                        00000000
+_B4EIDH                           00000000
+_B4EIDHbits                       00000000
+_B4EIDL                           00000000
+_B4EIDLbits                       00000000
+_B4SIDH                           00000000
+_B4SIDHbits                       00000000
+_B4SIDL                           00000000
+_B4SIDLbits                       00000000
+_B5CON                            00000000
+_B5CONbits                        00000000
+_B5D0                             00000000
+_B5D0bits                         00000000
+_B5D1                             00000000
+_B5D1bits                         00000000
+_B5D2                             00000000
+_B5D2bits                         00000000
+_B5D3                             00000000
+_B5D3bits                         00000000
+_B5D4                             00000000
+_B5D4bits                         00000000
+_B5D5                             00000000
+_B5D5bits                         00000000
+_B5D6                             00000000
+_B5D6bits                         00000000
+_B5D7                             00000000
+_B5D7bits                         00000000
+_B5DLC                            00000000
+_B5DLCbits                        00000000
+_B5EIDH                           00000000
+_B5EIDHbits                       00000000
+_B5EIDL                           00000000
+_B5EIDLbits                       00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 45
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_B5SIDH                           00000000
+_B5SIDHbits                       00000000
+_B5SIDL                           00000000
+_B5SIDLbits                       00000000
+_BAUDCON1                         00000000
+_BAUDCON1bits                     00000000
+_BAUDCON2                         00000000
+_BAUDCON2bits                     00000000
+_BIE0                             00000000
+_BIE0bits                         00000000
+_BRGCON1                          00000000
+_BRGCON1bits                      00000000
+_BRGCON2                          00000000
+_BRGCON2bits                      00000000
+_BRGCON3                          00000000
+_BRGCON3bits                      00000000
+_BSEL0                            00000000
+_BSEL0bits                        00000000
+_BSR                              00000000
+_CANCON                           00000000
+_CANCON_RO0                       00000000
+_CANCON_RO0bits                   00000000
+_CANCON_RO1                       00000000
+_CANCON_RO1bits                   00000000
+_CANCON_RO2                       00000000
+_CANCON_RO2bits                   00000000
+_CANCON_RO3                       00000000
+_CANCON_RO3bits                   00000000
+_CANCON_RO4                       00000000
+_CANCON_RO4bits                   00000000
+_CANCON_RO5                       00000000
+_CANCON_RO5bits                   00000000
+_CANCON_RO6                       00000000
+_CANCON_RO6bits                   00000000
+_CANCON_RO7                       00000000
+_CANCON_RO7bits                   00000000
+_CANCON_RO8                       00000000
+_CANCON_RO8bits                   00000000
+_CANCON_RO9                       00000000
+_CANCON_RO9bits                   00000000
+_CANCONbits                       00000000
+_CANSTAT                          00000000
+_CANSTAT_RO0                      00000000
+_CANSTAT_RO0bits                  00000000
+_CANSTAT_RO1                      00000000
+_CANSTAT_RO1bits                  00000000
+_CANSTAT_RO2                      00000000
+_CANSTAT_RO2bits                  00000000
+_CANSTAT_RO3                      00000000
+_CANSTAT_RO3bits                  00000000
+_CANSTAT_RO4                      00000000
+_CANSTAT_RO4bits                  00000000
+_CANSTAT_RO5                      00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 46
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_CANSTAT_RO5bits                  00000000
+_CANSTAT_RO6                      00000000
+_CANSTAT_RO6bits                  00000000
+_CANSTAT_RO7                      00000000
+_CANSTAT_RO7bits                  00000000
+_CANSTAT_RO8                      00000000
+_CANSTAT_RO8bits                  00000000
+_CANSTAT_RO9                      00000000
+_CANSTAT_RO9bits                  00000000
+_CANSTATbits                      00000000
+_CCP1CON                          00000000
+_CCP1CONbits                      00000000
+_CCP2CON                          00000000
+_CCP2CONbits                      00000000
+_CCP3CON                          00000000
+_CCP3CONbits                      00000000
+_CCP4CON                          00000000
+_CCP4CONbits                      00000000
+_CCP5CON                          00000000
+_CCP5CONbits                      00000000
+_CCPR1                            00000000
+_CCPR1H                           00000000
+_CCPR1L                           00000000
+_CCPR2                            00000000
+_CCPR2H                           00000000
+_CCPR2L                           00000000
+_CCPR3                            00000000
+_CCPR3H                           00000000
+_CCPR3L                           00000000
+_CCPR4                            00000000
+_CCPR4H                           00000000
+_CCPR4L                           00000000
+_CCPR5                            00000000
+_CCPR5H                           00000000
+_CCPR5L                           00000000
+_CCPTMRS                          00000000
+_CCPTMRSbits                      00000000
+_CIOCON                           00000000
+_CIOCONbits                       00000000
+_CM1CON                           00000000
+_CM1CON1                          00000000
+_CM1CON1bits                      00000000
+_CM1CONbits                       00000000
+_CM2CON                           00000000
+_CM2CON1                          00000000
+_CM2CON1bits                      00000000
+_CM2CONbits                       00000000
+_CMSTAT                           00000000
+_CMSTATUS                         00000000
+_CMSTATUSbits                     00000000
+_CMSTATbits                       00000000
+_COMSTAT                          00000000
+_COMSTATbits                      00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 47
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_CTMUCONH                         00000000
+_CTMUCONHbits                     00000000
+_CTMUCONL                         00000000
+_CTMUCONLbits                     00000000
+_CTMUICON                         00000000
+_CTMUICONbits                     00000000
+_CVRCON                           00000000
+_CVRCONbits                       00000000
+_ECANCON                          00000000
+_ECANCONbits                      00000000
+_ECCP1AS                          00000000
+_ECCP1ASbits                      00000000
+_ECCP1CON                         00000000
+_ECCP1CONbits                     00000000
+_ECCP1DEL                         00000000
+_ECCP1DELbits                     00000000
+_ECCP2CON                         00000000
+_ECCP2CONbits                     00000000
+_EEADR                            00000000
+_EEADRH                           00000000
+_EECON1                           00000000
+_EECON1bits                       00000000
+_EECON2                           00000000
+_EEDATA                           00000000
+_FSR0H                            00000000
+_FSR0L                            00000000
+_FSR1H                            00000000
+_FSR1L                            00000000
+_FSR2H                            00000000
+_FSR2L                            00000000
+_HLVDCON                          00000000
+_HLVDCONbits                      00000000
+_INDF0                            00000000
+_INDF1                            00000000
+_INDF2                            00000000
+_INTCON                           00000000
+_INTCON1                          00000000
+_INTCON1bits                      00000000
+_INTCON2                          00000000
+_INTCON2bits                      00000000
+_INTCON3                          00000000
+_INTCON3bits                      00000000
+_INTCONbits                       00000000
+_IOCB                             00000000
+_IOCBbits                         00000000
+_IPR1                             00000000
+_IPR1bits                         00000000
+_IPR2                             00000000
+_IPR2bits                         00000000
+_IPR3                             00000000
+_IPR3bits                         00000000
+_IPR4                             00000000
+_IPR4bits                         00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 48
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_IPR5                             00000000
+_IPR5bits                         00000000
+_LATA                             00000000
+_LATAbits                         00000000
+_LATB                             00000000
+_LATBbits                         00000000
+_LATC                             00000000
+_LATCbits                         00000000
+_MSEL0                            00000000
+_MSEL0bits                        00000000
+_MSEL1                            00000000
+_MSEL1bits                        00000000
+_MSEL2                            00000000
+_MSEL2bits                        00000000
+_MSEL3                            00000000
+_MSEL3bits                        00000000
+_ODCON                            00000000
+_ODCONbits                        00000000
+_OSCCON                           00000000
+_OSCCON2                          00000000
+_OSCCON2bits                      00000000
+_OSCCONbits                       00000000
+_OSCTUNE                          00000000
+_OSCTUNEbits                      00000000
+_PADCFG1                          00000000
+_PADCFG1bits                      00000000
+_PC                               00000000
+_PCL                              00000000
+_PCLATH                           00000000
+_PCLATU                           00000000
+_PIE1                             00000000
+_PIE1bits                         00000000
+_PIE2                             00000000
+_PIE2bits                         00000000
+_PIE3                             00000000
+_PIE3bits                         00000000
+_PIE4                             00000000
+_PIE4bits                         00000000
+_PIE5                             00000000
+_PIE5bits                         00000000
+_PIR1                             00000000
+_PIR1bits                         00000000
+_PIR2                             00000000
+_PIR2bits                         00000000
+_PIR3                             00000000
+_PIR3bits                         00000000
+_PIR4                             00000000
+_PIR4bits                         00000000
+_PIR5                             00000000
+_PIR5bits                         00000000
+_PLUSW0                           00000000
+_PLUSW1                           00000000
+_PLUSW2                           00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 49
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_PMD0                             00000000
+_PMD0bits                         00000000
+_PMD1                             00000000
+_PMD1bits                         00000000
+_PMD2                             00000000
+_PMD2bits                         00000000
+_PORTA                            00000000
+_PORTAbits                        00000000
+_PORTB                            00000000
+_PORTBbits                        00000000
+_PORTC                            00000000
+_PORTCbits                        00000000
+_PORTE                            00000000
+_PORTEbits                        00000000
+_POSTDEC0                         00000000
+_POSTDEC1                         00000000
+_POSTDEC2                         00000000
+_POSTINC0                         00000000
+_POSTINC1                         00000000
+_POSTINC2                         00000000
+_PR2                              00000000
+_PR4                              00000000
+_PREINC0                          00000000
+_PREINC1                          00000000
+_PREINC2                          00000000
+_PROD                             00000000
+_PRODH                            00000000
+_PRODL                            00000000
+_PSTR1CON                         00000000
+_PSTR1CONbits                     00000000
+_PWM1CON                          00000000
+_PWM1CONbits                      00000000
+_RCON                             00000000
+_RCONbits                         00000000
+_RCREG                            00000000
+_RCREG1                           00000000
+_RCREG2                           00000000
+_RCSTA                            00000000
+_RCSTA1                           00000000
+_RCSTA1bits                       00000000
+_RCSTA2                           00000000
+_RCSTA2bits                       00000000
+_RCSTAbits                        00000000
+_REFOCON                          00000000
+_REFOCONbits                      00000000
+_RXB0CON                          00000000
+_RXB0CONbits                      00000000
+_RXB0D0                           00000000
+_RXB0D0bits                       00000000
+_RXB0D1                           00000000
+_RXB0D1bits                       00000000
+_RXB0D2                           00000000
+_RXB0D2bits                       00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 50
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_RXB0D3                           00000000
+_RXB0D3bits                       00000000
+_RXB0D4                           00000000
+_RXB0D4bits                       00000000
+_RXB0D5                           00000000
+_RXB0D5bits                       00000000
+_RXB0D6                           00000000
+_RXB0D6bits                       00000000
+_RXB0D7                           00000000
+_RXB0D7bits                       00000000
+_RXB0DLC                          00000000
+_RXB0DLCbits                      00000000
+_RXB0EIDH                         00000000
+_RXB0EIDHbits                     00000000
+_RXB0EIDL                         00000000
+_RXB0EIDLbits                     00000000
+_RXB0SIDH                         00000000
+_RXB0SIDHbits                     00000000
+_RXB0SIDL                         00000000
+_RXB0SIDLbits                     00000000
+_RXB1CON                          00000000
+_RXB1CONbits                      00000000
+_RXB1D0                           00000000
+_RXB1D0bits                       00000000
+_RXB1D1                           00000000
+_RXB1D1bits                       00000000
+_RXB1D2                           00000000
+_RXB1D2bits                       00000000
+_RXB1D3                           00000000
+_RXB1D3bits                       00000000
+_RXB1D4                           00000000
+_RXB1D4bits                       00000000
+_RXB1D5                           00000000
+_RXB1D5bits                       00000000
+_RXB1D6                           00000000
+_RXB1D6bits                       00000000
+_RXB1D7                           00000000
+_RXB1D7bits                       00000000
+_RXB1DLC                          00000000
+_RXB1DLCbits                      00000000
+_RXB1EIDH                         00000000
+_RXB1EIDHbits                     00000000
+_RXB1EIDL                         00000000
+_RXB1EIDLbits                     00000000
+_RXB1SIDH                         00000000
+_RXB1SIDHbits                     00000000
+_RXB1SIDL                         00000000
+_RXB1SIDLbits                     00000000
+_RXERRCNT                         00000000
+_RXERRCNTbits                     00000000
+_RXF0EIDH                         00000000
+_RXF0EIDHbits                     00000000
+_RXF0EIDL                         00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 51
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_RXF0EIDLbits                     00000000
+_RXF0SIDH                         00000000
+_RXF0SIDHbits                     00000000
+_RXF0SIDL                         00000000
+_RXF0SIDLbits                     00000000
+_RXF10EIDH                        00000000
+_RXF10EIDHbits                    00000000
+_RXF10EIDL                        00000000
+_RXF10EIDLbits                    00000000
+_RXF10SIDH                        00000000
+_RXF10SIDHbits                    00000000
+_RXF10SIDL                        00000000
+_RXF10SIDLbits                    00000000
+_RXF11EIDH                        00000000
+_RXF11EIDHbits                    00000000
+_RXF11EIDL                        00000000
+_RXF11EIDLbits                    00000000
+_RXF11SIDH                        00000000
+_RXF11SIDHbits                    00000000
+_RXF11SIDL                        00000000
+_RXF11SIDLbits                    00000000
+_RXF12EIDH                        00000000
+_RXF12EIDHbits                    00000000
+_RXF12EIDL                        00000000
+_RXF12EIDLbits                    00000000
+_RXF12SIDH                        00000000
+_RXF12SIDHbits                    00000000
+_RXF12SIDL                        00000000
+_RXF12SIDLbits                    00000000
+_RXF13EIDH                        00000000
+_RXF13EIDHbits                    00000000
+_RXF13EIDL                        00000000
+_RXF13EIDLbits                    00000000
+_RXF13SIDH                        00000000
+_RXF13SIDHbits                    00000000
+_RXF13SIDL                        00000000
+_RXF13SIDLbits                    00000000
+_RXF14EIDH                        00000000
+_RXF14EIDHbits                    00000000
+_RXF14EIDL                        00000000
+_RXF14EIDLbits                    00000000
+_RXF14SIDH                        00000000
+_RXF14SIDHbits                    00000000
+_RXF14SIDL                        00000000
+_RXF14SIDLbits                    00000000
+_RXF15EIDH                        00000000
+_RXF15EIDHbits                    00000000
+_RXF15EIDL                        00000000
+_RXF15EIDLbits                    00000000
+_RXF15SIDH                        00000000
+_RXF15SIDHbits                    00000000
+_RXF15SIDL                        00000000
+_RXF15SIDLbits                    00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 52
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_RXF1EIDH                         00000000
+_RXF1EIDHbits                     00000000
+_RXF1EIDL                         00000000
+_RXF1EIDLbits                     00000000
+_RXF1SIDH                         00000000
+_RXF1SIDHbits                     00000000
+_RXF1SIDL                         00000000
+_RXF1SIDLbits                     00000000
+_RXF2EIDH                         00000000
+_RXF2EIDHbits                     00000000
+_RXF2EIDL                         00000000
+_RXF2EIDLbits                     00000000
+_RXF2SIDH                         00000000
+_RXF2SIDHbits                     00000000
+_RXF2SIDL                         00000000
+_RXF2SIDLbits                     00000000
+_RXF3EIDH                         00000000
+_RXF3EIDHbits                     00000000
+_RXF3EIDL                         00000000
+_RXF3EIDLbits                     00000000
+_RXF3SIDH                         00000000
+_RXF3SIDHbits                     00000000
+_RXF3SIDL                         00000000
+_RXF3SIDLbits                     00000000
+_RXF4EIDH                         00000000
+_RXF4EIDHbits                     00000000
+_RXF4EIDL                         00000000
+_RXF4EIDLbits                     00000000
+_RXF4SIDH                         00000000
+_RXF4SIDHbits                     00000000
+_RXF4SIDL                         00000000
+_RXF4SIDLbits                     00000000
+_RXF5EIDH                         00000000
+_RXF5EIDHbits                     00000000
+_RXF5EIDL                         00000000
+_RXF5EIDLbits                     00000000
+_RXF5SIDH                         00000000
+_RXF5SIDHbits                     00000000
+_RXF5SIDL                         00000000
+_RXF5SIDLbits                     00000000
+_RXF6EIDH                         00000000
+_RXF6EIDHbits                     00000000
+_RXF6EIDL                         00000000
+_RXF6EIDLbits                     00000000
+_RXF6SIDH                         00000000
+_RXF6SIDHbits                     00000000
+_RXF6SIDL                         00000000
+_RXF6SIDLbits                     00000000
+_RXF7EIDH                         00000000
+_RXF7EIDHbits                     00000000
+_RXF7EIDL                         00000000
+_RXF7EIDLbits                     00000000
+_RXF7SIDH                         00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 53
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_RXF7SIDHbits                     00000000
+_RXF7SIDL                         00000000
+_RXF7SIDLbits                     00000000
+_RXF8EIDH                         00000000
+_RXF8EIDHbits                     00000000
+_RXF8EIDL                         00000000
+_RXF8EIDLbits                     00000000
+_RXF8SIDH                         00000000
+_RXF8SIDHbits                     00000000
+_RXF8SIDL                         00000000
+_RXF8SIDLbits                     00000000
+_RXF9EIDH                         00000000
+_RXF9EIDHbits                     00000000
+_RXF9EIDL                         00000000
+_RXF9EIDLbits                     00000000
+_RXF9SIDH                         00000000
+_RXF9SIDHbits                     00000000
+_RXF9SIDL                         00000000
+_RXF9SIDLbits                     00000000
+_RXFBCON0                         00000000
+_RXFBCON0bits                     00000000
+_RXFBCON1                         00000000
+_RXFBCON1bits                     00000000
+_RXFBCON2                         00000000
+_RXFBCON2bits                     00000000
+_RXFBCON3                         00000000
+_RXFBCON3bits                     00000000
+_RXFBCON4                         00000000
+_RXFBCON4bits                     00000000
+_RXFBCON5                         00000000
+_RXFBCON5bits                     00000000
+_RXFBCON6                         00000000
+_RXFBCON6bits                     00000000
+_RXFBCON7                         00000000
+_RXFBCON7bits                     00000000
+_RXFCON0                          00000000
+_RXFCON0bits                      00000000
+_RXFCON1                          00000000
+_RXFCON1bits                      00000000
+_RXM0EIDH                         00000000
+_RXM0EIDHbits                     00000000
+_RXM0EIDL                         00000000
+_RXM0EIDLbits                     00000000
+_RXM0SIDH                         00000000
+_RXM0SIDHbits                     00000000
+_RXM0SIDL                         00000000
+_RXM0SIDLbits                     00000000
+_RXM1EIDH                         00000000
+_RXM1EIDHbits                     00000000
+_RXM1EIDL                         00000000
+_RXM1EIDLbits                     00000000
+_RXM1SIDH                         00000000
+_RXM1SIDHbits                     00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 54
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_RXM1SIDL                         00000000
+_RXM1SIDLbits                     00000000
+_SDFLC                            00000000
+_SDFLCbits                        00000000
+_SLRCON                           00000000
+_SLRCONbits                       00000000
+_SPBRG                            00000000
+_SPBRG1                           00000000
+_SPBRG2                           00000000
+_SPBRGH1                          00000000
+_SPBRGH2                          00000000
+_SSPADD                           00000000
+_SSPADDbits                       00000000
+_SSPBUF                           00000000
+_SSPCON1                          00000000
+_SSPCON1bits                      00000000
+_SSPCON2                          00000000
+_SSPCON2bits                      00000000
+_SSPSTAT                          00000000
+_SSPSTATbits                      00000000
+_STATUS                           00000000
+_STATUSbits                       00000000
+_STKPTR                           00000000
+_STKPTRbits                       00000000
+_T0CON                            00000000
+_T0CONbits                        00000000
+_T1CON                            00000000
+_T1CONbits                        00000000
+_T1GCON                           00000000
+_T1GCONbits                       00000000
+_T2CON                            00000000
+_T2CONbits                        00000000
+_T3CON                            00000000
+_T3CONbits                        00000000
+_T3GCON                           00000000
+_T3GCONbits                       00000000
+_T4CON                            00000000
+_T4CONbits                        00000000
+_TABLAT                           00000000
+_TBLPTR                           00000000
+_TBLPTRH                          00000000
+_TBLPTRL                          00000000
+_TBLPTRU                          00000000
+_TMR0                             00000000
+_TMR0H                            00000000
+_TMR0L                            00000000
+_TMR1                             00000000
+_TMR1H                            00000000
+_TMR1L                            00000000
+_TMR2                             00000000
+_TMR3                             00000000
+_TMR3H                            00000000
+_TMR3L                            00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 55
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_TMR4                             00000000
+_TOS                              00000000
+_TOSH                             00000000
+_TOSL                             00000000
+_TOSU                             00000000
+_TRISA                            00000000
+_TRISAbits                        00000000
+_TRISB                            00000000
+_TRISBbits                        00000000
+_TRISC                            00000000
+_TRISCbits                        00000000
+_TXB0CON                          00000000
+_TXB0CONbits                      00000000
+_TXB0D0                           00000000
+_TXB0D0bits                       00000000
+_TXB0D1                           00000000
+_TXB0D1bits                       00000000
+_TXB0D2                           00000000
+_TXB0D2bits                       00000000
+_TXB0D3                           00000000
+_TXB0D3bits                       00000000
+_TXB0D4                           00000000
+_TXB0D4bits                       00000000
+_TXB0D5                           00000000
+_TXB0D5bits                       00000000
+_TXB0D6                           00000000
+_TXB0D6bits                       00000000
+_TXB0D7                           00000000
+_TXB0D7bits                       00000000
+_TXB0DLC                          00000000
+_TXB0DLCbits                      00000000
+_TXB0EIDH                         00000000
+_TXB0EIDHbits                     00000000
+_TXB0EIDL                         00000000
+_TXB0EIDLbits                     00000000
+_TXB0SIDH                         00000000
+_TXB0SIDHbits                     00000000
+_TXB0SIDL                         00000000
+_TXB0SIDLbits                     00000000
+_TXB1CON                          00000000
+_TXB1CONbits                      00000000
+_TXB1D0                           00000000
+_TXB1D0bits                       00000000
+_TXB1D1                           00000000
+_TXB1D1bits                       00000000
+_TXB1D2                           00000000
+_TXB1D2bits                       00000000
+_TXB1D3                           00000000
+_TXB1D3bits                       00000000
+_TXB1D4                           00000000
+_TXB1D4bits                       00000000
+_TXB1D5                           00000000
+_TXB1D5bits                       00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 56
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_TXB1D6                           00000000
+_TXB1D6bits                       00000000
+_TXB1D7                           00000000
+_TXB1D7bits                       00000000
+_TXB1DLC                          00000000
+_TXB1DLCbits                      00000000
+_TXB1EIDH                         00000000
+_TXB1EIDHbits                     00000000
+_TXB1EIDL                         00000000
+_TXB1EIDLbits                     00000000
+_TXB1SIDH                         00000000
+_TXB1SIDHbits                     00000000
+_TXB1SIDL                         00000000
+_TXB1SIDLbits                     00000000
+_TXB2CON                          00000000
+_TXB2CONbits                      00000000
+_TXB2D0                           00000000
+_TXB2D0bits                       00000000
+_TXB2D1                           00000000
+_TXB2D1bits                       00000000
+_TXB2D2                           00000000
+_TXB2D2bits                       00000000
+_TXB2D3                           00000000
+_TXB2D3bits                       00000000
+_TXB2D4                           00000000
+_TXB2D4bits                       00000000
+_TXB2D5                           00000000
+_TXB2D5bits                       00000000
+_TXB2D6                           00000000
+_TXB2D6bits                       00000000
+_TXB2D7                           00000000
+_TXB2D7bits                       00000000
+_TXB2DLC                          00000000
+_TXB2DLCbits                      00000000
+_TXB2EIDH                         00000000
+_TXB2EIDHbits                     00000000
+_TXB2EIDL                         00000000
+_TXB2EIDLbits                     00000000
+_TXB2SIDH                         00000000
+_TXB2SIDHbits                     00000000
+_TXB2SIDL                         00000000
+_TXB2SIDLbits                     00000000
+_TXBIE                            00000000
+_TXBIEbits                        00000000
+_TXERRCNT                         00000000
+_TXERRCNTbits                     00000000
+_TXREG                            00000000
+_TXREG1                           00000000
+_TXREG2                           00000000
+_TXSTA                            00000000
+_TXSTA1                           00000000
+_TXSTA1bits                       00000000
+_TXSTA2                           00000000
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 57
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_TXSTA2bits                       00000000
+_TXSTAbits                        00000000
+_WDTCON                           00000000
+_WDTCONbits                       00000000
+_WPUB                             00000000
+_WPUBbits                         00000000
+_WREG                             00000000
+__18F26K80                        00000001
+__ACC_RAM_LOW_END                 0000005F
+__CODE_END                        0000FFFF
+__CODE_START                      00000000
+__EEPROM_END                      00F003FF
+__EEPROM_START                    00F00000
+__VECTOR_INT_HIGH                 00000008
+__VECTOR_INT_LOW                  00000018
+__VECTOR_RESET                    00000000
+__gptrget1                        00000000
+__gptrput1                        00000000
+_copy_char_fifo                   00000000
+_fifo_getchar                     00000000
+_fifo_putchar                     00000000
+_init_usart                       00000000
+_print_debug_fifo                 00000000
+_print_debug_value                00000000
+_print_hex_wait                   00000000
+_putchar                          00000000
+_putchar_fifo                     00000000
+_putchar_wait                     00000000
+_puts_rom                         00000000
+_puts_rom_fifo                    00000000
+_sData                            00000000
+r0x00                             00000000
+r0x01                             00000001
+r0x02                             00000002
+r0x03                             00000003
+r0x04                             00000004
+r0x05                             00000005
+r0x06                             00000006
+r0x07                             00000007
+r0x08                             00000008
+r0x09                             00000009
+r0x0a                             0000000A
+r0x0b                             0000000B
+r0x0c                             0000000C
+r0x0d                             0000000D
+r0x0e                             0000000E
+r0x0f                             0000000F
+r0x10                             00000010
+r0x11                             00000011
+r0x12                             00000012
+r0x13                             00000013
+r0x14                             00000014
+r0x15                             00000015
+gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 58
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+r0x16                             00000016
+r0x17                             00000017
+r0x18                             00000018
+r0x19                             00000019
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :   127 reported,     0 suppressed
+
+
