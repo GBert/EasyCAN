@@ -1,0 +1,61 @@
+-- ------------------------------------------------------
+-- Title: Test program for serial_hardware2.jal, using 2nd ESUART module
+--
+-- Author: Joep Suijs, Copyright (c) 2008..2008, all rights reserved.
+--
+-- Adapted-by:
+--
+-- Compiler: >=2.4g
+-- Revision: $Revision$
+--
+-- This file is part of jallib (http://jallib.googlecode.com)
+-- Released under the BSD license (http://www.opensource.org/licenses/bsd-license.php)
+--
+-- Description: Test program for serial hardware lib driving the
+-- 2nd serial module, EUSART2. 18F25K22 carries TX2 on pin_B6 and
+-- RX2 on pin_B7.
+--
+-- Sources:
+--
+-- setup: a serial connection to a terminal
+--
+
+-- Assuming PIC is running internal oscillator
+include 18f26k80 -- target PICmicro
+pragma target clock 64_000_000 -- oscillator frequency
+-- configuration memory settings (fuses)
+pragma target OSC HS_HIGH -- external HS osc
+pragma target PLLEN P4
+pragma target WDT disabled -- no watchdog
+pragma target DEBUG disabled -- no debugging
+pragma target MCLR external -- reset externally
+
+include delay
+
+-- set all IO as digital
+enable_digital_io()
+
+-- ok, now setup serial
+const serial_hw2_baudrate = 460_800
+include serial_hardware2
+serial_hw2_init()
+
+include print -- output library
+
+-- const byte str1[] = "0123456789012345678901234\n" -- define a string
+const byte str1[] = "fffffffffffffffffffffffff\n" -- define a string
+-- const byte str2[] = "ABCDEFGHIJKLMOPQRSTUVWXYZ\n" -- define a string
+const byte str2[] = "UUUUUUUUUUUUUUUUUUUUUUUUU\n" -- define a string
+-- const byte str3[] = "abcdefghijklmopqrstuvwxyz\n" -- define a string
+const byte str3[] = "UUUUUUUUUUUUUUUUUUUUUUUUU\n" -- define a string
+
+forever loop
+  print_string(serial_hw2_data, str1) -- output string to serial
+  delay_1ms(2)
+  print_string(serial_hw2_data, str2) -- output string to serial
+  delay_1ms(2)
+  print_string(serial_hw2_data, str1) -- output string to serial
+  delay_1ms(2)
+  print_string(serial_hw2_data, str3) -- output string to serial
+  delay_1ms(2)
+end loop
