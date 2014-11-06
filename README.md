@@ -24,7 +24,7 @@ firmware itself is programmed by the bootloader. So no PIC programmer needed.
 ### Status
 
 - working test PCB
-- working ds30loader firmware
-- working bin loader (modified pirate-loader for PIC18F26K80)
+- working Wellington bootloader from darron Broad
+- working easy-loader from Darron Broad
 - wip: SLCAN firmware (early stage: send test CAN frames)
 
