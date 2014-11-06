@@ -110,6 +110,11 @@ struct command_packet {
 #define IN  (0)
 #define OUT (1)
 
+/*
+ * Output stream for information
+ */
+FILE *info;
+
 /*******************************************************************************
  * Open serial device
  *
@@ -454,7 +459,7 @@ doCommand(int fd, uint8_t *buffer, int blen, int rlen)
 	
 	rc = fdio(fd, buffer, blen, TIMEOUT, OUT);
 	if (rc != blen) {
-		fprintf(stdout, "Serial timed-out [%d].\n", rc);
+		fprintf(stderr, "Serial timed-out [%d].\n", rc);
 		return -1;
 	}
 	
@@ -462,12 +467,12 @@ doCommand(int fd, uint8_t *buffer, int blen, int rlen)
 
 	rc = fdio(fd, buffer, rlen, TIMEOUT, IN);
 	if (rc != rlen) {
-		fprintf(stdout, "Serial timed-out [%d].\n", rc);
+		fprintf(stderr, "Serial timed-out [%d].\n", rc);
 		return -1;
 	}
 
 	if (buffer[rlen - 1] != RESPONSE_OK) {
-		fprintf(stdout, "Serial comms error [0x%02X != '%c'].\n",
+		fprintf(stderr, "Serial comms error [0x%02X != '%c'].\n",
 			buffer[rlen - 1], RESPONSE_OK);
 		return -1;
 	}
@@ -520,7 +525,7 @@ uploadFlash(int fd, int simulate, uint8_t *flash, uint32_t startaddr, uint16_t e
 			if (!simulate)
 				if (doCommand(fd, buffer, 6, 1) < 0)
 					return -1;
-			fprintf(stdout, "ERASE FLASH ROW 0x%06X %4d BYTES PAYLOAD\n",
+			if (info) fprintf(info, "ERASE FLASH ROW 0x%06X %4d BYTES PAYLOAD\n",
 				eaddress, p.datasize - 1);
 		} else { /* Erase then write */
 			p.datasize = 1 + rowsize;
@@ -529,7 +534,7 @@ uploadFlash(int fd, int simulate, uint8_t *flash, uint32_t startaddr, uint16_t e
 			if (!simulate)
 				if (doCommand(fd, buffer, 6 + rowsize, 1) < 0)
 					return -1;
-			fprintf(stdout, "ERASE FLASH ROW 0x%06X %4d BYTES PAYLOAD\n",
+			if (info) fprintf(info, "ERASE FLASH ROW 0x%06X %4d BYTES PAYLOAD\n",
 				eaddress, p.datasize - 1);
 			if (verify) {
 				p.addru = (eaddress & 0xFF0000) >> 16;
@@ -540,10 +545,11 @@ uploadFlash(int fd, int simulate, uint8_t *flash, uint32_t startaddr, uint16_t e
 				p.data[0] = getChecksum(buffer, 5);
 				if (doCommand(fd, buffer, 6, 1 + rowsize) < 0)
 					return -1;
-				if (memcmp(&flash[eaddress], buffer, rowsize) == 0)
-					fprintf(stdout, " VERIFY OK\n");
-				else
-					fprintf(stdout, " VERIFY FAILED\n");
+				if (memcmp(&flash[eaddress], buffer, rowsize) == 0) {
+					if (info) fprintf(info, " VERIFY OK\n");
+				} else {
+					if (info) fprintf(info, " VERIFY FAILED\n");
+				}
 			}
 		}
 		/* For each other write row */
@@ -562,7 +568,7 @@ uploadFlash(int fd, int simulate, uint8_t *flash, uint32_t startaddr, uint16_t e
 			if (!simulate)
 				if (doCommand(fd, buffer, 6 + rowsize, 1) < 0)
 					return -1;
-			fprintf(stdout, "WRITE FLASH ROW 0x%06X %4d BYTES PAYLOAD\n",
+			if (info) fprintf(info, "WRITE FLASH ROW 0x%06X %4d BYTES PAYLOAD\n",
 				raddress, p.datasize - 1);
 			if (verify) {
 				p.addru = (raddress & 0xFF0000) >> 16;
@@ -573,10 +579,11 @@ uploadFlash(int fd, int simulate, uint8_t *flash, uint32_t startaddr, uint16_t e
 				p.data[0] = getChecksum(buffer, 5);
 				if (doCommand(fd, buffer, 6, 1 + rowsize) < 0)
 					return -1;
-				if (memcmp(&flash[raddress], buffer, rowsize) == 0)
-					fprintf(stdout, " VERIFY OK\n");
-				else
-					fprintf(stdout, " VERIFY FAILED\n");
+				if (memcmp(&flash[raddress], buffer, rowsize) == 0) {
+					if (info) fprintf(info, " VERIFY OK\n");
+				} else {
+					if (info) fprintf(info, " VERIFY FAILED\n");
+				}
 			}
 		}
 	}
@@ -608,7 +615,7 @@ uploadEEPROM(int fd, int simulate, uint16_t *eeprom, uint16_t eesize, int verify
 		if (!simulate)
 			if (doCommand(fd, buffer, 7, 1) < 0)
 				return -1;
-		fprintf(stdout, "WRITE EEPROM 0x%04X = 0x%02X\n", i, eeprom[i]);
+		if (info) fprintf(info, "WRITE EEPROM 0x%04X = 0x%02X\n", i, eeprom[i]);
 		if (!verify)
 			continue;
 		p.addru = 0;
@@ -619,10 +626,11 @@ uploadEEPROM(int fd, int simulate, uint16_t *eeprom, uint16_t eesize, int verify
 		p.data[0] = getChecksum(buffer, 5);
 		if (doCommand(fd, buffer, 6, 2) < 0)
 			return -1;
-		if (buffer[0] != eeprom[i])
-			fprintf(stdout, " VERIFY ERROR\n");
-		else
-			fprintf(stdout, " VERIFY OK\n");
+		if (buffer[0] != eeprom[i]) {
+			if (info) fprintf(info, " VERIFY ERROR\n");
+		} else {
+			if (info) fprintf(info, " VERIFY OK\n");
+		}
 	}
 	return 0;
 }
@@ -651,10 +659,10 @@ dumpEEPROM(int fd, uint16_t *eeprom, uint16_t eesize)
 		eeprom[i] = buffer[0];
 	}
 	for (i = 0; i < eesize; i += 16) {
-		fprintf(stdout, "[%04X] ", i);
+		if (info) fprintf(info, "[%04X] ", i);
 		for (j = 0; j < 16; ++j)
-			fprintf(stdout, "%02X ", eeprom[i + j]);
-		fputc('\n', stdout);
+			if (info) fprintf(info, "%02X ", eeprom[i + j]);
+		fputc('\n', info);
 	}
 	return 0;
 }
@@ -684,10 +692,10 @@ dumpFlash(int fd, uint8_t *flash, uint32_t startaddr, uint8_t rowsize)
 			flash[i + j] = buffer[j];
 	}
 	for (i = 0; i < startaddr; i += 16) {
-		fprintf(stdout, "[%06X] ", i);
+		if (info) fprintf(info, "[%06X] ", i);
 		for (j = 0; j < 16; ++j)
-			fprintf(stdout, "%02X ", flash[i + j]);
-		fputc('\n', stdout);
+			if (info) fprintf(info, "%02X ", flash[i + j]);
+		fputc('\n', info);
 	}
 	return 0;
 }
@@ -700,15 +708,16 @@ dumpFlash(int fd, uint8_t *flash, uint32_t startaddr, uint8_t rowsize)
 void
 usage(const char *msg, int err)
 {
-	fprintf(stdout, "USAGE: easy-loader [OPTIONS] TTY-DEVICE [HEX-FILE]\n\n");
+	fprintf(stderr, "USAGE: easy-loader [OPTIONS] TTY-DEVICE [HEX-FILE]\n\n");
 
 	if (msg)
-		fprintf(stdout, "%s\n\n", msg);
+		fprintf(stderr, "%s\n\n", msg);
 
-	fprintf(stdout, "Options:\n"
+	fprintf(stderr, "Options:\n"
 		" -e read EEPROM\n"
 		" -f read flash\n"
 		" -h HELLO only\n"
+		" -q quiet\n"
 		" -r RTS toggle after serial port open\n"
 		" -s simulate erase/write\n"
 		" -v verify\n"
@@ -737,8 +746,9 @@ main(int argc, char **argv)
 	uint16_t erasesize, eesize;
 	uint32_t startaddr;
 
+	info = stdout;
         opterr = 0;
-        while ((opt = getopt(argc, argv, "efhrsv")) != -1) {
+        while ((opt = getopt(argc, argv, "efhrqsv")) != -1) {
 		switch (opt) {
 		case 'e':
 			eeprom_read = 1;
@@ -754,6 +764,9 @@ main(int argc, char **argv)
 			break;
 		case 'r':
 			toggle = 1;
+			break;
+		case 'q':
+			info = NULL;
 			break;
 		case 's':
 			simulate = 1;
@@ -774,25 +787,25 @@ main(int argc, char **argv)
 	dev = argv[0];
 	fd = openDevice(dev, B115200, toggle);
 	if (fd < 0) {
-		fprintf(stdout, "Failed to open serial device [%s].\n", dev);
+		fprintf(stderr, "Failed to open serial device [%s].\n", dev);
 		exit(EX_OSERR);
 	}
 
 	hello = HELLO;
 	rc = fdio(fd, &hello, 1, TIMEOUT, OUT);
 	if (rc != 1) {
-		fprintf(stdout, "Serial timed-out [%d].\n", rc);
+		fprintf(stderr, "Serial timed-out [%d].\n", rc);
 		exit(EX_SOFTWARE);
 	}
 	
 	rc = fdio(fd, (uint8_t *)&p, sizeof(struct hello_packet), TIMEOUT, IN);
 	if (rc != sizeof(struct hello_packet)) {
-		fprintf(stdout, "Serial timed-out [%d].\n", rc);
+		fprintf(stderr, "Serial timed-out [%d].\n", rc);
 		exit(EX_SOFTWARE);
 	}
 
 	if (p.response != RESPONSE_OK) {
-		fprintf(stdout, "Serial comms error [0x%02X != '%c'].\n", p.response, RESPONSE_OK);
+		fprintf(stderr, "Serial comms error [0x%02X != '%c'].\n", p.response, RESPONSE_OK);
 		exit(EX_SOFTWARE);
 	}
 
@@ -801,10 +814,10 @@ main(int argc, char **argv)
 	startaddr = p.startu << 16 | p.starth << 8 | p.startl;
 	eesize = p.eeh << 8 | p.eel;
 
-	fprintf(stdout, " PIC18 BOOT LOADER START ADDRESS = 0x%06X\n", startaddr);
-	fprintf(stdout, " PIC18 ERASE SIZE  = %d\n", erasesize);
-	fprintf(stdout, " PIC18 ROW SIZE    = %d\n", rowsize);
-	fprintf(stdout, " PIC18 EEPROM SIZE = %d\n", eesize);
+	if (info) fprintf(info, " PIC18 BOOT LOADER START ADDRESS = 0x%06X\n", startaddr);
+	if (info) fprintf(info, " PIC18 ERASE SIZE  = %d\n", erasesize);
+	if (info) fprintf(info, " PIC18 ROW SIZE    = %d\n", rowsize);
+	if (info) fprintf(info, " PIC18 EEPROM SIZE = %d\n", eesize);
 
 	if (hello_only) {
 		close(fd);
@@ -822,11 +835,11 @@ main(int argc, char **argv)
 		file = argv[1];
 		rc = readFile(file, flash, eeprom, startaddr, eesize);
 		if (rc < 0) {
-			fprintf(stdout, "Failed to open hex file [%s].\n", file);
+			fprintf(stderr, "Failed to open hex file [%s].\n", file);
 			exit(EX_SOFTWARE);
 		}
 		if (rc == 0) {
-			fprintf(stdout, "No data in file [%s].\n", file);
+			fprintf(stderr, "No data in file [%s].\n", file);
 			exit(EX_SOFTWARE);
 		}
 	
