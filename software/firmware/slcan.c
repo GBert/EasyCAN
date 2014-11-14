@@ -36,19 +36,30 @@ char rx_buffer_to_slcan (void) {
         slcan_buffer[0] -= 0x20;
         /* bits 29 - 25 */
         id_buffer[0] = RX_CANMessage.SIDH  >> 3;
+	slcan_buffer[1]= hex_string[id_buffer[0] & 0xf0] >> 4;
+	slcan_buffer[2]= hex_string[id_buffer[0] & 0x0f];
         /* bits 24 - 17 are spread over 3 registers - wow */
         id_buffer[1] =(RX_CANMessage.SIDL & 0x03) + ((RX_CANMessage.SIDL & 0xe0) >> 3)  + ((RX_CANMessage.SIDH & 0x07) << 5)   ;
+	slcan_buffer[3]= hex_string[id_buffer[1] & 0xf0] >> 4;
+	slcan_buffer[4]= hex_string[id_buffer[1] & 0x0f];
         /* bits 16 - 9 */
         id_buffer[2] = RX_CANMessage.EIDH;
+	slcan_buffer[5]= hex_string[id_buffer[2] & 0xf0] >> 4;
+	slcan_buffer[6]= hex_string[id_buffer[2] & 0x0f];
         /* bits  8 - 1 */
         id_buffer[3] = RX_CANMessage.EIDL;
+	slcan_buffer[7]= hex_string[id_buffer[3] & 0xf0] >> 4;
+	slcan_buffer[8]= hex_string[id_buffer[3] & 0x0f];
         /* ... */
         ptr = &slcan_buffer[9];
     } else {
         /* bits 11 - 9 */
         id_buffer[0] = (RX_CANMessage.SIDH >> 5);
+	slcan_buffer[1]= hex_string[id_buffer[0] & 0x0f];
         /* bits  8 - 1 */
         id_buffer[1] = ((RX_CANMessage.SIDL & 0xc0 ) >> 5) + (RX_CANMessage.SIDH << 3);
+	slcan_buffer[2]= hex_string[id_buffer[1] & 0xf0] >> 4;
+	slcan_buffer[3]= hex_string[id_buffer[2] & 0x0f];
         /* 11 bit standard frame */
         ptr = &slcan_buffer[4];
     }
