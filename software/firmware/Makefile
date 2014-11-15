@@ -11,7 +11,7 @@ SOURCE=main.c timer.c usart.c can.c slcan.c
 OBJECT=$(SOURCE:.c=.o)
 HEADER=$(SOURCE:.c=.h) prototypes.h
 
-BOOTLOADER	= pirate-loader
+BOOTLOADER	= easy-loader
 TERMINAL	= com
 
 build:$(TARGET)
@@ -38,7 +38,10 @@ endif
 	$(CC) $(CFLAGS) -c $< -o $@
 
 flash:
-	$(BOOTLOADER) --reset_rts --dev=/dev/ttyUSB0 --hex=$(MAIN).hex
+	$(BOOTLOADER) -r /dev/ttyUSB0 $(MAIN).hex
+
+verify:
+	$(BOOTLOADER) -r /dev/ttyUSB0 -v $(MAIN).hex
 
 com:
 	$(TERMINAL) /dev/ttyUSB0 500000
