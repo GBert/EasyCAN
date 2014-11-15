@@ -46,5 +46,6 @@ verify:
 com:
 	$(TERMINAL) /dev/ttyUSB0 500000
 
-terminal:
+trial:
+	$(BOOTLOADER) -r /dev/ttyUSB0 -q $(MAIN).hex
 	$(TERMINAL) /dev/ttyUSB0 500000
