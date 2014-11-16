@@ -154,14 +154,14 @@ main(int argc, char *argv[])
 {
 	int fdcons = STDIN_FILENO, fduart;
 	speed_spec *s;
-	int speed = B460800;
+	int speed = B500000;
 	struct termios oldfdcons, newfdcons, oldfduart, newfduart;
 	fd_set fds;
 	int rc;
 	char buf[1024];
 
 	if (argc < 2) {
-		fprintf(stderr, "Try: %s /dev/ttyS0 [460800]\n", argv[0]);
+		fprintf(stderr, "Try: %s /dev/ttyS0 [500000]\n", argv[0]);
 		exit(1);
 	}
 
