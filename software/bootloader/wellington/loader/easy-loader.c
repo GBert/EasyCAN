@@ -86,9 +86,9 @@ struct hello_packet {
 /*
  * Wellington boot loader responses
  */
-#define RESPONSE_OK 'K'
-#define RESPONSE_ERROR_CHECKSUM 'N'
-#define RESPONSE_ERROR_UNKNOWN  'U'
+#define RESPONSE_OK 'K'			/* 0x4B */
+#define RESPONSE_ERROR_CHECKSUM 'N'	/* 0x4E */
+#define RESPONSE_ERROR_UNKNOWN  'U'	/* 0x55 */
 
 /*
  * Easy loader command packet
@@ -264,7 +264,6 @@ canWrite(int fd, uint8_t *buffer, int buflen, int flags)
 	return 1;
 #else
 	errno = EBADF;
-
 	return -1;
 #endif
 }
@@ -306,7 +305,6 @@ canRead(int fd, uint8_t *buffer, int buflen, int flags)
 	return frame.can_dlc;
 #else
 	errno = EBADF;
-
 	return -1;
 #endif
 }
@@ -354,24 +352,17 @@ fdselect(int fd, long timeout, int io)
 	struct timeval tv;
 	fd_set fdset;
 
-	while (1) {
-		tv.tv_sec = timeout;
-		tv.tv_usec = 0;
+	tv.tv_sec = timeout;
+	tv.tv_usec = 0;
 
-		FD_ZERO(&fdset);
-		FD_SET(fd, &fdset);
+	FD_ZERO(&fdset);
+	FD_SET(fd, &fdset);
 
-		if (io == IN)
-			rc = select(fd + 1, &fdset, NULL, NULL, &tv);
-		else /* OUT */
-			rc = select(fd + 1, NULL, &fdset, NULL, &tv);
-		if (rc < 0) {
-			if (errno == EINTR)
-				continue;
-		}
-		return rc;
-	}
-	/* Not reached */
+	if (io == IN)
+		rc = select(fd + 1, &fdset, NULL, NULL, &tv);
+	else /* OUT */
+		rc = select(fd + 1, NULL, &fdset, NULL, &tv);
+	return rc;
 }
 
 /*******************************************************************************
@@ -387,34 +378,27 @@ fdreadwrite(int fd, uint8_t *buffer, int buflen, int io, int flags)
 
 	getsockopt(fd, SOL_SOCKET, SO_TYPE, &optval, &optlen);
 
-	while (1) {
-		if (io == IN) {
-			switch (optval) {
-			default:
-				rc = read(fd, buffer, buflen);
-				break;
-			case SOCK_RAW:
-				rc = canRead(fd, buffer, buflen, flags);
-				break;
-			}
+	if (io == IN) {
+		switch (optval) {
+		default:
+			rc = read(fd, buffer, buflen);
+			break;
+		case SOCK_RAW:
+			rc = canRead(fd, buffer, buflen, flags);
+			break;
 		}
-		else { /* OUT */
-			switch (optval) {
-			default:
-				rc = write(fd, buffer, buflen);
-				break;
-			case SOCK_RAW:
-				rc = canWrite(fd, buffer, buflen, flags);
-				break;
-			}
-		}
-		if (rc < 0) {
-			if (errno == EINTR || errno == EAGAIN)
-				continue;
-		}
-		return rc;
 	}
-	/* Not reached */
+	else { /* OUT */
+		switch (optval) {
+		default:
+			rc = write(fd, buffer, buflen);
+			break;
+		case SOCK_RAW:
+			rc = canWrite(fd, buffer, buflen, flags);
+			break;
+		}
+	}
+	return rc;
 }
 
 /*******************************************************************************
@@ -428,27 +412,29 @@ fdio(int fd, uint8_t *buffer, int buflen, long timeout, int io, int flags)
 	int rc;
 	int nb = 0;
 
-	while (buflen > 0) {
+	while (nb < buflen) {
 		rc = fdselect(fd, timeout, io);
 		if (rc < 0) {
-			fprintf(stderr, "Select failed.\n");
+			if (errno == EINTR)
+				continue;
+			fprintf(stderr, "Select failed [%d/%d].\n", nb, buflen);
 			return rc;
 		}
 		if (rc == 0) {
-			fprintf(stderr, "Select timed-out.\n");
+			fprintf(stderr, "Select timed-out [%d/%d]\n", nb, buflen);
 			return 0;
 		}
-		rc = fdreadwrite(fd, buffer, buflen, io, flags);
+		rc = fdreadwrite(fd, &buffer[nb], buflen - nb, io, flags);
 		if (rc < 0) {
-			fprintf(stderr, "R/W failed.\n");
+			if (errno == EINTR || errno == EAGAIN)
+				continue;
+			fprintf(stderr, "R/W failed [%d/%d].\n", nb, buflen);
 			return rc;
 		}
 		if (rc == 0) {
-			fprintf(stderr, "EOF.\n");
+			fprintf(stderr, "EOF [%d/%d].\n", nb, buflen);
 			return nb; /* EOF */
 		}
-		buffer += rc;
-		buflen -= rc;
 		nb += rc;
 	}
 	return nb;
@@ -529,7 +515,7 @@ gethex(FILE *fp, uint16_t *addr, uint8_t *typ, uint8_t *bin, uint8_t *binlen)
 
 	*addr = bin[1] << 8 | bin[2];
 	*typ = bin[3];
-	
+
 	return len;
 }
 
@@ -630,38 +616,47 @@ getChecksum(uint8_t *buffer, int blen)
  *
  ******************************************************************************/
 int
-doCommand(int fd, struct command_packet *p, int blen, int rlen)
+doCommand(int fd, struct command_packet *cmd, int blen, int rlen)
 {
-	uint8_t *buffer = (uint8_t *)p;
+	uint8_t *bcmd = (uint8_t *)cmd;
 	int rc;
 
-	assert(blen > 0);
+	while (1) {
+#if 0
+		printf("%s() address  = 0x%02X%02X%02X\n", __func__, cmd->addru, cmd->addrh, cmd->addrl);
+		printf("%s() command  = 0x%02X\n", __func__, cmd->command);
+		printf("%s() datasize = 0x%02X\n", __func__, cmd->datasize);
+		printf("%s() data[0]  = 0x%02X\n", __func__, cmd->data[0]);
+#endif
+		assert(blen > 0);
 
-	rc = fdio(fd, buffer, blen, TIMEOUT, OUT, flags);
-	if (rc != blen) {
-		if (rc < 0) {
-			fprintf(stderr, "I/O error in write [%s].\n", strerror(errno));
-		} else {
-			fprintf(stderr, "I/O timed-out in write [cmd = 0x%02X].\n", p->command);
+		rc = fdio(fd, bcmd, blen, TIMEOUT, OUT, flags);
+		if (rc != blen) {
+			if (rc < 0) {
+				fprintf(stderr, "I/O error in write [%s].\n", strerror(errno));
+				return -1;
+			}
+			fprintf(stderr, "I/O timed-out in write [cmd = 0x%02X].\n", cmd->command);
+			return -1;
 		}
-		return -1;
-	}
 	
-	assert(rlen > 0 && rlen < BUFLEN);
+		assert(rlen > 0 && rlen < BUFLEN);
 
-	rc = fdio(fd, buffer, rlen, TIMEOUT, IN, flags);
-	if (rc != rlen) {
-		if (rc < 0) {
-			fprintf(stderr, "I/O error in read [%s].\n", strerror(errno));
-		} else {
-			fprintf(stderr, "I/O timed-out in read [cmd = 0x%02X].\n", p->command);
+		rc = fdio(fd, bcmd, rlen, TIMEOUT, IN, flags);
+		if (rc != rlen) {
+			if (rc < 0) {
+				fprintf(stderr, "I/O error in read [%s].\n", strerror(errno));
+				return -1;
+			}
+			fprintf(stderr, "I/O timed-out in read [cmd = 0x%02X].\n", cmd->command);
+			return -1;
 		}
-		return -1;
+		
+		break;
 	}
 
-	if (buffer[rlen - 1] != RESPONSE_OK) {
-		fprintf(stderr, "I/O comms error [0x%02X != '%c'].\n",
-			buffer[rlen - 1], RESPONSE_OK);
+	if (bcmd[rlen - 1] != RESPONSE_OK) {
+		fprintf(stderr, "I/O comms error [0x%02X != '%c'].\n", bcmd[rlen - 1], RESPONSE_OK);
 		return -1;
 	}
 	return 0;
@@ -694,8 +689,8 @@ isBlank(uint8_t *flash, int size)
 int
 uploadFlash(int fd, int simulate, uint8_t *flash, uint32_t startaddr, uint16_t erasesize, uint8_t rowsize, int verify)
 {
-	struct command_packet p;
-	uint8_t *buffer = (uint8_t *)&p;
+	struct command_packet cmd;
+	uint8_t *bcmd = (uint8_t *)&cmd;
 	int eaddress, raddress, i;
 
 	/* For each erase row */
@@ -703,37 +698,37 @@ uploadFlash(int fd, int simulate, uint8_t *flash, uint32_t startaddr, uint16_t e
 		if (isBlank(&flash[eaddress], erasesize))
 			continue;
 		/* Erase then write first row */
-		p.addru = (eaddress & 0xFF0000) >> 16;
-		p.addrh = (eaddress & 0x00FF00) >> 8;
-		p.addrl = (eaddress & 0x0000FF);
-		p.command = COMMAND_FLASH_ERASE;
+		cmd.addru = (eaddress & 0xFF0000) >> 16;
+		cmd.addrh = (eaddress & 0x00FF00) >> 8;
+		cmd.addrl = (eaddress & 0x0000FF);
+		cmd.command = COMMAND_FLASH_ERASE;
 		if (isBlank(&flash[eaddress], rowsize)) {
-			p.datasize = 1;
-			p.data[0] = getChecksum(buffer, 5);
+			cmd.datasize = 1;
+			cmd.data[0] = getChecksum(bcmd, 5);
 			if (!simulate)
-				if (doCommand(fd, &p, 6, 1) < 0)
+				if (doCommand(fd, &cmd, 6, 1) < 0)
 					return -1;
 			if (info) fprintf(info, "ERASE FLASH ROW 0x%06X %4d BYTES PAYLOAD\n",
-				eaddress, p.datasize - 1);
+				eaddress, cmd.datasize - 1);
 		} else { /* Erase then write */
-			p.datasize = 1 + rowsize;
-			memcpy(p.data, &flash[eaddress], rowsize);
-			p.data[rowsize] = getChecksum(buffer, 5 + rowsize);
+			cmd.datasize = 1 + rowsize;
+			memcpy(cmd.data, &flash[eaddress], rowsize);
+			cmd.data[rowsize] = getChecksum(bcmd, 5 + rowsize);
 			if (!simulate)
-				if (doCommand(fd, &p, 6 + rowsize, 1) < 0)
+				if (doCommand(fd, &cmd, 6 + rowsize, 1) < 0)
 					return -1;
 			if (info) fprintf(info, "ERASE FLASH ROW 0x%06X %4d BYTES PAYLOAD\n",
-				eaddress, p.datasize - 1);
+				eaddress, cmd.datasize - 1);
 			if (verify) {
-				p.addru = (eaddress & 0xFF0000) >> 16;
-				p.addrh = (eaddress & 0x00FF00) >> 8;
-				p.addrl = (eaddress & 0x0000FF);
-				p.command = COMMAND_FLASH_READ;
-				p.datasize = 1;
-				p.data[0] = getChecksum(buffer, 5);
-				if (doCommand(fd, &p, 6, 1 + rowsize) < 0)
+				cmd.addru = (eaddress & 0xFF0000) >> 16;
+				cmd.addrh = (eaddress & 0x00FF00) >> 8;
+				cmd.addrl = (eaddress & 0x0000FF);
+				cmd.command = COMMAND_FLASH_READ;
+				cmd.datasize = 1;
+				cmd.data[0] = getChecksum(bcmd, 5);
+				if (doCommand(fd, &cmd, 6, 1 + rowsize) < 0)
 					return -1;
-				if (memcmp(&flash[eaddress], buffer, rowsize) == 0) {
+				if (memcmp(&flash[eaddress], bcmd, rowsize) == 0) {
 					if (info) fprintf(info, " VERIFY OK\n");
 				} else {
 					fprintf(stderr, " VERIFY ERROR\n");
@@ -746,28 +741,28 @@ uploadFlash(int fd, int simulate, uint8_t *flash, uint32_t startaddr, uint16_t e
 			if (isBlank(&flash[raddress], rowsize))
 				continue;
 			/* Write other rows */
-			p.addru = (raddress & 0xFF0000) >> 16;
-			p.addrh = (raddress & 0x00FF00) >> 8;
-			p.addrl = (raddress & 0x0000FF);
-			p.command = COMMAND_FLASH_WRITE;
-			p.datasize = 1 + rowsize;
-			memcpy(p.data, &flash[raddress], rowsize);
-			p.data[rowsize] = getChecksum(buffer, 5 + rowsize);
+			cmd.addru = (raddress & 0xFF0000) >> 16;
+			cmd.addrh = (raddress & 0x00FF00) >> 8;
+			cmd.addrl = (raddress & 0x0000FF);
+			cmd.command = COMMAND_FLASH_WRITE;
+			cmd.datasize = 1 + rowsize;
+			memcpy(cmd.data, &flash[raddress], rowsize);
+			cmd.data[rowsize] = getChecksum(bcmd, 5 + rowsize);
 			if (!simulate)
-				if (doCommand(fd, &p, 6 + rowsize, 1) < 0)
+				if (doCommand(fd, &cmd, 6 + rowsize, 1) < 0)
 					return -1;
 			if (info) fprintf(info, "WRITE FLASH ROW 0x%06X %4d BYTES PAYLOAD\n",
-				raddress, p.datasize - 1);
+				raddress, cmd.datasize - 1);
 			if (verify) {
-				p.addru = (raddress & 0xFF0000) >> 16;
-				p.addrh = (raddress & 0x00FF00) >> 8;
-				p.addrl = (raddress & 0x0000FF);
-				p.command = COMMAND_FLASH_READ;
-				p.datasize = 1;
-				p.data[0] = getChecksum(buffer, 5);
-				if (doCommand(fd, &p, 6, 1 + rowsize) < 0)
+				cmd.addru = (raddress & 0xFF0000) >> 16;
+				cmd.addrh = (raddress & 0x00FF00) >> 8;
+				cmd.addrl = (raddress & 0x0000FF);
+				cmd.command = COMMAND_FLASH_READ;
+				cmd.datasize = 1;
+				cmd.data[0] = getChecksum(bcmd, 5);
+				if (doCommand(fd, &cmd, 6, 1 + rowsize) < 0)
 					return -1;
-				if (memcmp(&flash[raddress], buffer, rowsize) == 0) {
+				if (memcmp(&flash[raddress], bcmd, rowsize) == 0) {
 					if (info) fprintf(info, " VERIFY OK\n");
 				} else {
 					fprintf(stderr, " VERIFY ERROR\n");
@@ -786,35 +781,35 @@ uploadFlash(int fd, int simulate, uint8_t *flash, uint32_t startaddr, uint16_t e
 int
 uploadEEPROM(int fd, int simulate, uint16_t *eeprom, uint16_t eesize, int verify)
 {
-	struct command_packet p;
-	uint8_t *buffer = (uint8_t *)&p;
+	struct command_packet cmd;
+	uint8_t *bcmd = (uint8_t *)&cmd;
 	int i;
 
 	for (i = 0; i < eesize; ++i) {
 		if (eeprom[i] == 0xFFFF)
 			continue;
-		p.addru = 0;
-		p.addrh = (i & 0x00FF00) >> 8;
-		p.addrl = (i & 0x0000FF);
-		p.command = COMMAND_EE_WRITE;
-		p.datasize = 2;
-		p.data[0] = eeprom[i];
-		p.data[1] = getChecksum(buffer, 6);
+		cmd.addru = 0;
+		cmd.addrh = (i & 0x00FF00) >> 8;
+		cmd.addrl = (i & 0x0000FF);
+		cmd.command = COMMAND_EE_WRITE;
+		cmd.datasize = 2;
+		cmd.data[0] = eeprom[i];
+		cmd.data[1] = getChecksum(bcmd, 6);
 		if (!simulate)
-			if (doCommand(fd, &p, 7, 1) < 0)
+			if (doCommand(fd, &cmd, 7, 1) < 0)
 				return -1;
 		if (info) fprintf(info, "WRITE EEPROM 0x%04X = 0x%02X\n", i, eeprom[i]);
 		if (!verify)
 			continue;
-		p.addru = 0;
-		p.addrh = (i & 0x00FF00) >> 8;
-		p.addrl = (i & 0x0000FF);
-		p.command = COMMAND_EE_READ;
-		p.datasize = 1;
-		p.data[0] = getChecksum(buffer, 5);
-		if (doCommand(fd, &p, 6, 2) < 0)
+		cmd.addru = 0;
+		cmd.addrh = (i & 0x00FF00) >> 8;
+		cmd.addrl = (i & 0x0000FF);
+		cmd.command = COMMAND_EE_READ;
+		cmd.datasize = 1;
+		cmd.data[0] = getChecksum(bcmd, 5);
+		if (doCommand(fd, &cmd, 6, 2) < 0)
 			return -1;
-		if (buffer[0] == eeprom[i]) {
+		if (bcmd[0] == eeprom[i]) {
 			if (info) fprintf(info, " VERIFY OK\n");
 		} else {
 			fprintf(stderr, " VERIFY ERROR\n");
@@ -831,20 +826,20 @@ uploadEEPROM(int fd, int simulate, uint16_t *eeprom, uint16_t eesize, int verify
 int
 dumpEEPROM(int fd, uint16_t *eeprom, uint16_t eesize)
 {
-	struct command_packet p;
-	uint8_t *buffer = (uint8_t *)&p;
+	struct command_packet cmd;
+	uint8_t *bcmd = (uint8_t *)&cmd;
 	int i, j;
 
 	for (i = 0; i < eesize; ++i) {
-		p.addru = 0;
-		p.addrh = (i & 0x00FF00) >> 8;
-		p.addrl = (i & 0x0000FF);
-		p.command = COMMAND_EE_READ;
-		p.datasize = 1;
-		p.data[0] = getChecksum(buffer, 5);
-		if (doCommand(fd, &p, 6, 2) < 0)
+		cmd.addru = 0;
+		cmd.addrh = (i & 0x00FF00) >> 8;
+		cmd.addrl = (i & 0x0000FF);
+		cmd.command = COMMAND_EE_READ;
+		cmd.datasize = 1;
+		cmd.data[0] = getChecksum(bcmd, 5);
+		if (doCommand(fd, &cmd, 6, 2) < 0)
 			return -1;
-		eeprom[i] = buffer[0];
+		eeprom[i] = bcmd[0];
 	}
 	for (i = 0; i < eesize; i += 16) {
 		if (info) fprintf(info, "[%04X] ", i);
@@ -863,21 +858,21 @@ dumpEEPROM(int fd, uint16_t *eeprom, uint16_t eesize)
 int
 dumpFlash(int fd, uint8_t *flash, uint32_t startaddr, uint8_t rowsize)
 {
-	struct command_packet p;
-	uint8_t *buffer = (uint8_t *)&p;
+	struct command_packet cmd;
+	uint8_t *bcmd = (uint8_t *)&cmd;
 	int i, j;
 
 	for (i = 0; i < startaddr; i += rowsize) {
-		p.addru = (i & 0xFF0000) >> 16;
-		p.addrh = (i & 0x00FF00) >> 8;
-		p.addrl = (i & 0x0000FF);
-		p.command = COMMAND_FLASH_READ;
-		p.datasize = 1;
-		p.data[0] = getChecksum(buffer, 5);
-		if (doCommand(fd, &p, 6, 1 + rowsize) < 0)
+		cmd.addru = (i & 0xFF0000) >> 16;
+		cmd.addrh = (i & 0x00FF00) >> 8;
+		cmd.addrl = (i & 0x0000FF);
+		cmd.command = COMMAND_FLASH_READ;
+		cmd.datasize = 1;
+		cmd.data[0] = getChecksum(bcmd, 5);
+		if (doCommand(fd, &cmd, 6, 1 + rowsize) < 0)
 			return -1;
 		for (j = 0; j < rowsize; ++j)
-			flash[i + j] = buffer[j];
+			flash[i + j] = bcmd[j];
 	}
 	for (i = 0; i < startaddr; i += 16) {
 		if (info) fprintf(info, "[%06X] ", i);
@@ -927,10 +922,11 @@ main(int argc, char **argv)
 	int opt, fd, rc;
 	int nargs = 2, eeprom_read = 0, flash_read = 0, hello_only = 0, toggle = 0, simulate = 0, verify = 0;
 	char *dev, *file;
-	uint8_t *flash = NULL, hello;
+	uint8_t *flash = NULL;
 	uint16_t *eeprom = NULL;
 
-	struct hello_packet p;
+	struct hello_packet hello;
+	uint8_t *bhello = (uint8_t *)&hello;
 	uint8_t rowsize;
 	uint16_t erasesize, eesize;
 	uint32_t startaddr;
@@ -987,28 +983,28 @@ main(int argc, char **argv)
 		exit(EX_OSERR);
 	}
 
-	hello = HELLO;
-	rc = fdio(fd, &hello, 1, TIMEOUT, OUT, flags);
+	bhello[0] = HELLO;
+	rc = fdio(fd, bhello, 1, TIMEOUT, OUT, flags);
 	if (rc != 1) {
 		fprintf(stderr, "I/O timed-out in write [HELLO].\n");
 		exit(EX_SOFTWARE);
 	}
 	
-	rc = fdio(fd, (uint8_t *)&p, sizeof(struct hello_packet), TIMEOUT, IN, flags);
+	rc = fdio(fd, bhello, sizeof(struct hello_packet), TIMEOUT, IN, flags);
 	if (rc != sizeof(struct hello_packet)) {
 		fprintf(stderr, "I/O timed-out in read [HELLO].\n");
 		exit(EX_SOFTWARE);
 	}
 
-	if (p.response != RESPONSE_OK) {
-		fprintf(stderr, "I/O comms error [0x%02X != '%c'].\n", p.response, RESPONSE_OK);
+	if (hello.response != RESPONSE_OK) {
+		fprintf(stderr, "I/O comms error [0x%02X != '%c'].\n", hello.response, RESPONSE_OK);
 		exit(EX_SOFTWARE);
 	}
 
-	rowsize = p.row;
-	erasesize = p.erah << 8 | p.eral;
-	startaddr = p.startu << 16 | p.starth << 8 | p.startl;
-	eesize = p.eeh << 8 | p.eel;
+	rowsize = hello.row;
+	erasesize = hello.erah << 8 | hello.eral;
+	startaddr = hello.startu << 16 | hello.starth << 8 | hello.startl;
+	eesize = hello.eeh << 8 | hello.eel;
 
 	if (info) fprintf(info, "PIC18 BOOT LOADER START ADDRESS = 0x%06X\n", startaddr);
 	if (info) fprintf(info, "PIC18 ERASE SIZE  = %d\n", erasesize);
