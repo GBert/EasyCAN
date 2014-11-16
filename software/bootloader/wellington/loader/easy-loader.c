@@ -32,7 +32,7 @@
  */
 
 /*
- * Various UNIX header files
+ * Various UNIX and Linux header files
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,6 +48,16 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <netdb.h>
+#include <net/if.h>
+#ifdef __linux
+#include <linux/can.h>
+#endif
 
 /*
  * Generic buffer
@@ -111,14 +121,21 @@ struct command_packet {
 #define OUT (1)
 
 /*
+ * CAN Bus message-Id
+ */
+int flags = 0x667;
+
+/*
  * Output stream for information
  */
 FILE *info;
 
 /*******************************************************************************
+ *
  * Open serial device
  *
  * Toggle RTS if required
+ *
  ******************************************************************************/
 int
 openDevice(const char *dev, speed_t baudrate, int toggle)
@@ -131,30 +148,167 @@ openDevice(const char *dev, speed_t baudrate, int toggle)
 		return fd;
 
 	fcntl(fd, F_SETFL, O_NONBLOCK | fcntl(fd, F_GETFL));
-	
-	memset(&options, 0, sizeof(options));
 
-	options.c_cflag = CS8 | CLOCAL | CREAD;
-	
+	tcgetattr(fd, &options);
+
+	/*
+	 * Raw mode
+	 *
+	 *  Linux TERMIOS(3)
+	 */
+
+	options.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
+	options.c_oflag &= ~(OPOST);
+	options.c_cflag &= ~(CSIZE | PARENB);
+	options.c_cflag |= (CS8);
+	options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+
+	options.c_cc[VMIN] = 0;
+	options.c_cc[VTIME] = 0;
+
 	cfsetispeed(&options, baudrate);
 	cfsetospeed(&options, baudrate);
-	
+
 	tcsetattr(fd, TCSANOW, &options);
 
 	tcflush(fd, TCIOFLUSH);
 
-        if (toggle) {
+	if (toggle) {
 		ioctl(fd, TIOCMGET, &status);
 
 		status |= TIOCM_RTS;
 		ioctl(fd, TIOCMSET, &status);
-                usleep(200000);
+		usleep(200000);
 
 		status &= ~TIOCM_RTS;
 		ioctl(fd, TIOCMSET, &status);
-                usleep(100000);
-        }
+		usleep(100000);
+	}
 	return fd;
+}
+
+/*******************************************************************************
+ *
+ * Open Linux CAN socket
+ *
+ ******************************************************************************/
+int
+openCanSock(const char *dev)
+{
+#ifdef __linux
+	struct ifreq ifr;
+	struct sockaddr_can addr;
+	int fsock, rc;
+
+	fsock = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+	if (fsock < 0) {
+		return fsock;
+	}
+
+	bzero(&ifr, sizeof(ifr));
+	strncpy(ifr.ifr_name, dev, IFNAMSIZ);
+
+	rc = ioctl(fsock, SIOCGIFINDEX, &ifr);
+	if (rc < 0) {
+		close(fsock);
+		return rc;
+	}
+
+	bzero(&addr, sizeof(addr));
+	addr.can_family = AF_CAN ;
+	addr.can_ifindex = ifr.ifr_ifindex;
+
+	rc = bind(fsock, (struct sockaddr *)&addr, sizeof(addr));
+	if (rc < 0) {
+		close(fsock);
+		return rc;
+	}
+
+	return fsock;
+#else
+	return -1;
+#endif
+}
+
+/*******************************************************************************
+ *
+ * Write to Linux CAN socket
+ *
+ *  If this fails with ENOBUFS, then increase the TX queue with:
+ *
+ *	ip link set can0 txqueuelen 1024
+ *
+ ******************************************************************************/
+int
+canWrite(int fd, uint8_t *buffer, int buflen, int flags)
+{
+#ifdef __linux
+	struct can_frame frame;
+	int rc;
+
+	if (buflen == 0)
+		return 0;
+
+	bzero(&frame, sizeof(frame));
+
+	frame.can_id = flags;
+	frame.can_dlc = 1;
+	frame.data[0] = buffer[0];
+
+	rc = write(fd, &frame, sizeof(frame));
+	if (rc <= 0)
+		return rc;
+	if (rc != sizeof(frame))
+		return -1;
+
+	return 1;
+#else
+	errno = EBADF;
+
+	return -1;
+#endif
+}
+
+/*******************************************************************************
+ *
+ * Read from Linux CAN socket
+ *
+ ******************************************************************************/
+int
+canRead(int fd, uint8_t *buffer, int buflen, int flags)
+{
+#ifdef __linux
+	struct can_frame frame;
+	int rc;
+
+	if (buflen == 0)
+		return 0;
+
+	bzero(&frame, sizeof(frame));
+
+	rc = read(fd, &frame, sizeof(frame));
+	if (rc <= 0)
+		return rc;
+	if (rc != sizeof(frame))
+		return -1;
+	
+	if (frame.can_id != flags) {
+		errno = EAGAIN; /* Filter message */
+		return -1;
+	}
+	if (frame.can_dlc != 1) {
+		errno = EAGAIN; /* Filter message */
+		return -1;
+	}
+
+	memcpy(buffer, frame.data, frame.can_dlc);
+
+	return frame.can_dlc;
+#else
+	errno = EBADF;
+
+	return -1;
+#endif
 }
 
 /*******************************************************************************
@@ -166,7 +320,7 @@ static inline void *
 xmalloc(size_t n, int c)
 {
 	void *s;
-	
+
 	if (!n)
 		return NULL;
 	s = malloc(n);
@@ -199,7 +353,7 @@ fdselect(int fd, long timeout, int io)
 	int rc;
 	struct timeval tv;
 	fd_set fdset;
-	
+
 	while (1) {
 		tv.tv_sec = timeout;
 		tv.tv_usec = 0;
@@ -211,11 +365,11 @@ fdselect(int fd, long timeout, int io)
 			rc = select(fd + 1, &fdset, NULL, NULL, &tv);
 		else /* OUT */
 			rc = select(fd + 1, NULL, &fdset, NULL, &tv);
-                if (rc < 0) {
-                        if (errno == EINTR)
-                                continue;
-                }
-                return rc;
+		if (rc < 0) {
+			if (errno == EINTR)
+				continue;
+		}
+		return rc;
 	}
 	/* Not reached */
 }
@@ -226,19 +380,38 @@ fdselect(int fd, long timeout, int io)
  *
  ******************************************************************************/
 int
-fdreadwrite(int fd, uint8_t *buffer, int buflen, int io)
+fdreadwrite(int fd, uint8_t *buffer, int buflen, int io, int flags)
 {
-	int rc;
-	
+	int rc = 0;
+	socklen_t optval, optlen = sizeof(socklen_t);
+
+	getsockopt(fd, SOL_SOCKET, SO_TYPE, &optval, &optlen);
+
 	while (1) {
-		if (io == IN)
-			rc = read(fd, buffer, buflen);
-		else /* OUT */
-			rc = write(fd, buffer, buflen);
+		if (io == IN) {
+			switch (optval) {
+			default:
+				rc = read(fd, buffer, buflen);
+				break;
+			case SOCK_RAW:
+				rc = canRead(fd, buffer, buflen, flags);
+				break;
+			}
+		}
+		else { /* OUT */
+			switch (optval) {
+			default:
+				rc = write(fd, buffer, buflen);
+				break;
+			case SOCK_RAW:
+				rc = canWrite(fd, buffer, buflen, flags);
+				break;
+			}
+		}
 		if (rc < 0) {
-                        if (errno == EINTR || errno == EAGAIN)
-                                continue;
-                }
+			if (errno == EINTR || errno == EAGAIN)
+				continue;
+		}
 		return rc;
 	}
 	/* Not reached */
@@ -250,24 +423,28 @@ fdreadwrite(int fd, uint8_t *buffer, int buflen, int io)
  *
  ******************************************************************************/
 int
-fdio(int fd, uint8_t *buffer, int buflen, long timeout, int io)
+fdio(int fd, uint8_t *buffer, int buflen, long timeout, int io, int flags)
 {
 	int rc;
 	int nb = 0;
-	
+
 	while (buflen > 0) {
 		rc = fdselect(fd, timeout, io);
 		if (rc < 0) {
+			fprintf(stderr, "Select failed.\n");
 			return rc;
 		}
 		if (rc == 0) {
+			fprintf(stderr, "Select timed-out.\n");
 			return 0;
 		}
-		rc = fdreadwrite(fd, buffer, buflen, io);
+		rc = fdreadwrite(fd, buffer, buflen, io, flags);
 		if (rc < 0) {
+			fprintf(stderr, "R/W failed.\n");
 			return rc;
 		}
 		if (rc == 0) {
+			fprintf(stderr, "EOF.\n");
 			return nb; /* EOF */
 		}
 		buffer += rc;
@@ -291,7 +468,7 @@ hex2nib(char c)
 		n = c - 'a' + 10;
 	}
 	else if (c >= 'A' && c <= 'F') {
-		n = c - 'A' + 10;		
+		n = c - 'A' + 10;
 	}
 	else if (c >= '0' && c <= '9') {
 		n = c - '0';
@@ -415,19 +592,19 @@ void
 fixGOTO(uint8_t *flash, uint32_t startaddr)
 {
 	uint32_t gotoapp;
-	
+
 	// GOTO application
 	gotoapp = startaddr - 4; 
 	flash[gotoapp] = flash[0];
 	flash[gotoapp + 1] = flash[1];
 	flash[gotoapp + 2] = flash[2];
 	flash[gotoapp + 3] = flash[3];
-	
+
 	// GOTO bootloader
-	flash[0] = ((startaddr & 0x00001FE ) >> 1);
+	flash[0] = ((startaddr & 0x00001FE) >> 1);
 	flash[1] = 0xEF;
-	flash[2] = ((startaddr & 0x001FE00 ) >> 9);
-	flash[3] = ((startaddr & 0x01E0000 ) >> 17) | 0xF0;
+	flash[2] = ((startaddr & 0x001FE00) >> 9);
+	flash[3] = ((startaddr & 0x01E0000) >> 17) | 0xF0;
 }
 
 /*******************************************************************************
@@ -453,26 +630,37 @@ getChecksum(uint8_t *buffer, int blen)
  *
  ******************************************************************************/
 int
-doCommand(int fd, uint8_t *buffer, int blen, int rlen)
+doCommand(int fd, struct command_packet *p, int blen, int rlen)
 {
+	uint8_t *buffer = (uint8_t *)p;
 	int rc;
-	
-	rc = fdio(fd, buffer, blen, TIMEOUT, OUT);
+
+	assert(blen > 0);
+
+	rc = fdio(fd, buffer, blen, TIMEOUT, OUT, flags);
 	if (rc != blen) {
-		fprintf(stderr, "Serial timed-out [%d].\n", rc);
+		if (rc < 0) {
+			fprintf(stderr, "I/O error in write [%s].\n", strerror(errno));
+		} else {
+			fprintf(stderr, "I/O timed-out in write [cmd = 0x%02X].\n", p->command);
+		}
 		return -1;
 	}
 	
-	assert(rlen < BUFLEN);
+	assert(rlen > 0 && rlen < BUFLEN);
 
-	rc = fdio(fd, buffer, rlen, TIMEOUT, IN);
+	rc = fdio(fd, buffer, rlen, TIMEOUT, IN, flags);
 	if (rc != rlen) {
-		fprintf(stderr, "Serial timed-out [%d].\n", rc);
+		if (rc < 0) {
+			fprintf(stderr, "I/O error in read [%s].\n", strerror(errno));
+		} else {
+			fprintf(stderr, "I/O timed-out in read [cmd = 0x%02X].\n", p->command);
+		}
 		return -1;
 	}
 
 	if (buffer[rlen - 1] != RESPONSE_OK) {
-		fprintf(stderr, "Serial comms error [0x%02X != '%c'].\n",
+		fprintf(stderr, "I/O comms error [0x%02X != '%c'].\n",
 			buffer[rlen - 1], RESPONSE_OK);
 		return -1;
 	}
@@ -523,7 +711,7 @@ uploadFlash(int fd, int simulate, uint8_t *flash, uint32_t startaddr, uint16_t e
 			p.datasize = 1;
 			p.data[0] = getChecksum(buffer, 5);
 			if (!simulate)
-				if (doCommand(fd, buffer, 6, 1) < 0)
+				if (doCommand(fd, &p, 6, 1) < 0)
 					return -1;
 			if (info) fprintf(info, "ERASE FLASH ROW 0x%06X %4d BYTES PAYLOAD\n",
 				eaddress, p.datasize - 1);
@@ -532,7 +720,7 @@ uploadFlash(int fd, int simulate, uint8_t *flash, uint32_t startaddr, uint16_t e
 			memcpy(p.data, &flash[eaddress], rowsize);
 			p.data[rowsize] = getChecksum(buffer, 5 + rowsize);
 			if (!simulate)
-				if (doCommand(fd, buffer, 6 + rowsize, 1) < 0)
+				if (doCommand(fd, &p, 6 + rowsize, 1) < 0)
 					return -1;
 			if (info) fprintf(info, "ERASE FLASH ROW 0x%06X %4d BYTES PAYLOAD\n",
 				eaddress, p.datasize - 1);
@@ -543,12 +731,12 @@ uploadFlash(int fd, int simulate, uint8_t *flash, uint32_t startaddr, uint16_t e
 				p.command = COMMAND_FLASH_READ;
 				p.datasize = 1;
 				p.data[0] = getChecksum(buffer, 5);
-				if (doCommand(fd, buffer, 6, 1 + rowsize) < 0)
+				if (doCommand(fd, &p, 6, 1 + rowsize) < 0)
 					return -1;
 				if (memcmp(&flash[eaddress], buffer, rowsize) == 0) {
 					if (info) fprintf(info, " VERIFY OK\n");
 				} else {
-					if (info) fprintf(info, " VERIFY FAILED\n");
+					fprintf(stderr, " VERIFY ERROR\n");
 				}
 			}
 		}
@@ -566,7 +754,7 @@ uploadFlash(int fd, int simulate, uint8_t *flash, uint32_t startaddr, uint16_t e
 			memcpy(p.data, &flash[raddress], rowsize);
 			p.data[rowsize] = getChecksum(buffer, 5 + rowsize);
 			if (!simulate)
-				if (doCommand(fd, buffer, 6 + rowsize, 1) < 0)
+				if (doCommand(fd, &p, 6 + rowsize, 1) < 0)
 					return -1;
 			if (info) fprintf(info, "WRITE FLASH ROW 0x%06X %4d BYTES PAYLOAD\n",
 				raddress, p.datasize - 1);
@@ -577,12 +765,12 @@ uploadFlash(int fd, int simulate, uint8_t *flash, uint32_t startaddr, uint16_t e
 				p.command = COMMAND_FLASH_READ;
 				p.datasize = 1;
 				p.data[0] = getChecksum(buffer, 5);
-				if (doCommand(fd, buffer, 6, 1 + rowsize) < 0)
+				if (doCommand(fd, &p, 6, 1 + rowsize) < 0)
 					return -1;
 				if (memcmp(&flash[raddress], buffer, rowsize) == 0) {
 					if (info) fprintf(info, " VERIFY OK\n");
 				} else {
-					if (info) fprintf(info, " VERIFY FAILED\n");
+					fprintf(stderr, " VERIFY ERROR\n");
 				}
 			}
 		}
@@ -613,7 +801,7 @@ uploadEEPROM(int fd, int simulate, uint16_t *eeprom, uint16_t eesize, int verify
 		p.data[0] = eeprom[i];
 		p.data[1] = getChecksum(buffer, 6);
 		if (!simulate)
-			if (doCommand(fd, buffer, 7, 1) < 0)
+			if (doCommand(fd, &p, 7, 1) < 0)
 				return -1;
 		if (info) fprintf(info, "WRITE EEPROM 0x%04X = 0x%02X\n", i, eeprom[i]);
 		if (!verify)
@@ -624,12 +812,12 @@ uploadEEPROM(int fd, int simulate, uint16_t *eeprom, uint16_t eesize, int verify
 		p.command = COMMAND_EE_READ;
 		p.datasize = 1;
 		p.data[0] = getChecksum(buffer, 5);
-		if (doCommand(fd, buffer, 6, 2) < 0)
+		if (doCommand(fd, &p, 6, 2) < 0)
 			return -1;
-		if (buffer[0] != eeprom[i]) {
-			if (info) fprintf(info, " VERIFY ERROR\n");
-		} else {
+		if (buffer[0] == eeprom[i]) {
 			if (info) fprintf(info, " VERIFY OK\n");
+		} else {
+			fprintf(stderr, " VERIFY ERROR\n");
 		}
 	}
 	return 0;
@@ -654,7 +842,7 @@ dumpEEPROM(int fd, uint16_t *eeprom, uint16_t eesize)
 		p.command = COMMAND_EE_READ;
 		p.datasize = 1;
 		p.data[0] = getChecksum(buffer, 5);
-		if (doCommand(fd, buffer, 6, 2) < 0)
+		if (doCommand(fd, &p, 6, 2) < 0)
 			return -1;
 		eeprom[i] = buffer[0];
 	}
@@ -662,7 +850,7 @@ dumpEEPROM(int fd, uint16_t *eeprom, uint16_t eesize)
 		if (info) fprintf(info, "[%04X] ", i);
 		for (j = 0; j < 16; ++j)
 			if (info) fprintf(info, "%02X ", eeprom[i + j]);
-		fputc('\n', info);
+		if (info) fputc('\n', info);
 	}
 	return 0;
 }
@@ -686,7 +874,7 @@ dumpFlash(int fd, uint8_t *flash, uint32_t startaddr, uint8_t rowsize)
 		p.command = COMMAND_FLASH_READ;
 		p.datasize = 1;
 		p.data[0] = getChecksum(buffer, 5);
-		if (doCommand(fd, buffer, 6, 1 + rowsize) < 0)
+		if (doCommand(fd, &p, 6, 1 + rowsize) < 0)
 			return -1;
 		for (j = 0; j < rowsize; ++j)
 			flash[i + j] = buffer[j];
@@ -695,7 +883,7 @@ dumpFlash(int fd, uint8_t *flash, uint32_t startaddr, uint8_t rowsize)
 		if (info) fprintf(info, "[%06X] ", i);
 		for (j = 0; j < 16; ++j)
 			if (info) fprintf(info, "%02X ", flash[i + j]);
-		fputc('\n', info);
+		if (info) fputc('\n', info);
 	}
 	return 0;
 }
@@ -708,19 +896,20 @@ dumpFlash(int fd, uint8_t *flash, uint32_t startaddr, uint8_t rowsize)
 void
 usage(const char *msg, int err)
 {
-	fprintf(stderr, "USAGE: easy-loader [OPTIONS] TTY-DEVICE [HEX-FILE]\n\n");
+	fprintf(stderr, "USAGE: easy-loader [OPTIONS] DEVICE [HEX-FILE]\n\n");
 
 	if (msg)
 		fprintf(stderr, "%s\n\n", msg);
 
 	fprintf(stderr, "Options:\n"
-		" -e read EEPROM\n"
-		" -f read flash\n"
-		" -h HELLO only\n"
-		" -q quiet\n"
-		" -r RTS toggle after serial port open\n"
-		" -s simulate erase/write\n"
-		" -v verify\n"
+		" -e   read EEPROM\n"
+		" -f   read flash\n"
+		" -h   HELLO only\n"
+		" -i N use CAN bus message id N\n"
+		" -q   quiet\n"
+		" -r   RTS toggle after serial port open\n"
+		" -s   simulate erase/write\n"
+		" -v   verify\n"
 		
 		"\n");
 
@@ -735,7 +924,7 @@ usage(const char *msg, int err)
 int
 main(int argc, char **argv)
 {
-        int opt, fd, rc;
+	int opt, fd, rc;
 	int nargs = 2, eeprom_read = 0, flash_read = 0, hello_only = 0, toggle = 0, simulate = 0, verify = 0;
 	char *dev, *file;
 	uint8_t *flash = NULL, hello;
@@ -747,21 +936,24 @@ main(int argc, char **argv)
 	uint32_t startaddr;
 
 	info = stdout;
-        opterr = 0;
-        while ((opt = getopt(argc, argv, "efhrqsv")) != -1) {
+	opterr = 0;
+	while ((opt = getopt(argc, argv, "efhi:rqsv")) != -1) {
 		switch (opt) {
 		case 'e':
 			eeprom_read = 1;
-			nargs--;
+			nargs = 1;
 			break;
 		case 'f':
 			flash_read = 1;
-			nargs--;
+			nargs = 1;
 			break;
 		case 'h':
 			hello_only = 1;
-			nargs--;
+			nargs = 1;
 			break;
+		case 'i':
+			flags = strtol(optarg, NULL, 0);
+			break;	
 		case 'r':
 			toggle = 1;
 			break;
@@ -785,27 +977,31 @@ main(int argc, char **argv)
 	}
 
 	dev = argv[0];
-	fd = openDevice(dev, B115200, toggle);
+	if (dev[0] == '/') {
+		fd = openDevice(dev, B115200, toggle);
+	} else {
+		fd = openCanSock(dev);
+	}
 	if (fd < 0) {
-		fprintf(stderr, "Failed to open serial device [%s].\n", dev);
+		fprintf(stderr, "Failed to open I/O device [%s].\n", dev);
 		exit(EX_OSERR);
 	}
 
 	hello = HELLO;
-	rc = fdio(fd, &hello, 1, TIMEOUT, OUT);
+	rc = fdio(fd, &hello, 1, TIMEOUT, OUT, flags);
 	if (rc != 1) {
-		fprintf(stderr, "Serial timed-out [%d].\n", rc);
+		fprintf(stderr, "I/O timed-out in write [HELLO].\n");
 		exit(EX_SOFTWARE);
 	}
 	
-	rc = fdio(fd, (uint8_t *)&p, sizeof(struct hello_packet), TIMEOUT, IN);
+	rc = fdio(fd, (uint8_t *)&p, sizeof(struct hello_packet), TIMEOUT, IN, flags);
 	if (rc != sizeof(struct hello_packet)) {
-		fprintf(stderr, "Serial timed-out [%d].\n", rc);
+		fprintf(stderr, "I/O timed-out in read [HELLO].\n");
 		exit(EX_SOFTWARE);
 	}
 
 	if (p.response != RESPONSE_OK) {
-		fprintf(stderr, "Serial comms error [0x%02X != '%c'].\n", p.response, RESPONSE_OK);
+		fprintf(stderr, "I/O comms error [0x%02X != '%c'].\n", p.response, RESPONSE_OK);
 		exit(EX_SOFTWARE);
 	}
 
@@ -814,10 +1010,10 @@ main(int argc, char **argv)
 	startaddr = p.startu << 16 | p.starth << 8 | p.startl;
 	eesize = p.eeh << 8 | p.eel;
 
-	if (info) fprintf(info, " PIC18 BOOT LOADER START ADDRESS = 0x%06X\n", startaddr);
-	if (info) fprintf(info, " PIC18 ERASE SIZE  = %d\n", erasesize);
-	if (info) fprintf(info, " PIC18 ROW SIZE    = %d\n", rowsize);
-	if (info) fprintf(info, " PIC18 EEPROM SIZE = %d\n", eesize);
+	if (info) fprintf(info, "PIC18 BOOT LOADER START ADDRESS = 0x%06X\n", startaddr);
+	if (info) fprintf(info, "PIC18 ERASE SIZE  = %d\n", erasesize);
+	if (info) fprintf(info, "PIC18 ROW SIZE    = %d\n", rowsize);
+	if (info) fprintf(info, "PIC18 EEPROM SIZE = %d\n", eesize);
 
 	if (hello_only) {
 		close(fd);
@@ -839,10 +1035,10 @@ main(int argc, char **argv)
 			exit(EX_SOFTWARE);
 		}
 		if (rc == 0) {
-			fprintf(stderr, "No data in file [%s].\n", file);
+			fprintf(stderr, "No data in hex file [%s].\n", file);
 			exit(EX_SOFTWARE);
 		}
-	
+
 		fixGOTO(flash, startaddr);
 
 		if (uploadFlash(fd, simulate, flash, startaddr, erasesize, rowsize, verify) == 0) {
