@@ -22,8 +22,9 @@
 #   with The Wellington Boot Loader. If not, see http://www.gnu.org/licenses/
 #------------------------------------------------------------------------------
 
-BOOTLOADER      = easy-loader
-TERMINAL        = com
+BOOTLOADER	= easy-loader
+TERMINAL	= com
+MAIN		= easy-can
 
 build:
 	$(MAKE) -f gpasm.mk build
