@@ -64,7 +64,7 @@
 #define CAN_ID_ALL (1)				/* RX all messages, else   */
 #define CAN_ID (0x666)		 		/* RX only this Message-Id */
 
-#define CAN_BRG1 (0x07)				/* 250kbaud @ 64 MHz */
+#define CAN_BRG1 (0x0f)				/* 125kbaud @ 64 MHz */
 #define CAN_BRG2 (0xBC)
 #define CAN_BRG3 (0x01)
 

@@ -49,6 +49,7 @@
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+#include <sys/resource.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -67,7 +68,7 @@
 /*
  * I/O time out in seconds
  */
-#define TIMEOUT (10)
+#define TIMEOUT (1)
 
 /*
  * Can-can session
@@ -290,18 +291,18 @@ count_str(void)
 	static uint32_t count = 0;
 	struct timeval tv2, tv3;
 
-	count++;
-
-	if (tv1.tv_sec == 0)
+	if (count == 0) {
 		gettimeofday(&tv1, NULL);
-
-	gettimeofday(&tv2, NULL);
-	timersub(&tv2, &tv1, &tv3);
-		
-	if (tv3.tv_sec >= 1) {
-		printf("%u pps\n", count);
-		tv1 = tv2;
-		count = 0;
+		count = 1;
+	} else {
+		gettimeofday(&tv2, NULL);
+		timersub(&tv2, &tv1, &tv3);
+		if (tv3.tv_sec >= 1) {
+			printf("%u pps\n", count);
+			count = 0;
+		} else {
+			count++;
+		}
 	}
 }
 
@@ -325,7 +326,7 @@ process_str(char *s)
 	}
 
 	if (this != (prev + 1))
-		printf("%llu != %llu + 1\n", this, prev);
+		printf("[%s] %llu != %llu + 1\n", s, this, prev);
 
 	prev = this;
 
@@ -338,20 +339,24 @@ process_str(char *s)
  *
  ******************************************************************************/
 static inline char *
-detect_str(char *inbuf, int *nb)
+detect_str(char *inbuf, uint32_t *nb)
 {
 	char *cp;
-	int i;
+	uint32_t i;
 
 	if ((cp = strchr(inbuf, '\r')) != NULL) {
 		i = cp - inbuf;
 		inbuf[i++] = '\0';
 				
-		if (inbuf[0] == 't')
+		if (inbuf[0] == 't' && i == 22)
 			process_str(inbuf);
 
 		(*nb) -= i;
+		assert(*nb >= 0);
+
 		memmove(inbuf, &inbuf[i], *nb);
+
+		assert(*nb < BUFLEN);
 		inbuf[*nb] = '\0';
 	}
 	return cp;
@@ -361,17 +366,24 @@ detect_str(char *inbuf, int *nb)
  *
  * Detect Overrun and Remove
  *
+ *  Linux will insert a null byte when an overrun is detected.
+ *
  ******************************************************************************/
 static inline char *
-remove_null(char *inbuf, int *nb)
+remove_null(char *inbuf, uint32_t *nb)
 {
 	char *cp;
-	int i;
+	uint32_t i;
 
 	if ((cp = memchr(inbuf, 0, *nb)) != NULL) {
 		i = cp - inbuf + 1;
+
 		(*nb) -= i;
+		assert(*nb >= 0);
+
 		memmove(inbuf, &inbuf[i], *nb);
+
+		assert(*nb < BUFLEN);
 		inbuf[*nb] = '\0';
 	}
 	return cp;
@@ -385,15 +397,16 @@ remove_null(char *inbuf, int *nb)
 void
 can2tty(session_t *c)
 {
-	int rc, nb = 0;
+	int rc;
+	uint32_t nb = 0;
 	char inbuf[BUFLEN + 1];
 	struct timeval tv;
 	fd_set fdread, fdwrite;
 	int fd = (c->csock > c->fdtty) ? c->csock : c->fdtty;
 	uint64_t seq = 0;
 
-	bzero(inbuf, BUFLEN + 1);
-	
+	memset(inbuf, 0, BUFLEN + 1);
+
 	while (1) {
 		tv.tv_sec = TIMEOUT;
 		tv.tv_usec = 0;
@@ -405,7 +418,6 @@ can2tty(session_t *c)
 		FD_SET(c->csock, &fdwrite);
 
 		rc = select(fd + 1, &fdread, &fdwrite, NULL, &tv);
-		usleep(100);
 		if (rc < 0) {
 			if (errno == EINTR)
 				continue;
@@ -425,6 +437,9 @@ can2tty(session_t *c)
 						strerror(errno));
 					return;
 				}
+			} else if (rc == 0) {
+				fprintf(stderr, "EOF in Send\n");
+				return;
 			} else if (rc > 0) {
 				seq++;
 			}
@@ -440,7 +455,7 @@ can2tty(session_t *c)
 					return;
 				}
 			} else if (rc == 0) {
-				fprintf(stderr, "EOF\n");
+				fprintf(stderr, "EOF in Read\n");
 				return;
 			} else {
 				nb += rc;
@@ -465,6 +480,7 @@ usage(const char *msg, int err)
 		fprintf(stderr, "%s\n\n", msg);
 
 	fprintf(stderr, "Options:\n"
+		" -i N use CAN bus message id N\n"
 
 		"\n");
 
@@ -479,25 +495,58 @@ usage(const char *msg, int err)
 int
 main(int argc, char **argv)
 {
-	session_t c;
+	int opt;
+	int nargs = 2;
+	char *candev, *ttydev;
 
+	session_t c;
 	c.dir = 0;
 	c.cid = 0;
 
-	c.csock = openCanSock("can0");
+	opterr = 0;
+	while ((opt = getopt(argc, argv, "i:")) != -1) {
+		switch (opt) {
+		case 'i':
+			c.cid = strtol(optarg, NULL, 0);
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	if (argc < nargs) {
+		usage("Missing args", EX_USAGE);
+	}
+
+	if (argv[0][0] == '/') {
+		ttydev = argv[0];
+		candev = argv[1];
+		c.dir = 1;
+	} else {
+		candev = argv[0];
+		ttydev = argv[1];
+		c.dir = 0;
+	}
+
+	c.csock = openCanSock(candev);
 	if (c.csock < 0) {
-		fprintf(stderr, "Failed to open can socket [%s].\n", "can0");
+		fprintf(stderr, "Failed to open can socket [%s].\n", candev);
 		exit(EX_OSERR);
 	}
 
-	c.fdtty = openDevice("/dev/ttyUSB0", B500000);
+	c.fdtty = openDevice(ttydev, B500000);
 	if (c.fdtty < 0) {
-		fprintf(stderr, "Failed to open tty device [%s].\n", "/dev/ttyUSB0");
+		fprintf(stderr, "Failed to open tty device [%s].\n", ttydev);
 		exit(EX_OSERR);
 	}
+
+	setpriority(PRIO_PROCESS, 0, -20); /* Needs permission to succeed */
+
 	sleep(2);
+
 	if (c.dir == 0)
 		can2tty(&c);
+	else
+		fprintf(stderr, "Unimplemented\n");
 
 	close(c.fdtty);
 	close(c.csock);
