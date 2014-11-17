@@ -190,8 +190,8 @@ init_uart(void)
 	SPBRGH1 = BRG >> 8;	/* Baudrate */
 	SPBRG1  = BRG & 0xFF;
 
-	/* 9-Bit Enable + Enable Transmit + High Speed Mode + 9th Bit High */
-	TXSTA = _TX9 + _TXEN + _BRGH + _TX9D;
+	/* Enable Transmit + High Speed Mode */
+	TXSTA = _TXEN + _BRGH;
 
 	/* Enable Serial Port + Receiver */
 	RCSTA = _SPEN + _CREN;
