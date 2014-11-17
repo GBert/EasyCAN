@@ -426,8 +426,6 @@ init_ports(void)
     CM1CON = 0;                 // disable comperator
     CM2CON = 0;                 // disable comperator
     LED_TRIS = 0;
-    TRISBbits.TRISB2 = 0;       // make the CAN TX pin a digital output
-    TRISBbits.TRISB3 = 1;       // make the CAN RX pin a digital input
 }
 
 
@@ -445,7 +443,6 @@ main(void)
 
 	init_ports();
 
-	LED_TRIS = 0;
 	init_uart();
 	init_canbus();
 
