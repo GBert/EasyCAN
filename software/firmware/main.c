@@ -81,7 +81,7 @@ void main(void) {
         //ret=can_writemsg();
 	ret=fifo_putchar(&tx_fifo);
         if (c=fifo_getchar(&rx_fifo)) {
-	    if (c==0x0d) {
+	    if (c=='\r') {
 	        copy_char_fifo(&rx_fifo,&tx_fifo);
 		putchar_fifo(0x0a,&tx_fifo);
                 can_send_test_frame();

@@ -9,6 +9,8 @@
 
 #include "main.h"
 
+#pragma config XINST=OFF
+
 volatile unsigned char timer_ticks=0;
 
 void init_port(void) {

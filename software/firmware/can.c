@@ -198,6 +198,3 @@ void can_send_test_frame(void) {
     TX_CANMessage.Priority=0;
     can_writemsg();
 }
-   
-
-

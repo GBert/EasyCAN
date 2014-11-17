@@ -1,0 +1,38 @@
+
+we are using a crystal with 16 MHz and CAN bus is on PortB
+
+ ; Extended Instruction Set:
+                 CONFIG    XINST=OFF
+ ; Oscillator:
+-                CONFIG    FOSC=INTIO1 ;CLKOUT on OSC2
++                CONFIG    FOSC=HS2 ;CLKOUT on OSC2
+ ; PLL x4 Enable bit:
+-                CONFIG    PLLCFG=OFF
++                CONFIG    PLLCFG=ON
+ ; Fail-Safe Clock Monitor:
+                 CONFIG    FCMEN=OFF
+ ; Internal External Oscillator Switch Over Mode:
+@@ -117,7 +117,7 @@
+ ; Watchdog Postscaler:
+                 CONFIG    WDTPS=1024
+ ; ECAN Mux bit:
+-                CONFIG    CANMX=PORTC
++                CONFIG    CANMX=PORTB
+ ; MSSP address masking:
+                 CONFIG    MSSPMSK=MSK5
+ ; Master Clear Enable:
+@@ -179,12 +179,13 @@ PROCINIT        MACRO
+ #DEFINE         _4MHZ   b'01010000'
+ #DEFINE         _2MHZ   b'01000000'
+ #DEFINE         _1MHZ   b'00110000'
++#DEFINE         _HS2    b'00100000'    ;ext crystal
+ 
+-                MOVLW   _16MHZ
++                MOVLW   _HS2
+                 MOVWF   OSCCON
+ 
+-INITHFIOFS      BTFSS   OSCCON,HFIOFS
+-                GOTO    INITHFIOFS
++;INITHFIOFS      BTFSS   OSCCON,HFIOFS
++;                GOTO    INITHFIOFS
+
