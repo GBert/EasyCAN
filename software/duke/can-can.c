@@ -60,7 +60,7 @@
 #endif
 
 /*
- * Input buffer
+ * Input inbuf
  */
 #define BUFLEN (8192)
 
@@ -89,6 +89,7 @@ openDevice(const char *dev, speed_t baudrate)
 {
 	int fd;
 	struct termios options;
+	unsigned int arg, status;
 
 	fd = open(dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (fd < 0)
@@ -120,6 +121,14 @@ openDevice(const char *dev, speed_t baudrate)
 
 	tcflush(fd, TCIOFLUSH);
 
+
+	status = ioctl(fd, TIOCMGET, &arg);
+
+        /* modify RTS for EasyCAN */
+	arg &= ~TIOCM_RTS;
+	ioctl(fd, TIOCMSET, &arg);
+	printf("waiting Easy-CAN to come up...\n");
+	sleep(2);
 	return fd;
 }
 
@@ -176,7 +185,7 @@ openCanSock(const char *dev)
  *
  ******************************************************************************/
 int
-canWrite(session_t *c, uint8_t *buffer, int buflen)
+canWrite(session_t *c, uint8_t *inbuf, int buflen)
 {
 #ifdef __linux
 	struct can_frame frame;
@@ -189,7 +198,7 @@ canWrite(session_t *c, uint8_t *buffer, int buflen)
 
 	frame.can_id = c->cid;
 	frame.can_dlc = buflen;
-	memcpy(frame.data, buffer, buflen);
+	memcpy(frame.data, inbuf, buflen);
 
 	rc = write(c->csock, &frame, sizeof(frame));
 	if (rc <= 0)
@@ -211,7 +220,7 @@ canWrite(session_t *c, uint8_t *buffer, int buflen)
  *
  ******************************************************************************/
 int
-canRead(session_t *c, uint8_t *buffer, int buflen)
+canRead(session_t *c, uint8_t *inbuf, int buflen)
 {
 #ifdef __linux
 	struct can_frame frame;
@@ -228,7 +237,7 @@ canRead(session_t *c, uint8_t *buffer, int buflen)
 	if (rc != sizeof(frame))
 		return -1;
 
-	memcpy(buffer, frame.data, frame.can_dlc);
+	memcpy(inbuf, frame.data, frame.can_dlc);
 
 	return frame.can_dlc;
 #else
@@ -240,46 +249,132 @@ canRead(session_t *c, uint8_t *buffer, int buflen)
 
 /*******************************************************************************
  *
- * Detect string and output
+ * Read Hex Nibble
+ *
+ ******************************************************************************/
+uint8_t
+hex2nib(char c)
+{
+	uint8_t n = 0;
+
+	if (c >= 'a' && c <= 'f') {
+		 n = c - 'a' + 10;
+	}
+	else if (c >= 'A' && c <= 'F') {
+		 n = c - 'A' + 10;
+	}
+	else if (c >= '0' && c <= '9') {
+		 n = c - '0';
+	}
+	return n;
+}
+
+/*******************************************************************************
+ *
+ * Read Hex Byte
+ *
+ ******************************************************************************/
+static inline uint8_t
+hex2byt(char *s)
+{
+	return hex2nib(s[0]) << 4 | hex2nib(s[1]);
+}
+
+/*******************************************************************************
+ *
+ * Count Strings
+ *
+ ******************************************************************************/
+static inline void
+count_str(void)
+{
+	static struct timeval tv1 = {0};
+	static uint32_t count = 0;
+	struct timeval tv2, tv3;
+
+	count++;
+
+	if (tv1.tv_sec == 0)
+		gettimeofday(&tv1, NULL);
+
+	gettimeofday(&tv2, NULL);
+	timersub(&tv2, &tv1, &tv3);
+		
+	if (tv3.tv_sec >= 1) {
+		printf("%u pps\n", count);
+		tv1 = tv2;
+		count = 0;
+	}
+}
+
+/*******************************************************************************
+ *
+ * Process String t0008B905000000000000
+ *
+ ******************************************************************************/
+static inline void
+process_str(char *s)
+{
+	static uint64_t prev = -1;
+	uint64_t this = 0;
+
+	int i = 5, j = 0;
+	uint8_t *p = (uint8_t *)&this;
+
+	while (j < 8) {
+		p[j++] = hex2byt(&s[i]);
+		i += 2;
+	}
+
+	if (this != (prev + 1))
+		printf("%llu != %llu + 1\n", this, prev);
+
+	prev = this;
+
+	count_str();
+}
+
+/*******************************************************************************
+ *
+ * Detect String and Process
  *
  ******************************************************************************/
 static inline char *
-print_str(char *buffer, int *nb)
+detect_str(char *inbuf, int *nb)
 {
 	char *cp;
 	int i;
 
-	if ((cp = strchr(buffer, '\r')) != NULL) {
-		i = cp - buffer;
-		buffer[i++] = '\0';
+	if ((cp = strchr(inbuf, '\r')) != NULL) {
+		i = cp - inbuf;
+		inbuf[i++] = '\0';
 				
-		if (buffer[0] == 't')
-			printf("%04X %s\n", *nb, buffer);
-		// else missing header
+		if (inbuf[0] == 't')
+			process_str(inbuf);
 
 		(*nb) -= i;
-		memmove(buffer, &buffer[i], *nb);
-		buffer[*nb] = '\0';
+		memmove(inbuf, &inbuf[i], *nb);
+		inbuf[*nb] = '\0';
 	}
 	return cp;
 }
 
 /*******************************************************************************
  *
- * Detect overrun and remove
+ * Detect Overrun and Remove
  *
  ******************************************************************************/
 static inline char *
-remove_null(char *buffer, int *nb)
+remove_null(char *inbuf, int *nb)
 {
 	char *cp;
 	int i;
 
-	if ((cp = memchr(buffer, 0, *nb)) != NULL) {
-		i = cp - buffer + 1;
+	if ((cp = memchr(inbuf, 0, *nb)) != NULL) {
+		i = cp - inbuf + 1;
 		(*nb) -= i;
-		memmove(buffer, &buffer[i], *nb);
-		buffer[*nb] = '\0';
+		memmove(inbuf, &inbuf[i], *nb);
+		inbuf[*nb] = '\0';
 	}
 	return cp;
 }
@@ -293,13 +388,13 @@ void
 can2tty(session_t *c)
 {
 	int rc, nb = 0;
-	char buffer[BUFLEN + 1];
+	char inbuf[BUFLEN + 1];
 	struct timeval tv;
 	fd_set fdread, fdwrite;
 	int fd = (c->csock > c->fdtty) ? c->csock : c->fdtty;
 	uint64_t seq = 0;
 
-	bzero(buffer, BUFLEN + 1);
+	bzero(inbuf, BUFLEN + 1);
 
 	while (1) {
 		tv.tv_sec = TIMEOUT;
@@ -322,38 +417,38 @@ can2tty(session_t *c)
 			return;
 		}
 
-		if (FD_ISSET(c->fdtty, &fdread)) {
-			rc = read(c->fdtty, &buffer[nb], BUFLEN - nb);
-			if (rc < 0) {
-				if (errno == EINTR || errno == EAGAIN)
-                                	continue;
-				fprintf(stderr, "read() FAILED\n");
-				return;
-			}
-			if (rc == 0) {
-				fprintf(stderr, "EOF\n");
-				return;
-			}
-			nb += rc;
-			while (1) {
-				if ((print_str(buffer, &nb) == NULL) &&
-					(remove_null(buffer, &nb) == NULL))
-					break;
-			}
-		}
-
+		/* Send on CAN Bus */
 		if (FD_ISSET(c->csock, &fdwrite)) {
 			rc = canWrite(c, (uint8_t *)&seq, 8);
 			if (rc < 0) {
-				if (errno == EINTR || errno == EAGAIN)
-                                	continue;
-				fprintf(stderr, "canWrite() FAILED\n");
-				return;
+				if (errno != EINTR && errno != EAGAIN) {
+					fprintf(stderr, "canWrite() FAILED [%s]\n",
+						strerror(errno));
+					return;
+				}
+			} else if (rc > 0) {
+				seq++;
 			}
-			seq++;
 		}
 
-		usleep(500);
+		/* Receive on Serial UART */
+		if (FD_ISSET(c->fdtty, &fdread)) {
+			rc = read(c->fdtty, &inbuf[nb], BUFLEN - nb);
+			if (rc < 0) {
+				if (errno != EINTR && errno != EAGAIN) {
+					fprintf(stderr, "read() FAILED [%s]\n",
+						strerror(errno));
+					return;
+				}
+			} else if (rc == 0) {
+				fprintf(stderr, "EOF\n");
+				return;
+			} else {
+				nb += rc;
+				while (detect_str(inbuf, &nb) || remove_null(inbuf, &nb))
+					;
+			}
+		}
 	}
 }
 
