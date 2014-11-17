@@ -396,9 +396,9 @@ main(int argc, char **argv)
 		exit(EX_OSERR);
 	}
 
-	c.fdtty = openDevice("/dev/ttyPL2303", B460800);
+	c.fdtty = openDevice("/dev/ttyUSB0", B500000);
 	if (c.fdtty < 0) {
-		fprintf(stderr, "Failed to open tty device [%s].\n", "/dev/ttyPL2303");
+		fprintf(stderr, "Failed to open tty device [%s].\n", "/dev/ttyUSB0");
 		exit(EX_OSERR);
 	}
 

@@ -460,7 +460,6 @@ main(void)
 
 			TX_PUTC('\r');
 		}
-
 		LED = COMSTAT;
 	}
 }
