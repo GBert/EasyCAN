@@ -22,6 +22,9 @@
 #   with The Wellington Boot Loader. If not, see http://www.gnu.org/licenses/
 #------------------------------------------------------------------------------
 
+BOOTLOADER      = easy-loader
+TERMINAL        = com
+
 build:
 	$(MAKE) -f gpasm.mk build
 	$(MAKE) -f easy-can.mk build
@@ -37,3 +40,16 @@ uninstall:
 clean:
 	$(MAKE) -f gpasm.mk clean
 	$(MAKE) -f easy-can.mk clean
+
+flash:
+	$(BOOTLOADER) -r /dev/ttyUSB0 $(MAIN).hex
+
+verify:
+	$(BOOTLOADER) -r /dev/ttyUSB0 -v $(MAIN).hex
+
+com:
+	$(TERMINAL) /dev/ttyUSB0 500000
+
+trial:
+	$(BOOTLOADER) -r /dev/ttyUSB0 -q $(MAIN).hex
+	$(TERMINAL) /dev/ttyUSB0 500000
