@@ -128,11 +128,11 @@ isrLowPriority(void) __interrupt 2
  *
  *  WREG x 4TCY + CALL(2TCY) + RETURN(2TCY) + SDCC(9TCY)
  *
- *  Eg. For 50us with FCY = 10,000,000, WREG = 122
+ *  Eg. For 50us with FCY = 16,000,000, WREG = 197
  *
- *  .000050 / (1 / 10000000) = 500 INSTRUCTIONS
- *  500 - 13 = 487		SUBTRACT CALL OVERHEAD
- *  487 / 4  = 121.75		DETERMINE LOOP COUNT
+ *  .000050 / (1 / 16000000) = 800 INSTRUCTIONS
+ *  800 - 13 = 787		SUBTRACT CALL OVERHEAD
+ *  787 / 4  = 196.75		DETERMINE LOOP COUNT
  */
 void
 delay_tcy(int wreg) __wparam
@@ -415,6 +415,22 @@ can_puts(uint8_t *buffer, int8_t blen, uint16_t message_id)
 	return slen;
 }
 
+void
+init_ports(void)
+{
+    ANCON0 = 0;                 // analog off
+    ANCON1 = 0;                 // analog off
+    ADCON0 = 0;                 // disable ADC
+    ADCON1 = 0;                 // disable ADC
+    ADCON2 = 0;                 // disable ADC
+    CM1CON = 0;                 // disable comperator
+    CM2CON = 0;                 // disable comperator
+    LED_TRIS = 0;
+    TRISBbits.TRISB2 = 0;       // make the CAN TX pin a digital output
+    TRISBbits.TRISB3 = 1;       // make the CAN RX pin a digital input
+}
+
+
 /*****************************************************************************/
 
 /*
@@ -426,6 +442,8 @@ main(void)
 	uint8_t buffer[CAN_LEN] = {0};
 	uint16_t message_id = 0;
 	int8_t i = 0, j = 0;
+
+	init_ports();
 
 	LED_TRIS = 0;
 	init_uart();

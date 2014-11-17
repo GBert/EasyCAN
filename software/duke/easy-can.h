@@ -57,8 +57,8 @@
 #define FOSC (64000000)				/* Oscillator frequency */
 #define FCY  (FOSC / 4)				/* Instructions per second */
 
-#define DELAY50U (FCY / 81967)			/* >50us delay for delay_tcy() */
-#define DELAY10U (FCY / 454545)			/* >10us delay for delay_tcy() */
+#define DELAY50U (FCY / 131147)			/* >50us delay for delay_tcy() */
+#define DELAY10U (FCY / 727272)			/* >10us delay for delay_tcy() */
 
 /* CAN Bus */
 #define CAN_ID_ALL (1)				/* RX all messages, else   */
