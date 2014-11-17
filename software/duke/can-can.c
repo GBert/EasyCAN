@@ -67,7 +67,7 @@
 /*
  * I/O time out in seconds
  */
-#define TIMEOUT (1)
+#define TIMEOUT (10)
 
 /*
  * Can-can session
@@ -121,14 +121,12 @@ openDevice(const char *dev, speed_t baudrate)
 
 	tcflush(fd, TCIOFLUSH);
 
-
-	status = ioctl(fd, TIOCMGET, &arg);
+        status = ioctl(fd, TIOCMGET, &arg);
 
         /* modify RTS for EasyCAN */
-	arg &= ~TIOCM_RTS;
-	ioctl(fd, TIOCMSET, &arg);
-	printf("waiting Easy-CAN to come up...\n");
-	sleep(2);
+        arg &= ~TIOCM_RTS;
+        ioctl(fd, TIOCMSET, &arg);
+
 	return fd;
 }
 
@@ -395,7 +393,7 @@ can2tty(session_t *c)
 	uint64_t seq = 0;
 
 	bzero(inbuf, BUFLEN + 1);
-
+	
 	while (1) {
 		tv.tv_sec = TIMEOUT;
 		tv.tv_usec = 0;
@@ -407,6 +405,7 @@ can2tty(session_t *c)
 		FD_SET(c->csock, &fdwrite);
 
 		rc = select(fd + 1, &fdread, &fdwrite, NULL, &tv);
+		usleep(100);
 		if (rc < 0) {
 			if (errno == EINTR)
 				continue;
@@ -496,7 +495,7 @@ main(int argc, char **argv)
 		fprintf(stderr, "Failed to open tty device [%s].\n", "/dev/ttyUSB0");
 		exit(EX_OSERR);
 	}
-
+	sleep(2);
 	if (c.dir == 0)
 		can2tty(&c);
 

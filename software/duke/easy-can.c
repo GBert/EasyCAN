@@ -468,6 +468,13 @@ main(void)
 
 			TX_PUTC(bin2asc[i]);
 
+#if 0
+			/* Transmit Tx Buffer? */
+			if (TXSTA & _TRMT) {
+				TXREG = TX_GETC();
+			}
+#endif 
+
 			for (j = 0; j < i; ++j) {
 				TX_PUTC(bin2asc[buffer[j] & 0xF0]);
 				TX_PUTC(bin2asc[buffer[j] & 0x0F]);
