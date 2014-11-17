@@ -68,7 +68,7 @@
 /*
  * I/O time out in seconds
  */
-#define TIMEOUT (1)
+#define TIMEOUT (2)
 
 /*
  * Can-can session
@@ -86,7 +86,7 @@ typedef struct {
  *
  ******************************************************************************/
 int
-openDevice(const char *dev, speed_t baudrate)
+openDevice(const char *dev, speed_t speed)
 {
 	int fd;
 	struct termios options;
@@ -115,20 +115,47 @@ openDevice(const char *dev, speed_t baudrate)
 	options.c_cc[VMIN] = 0;
 	options.c_cc[VTIME] = 0;
 
-	cfsetispeed(&options, baudrate);
-	cfsetospeed(&options, baudrate);
+	cfsetispeed(&options, speed);
+	cfsetospeed(&options, speed);
 
 	tcsetattr(fd, TCSANOW, &options);
 
 	tcflush(fd, TCIOFLUSH);
 
-        status = ioctl(fd, TIOCMGET, &arg);
-
-        /* modify RTS for EasyCAN */
-        arg &= ~TIOCM_RTS;
-        ioctl(fd, TIOCMSET, &arg);
+	status = ioctl(fd, TIOCMGET, &arg);
+	/* modify RTS for EasyCAN */
+	arg &= ~TIOCM_RTS;
+	ioctl(fd, TIOCMSET, &arg);
 
 	return fd;
+
+	return fd;
+}
+
+/*******************************************************************************
+ *
+ * Return `speed_t' for Given Baud Rate
+ *
+ ******************************************************************************/
+speed_t
+serial_speed(uint32_t baudrate)
+{
+	static uint32_t rates[] = {
+		0, 75, 110, 300, 1200, 2400, 4800, 9600,
+		19200, 38400, 57600, 115200,
+		230400, 460800, 500000, 921600, UINT32_MAX
+	};
+	static speed_t speeds[] = {
+		B0, B75, B110, B300, B1200, B2400, B4800, B9600,
+		B19200, B38400, B57600, B115200,
+		B230400, B460800, B500000, B921600, B921600
+	};
+	int i = 0;
+
+	while (baudrate > rates[i++])
+		;
+
+	return speeds[--i];
 }
 
 /*******************************************************************************
@@ -326,7 +353,7 @@ process_str(char *s)
 	}
 
 	if (this != (prev + 1))
-		printf("[%s] %llu != %llu + 1\n", s, this, prev);
+		printf("[%s] %ju != %ju + 1\n", s, this, prev);
 
 	prev = this;
 
@@ -423,6 +450,7 @@ can2tty(session_t *c)
 				continue;
 		}
 
+		/* The CAN Bus is down? */
 		if (rc == 0) {
 			fprintf(stderr, "select() TIMED-OUT\n");
 			return;
@@ -480,6 +508,7 @@ usage(const char *msg, int err)
 		fprintf(stderr, "%s\n\n", msg);
 
 	fprintf(stderr, "Options:\n"
+		" -b N use TTY baud rate N\n"
 		" -i N use CAN bus message id N\n"
 
 		"\n");
@@ -498,14 +527,18 @@ main(int argc, char **argv)
 	int opt;
 	int nargs = 2;
 	char *candev, *ttydev;
+	uint32_t baudrate = 460800;
 
 	session_t c;
 	c.dir = 0;
 	c.cid = 0;
 
 	opterr = 0;
-	while ((opt = getopt(argc, argv, "i:")) != -1) {
+	while ((opt = getopt(argc, argv, "b:i:")) != -1) {
 		switch (opt) {
+		case 'b':
+			baudrate = strtoul(optarg, NULL, 0);
+			break;
 		case 'i':
 			c.cid = strtol(optarg, NULL, 0);
 			break;
@@ -533,7 +566,7 @@ main(int argc, char **argv)
 		exit(EX_OSERR);
 	}
 
-	c.fdtty = openDevice(ttydev, B500000);
+	c.fdtty = openDevice(ttydev, serial_speed(baudrate));
 	if (c.fdtty < 0) {
 		fprintf(stderr, "Failed to open tty device [%s].\n", ttydev);
 		exit(EX_OSERR);
@@ -541,8 +574,7 @@ main(int argc, char **argv)
 
 	setpriority(PRIO_PROCESS, 0, -20); /* Needs permission to succeed */
 
-	sleep(2);
-
+	sleep(1);
 	if (c.dir == 0)
 		can2tty(&c);
 	else
