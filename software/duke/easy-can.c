@@ -192,13 +192,13 @@ init_uart(void)
 
 #if USE_2STOP == 1
 	/* 9-Bit Enable + Enable Transmit + High Speed Mode + 9th Bit High */
-	TXSTA = _TX9 + _TXEN + _BRGH + _TX9D;
+	TXSTA1 = _TX9 + _TXEN + _BRGH + _TX9D;
 #else
 	/* Enable Transmit + High Speed Mode */
-	TXSTA = _TXEN + _BRGH;
+	TXSTA1 = _TXEN + _BRGH;
 #endif
 	/* Enable Serial Port + Receiver */
-	RCSTA = _SPEN + _CREN;
+	RCSTA1 = _SPEN + _CREN;
 
 #if USE_STDIO == 1
 	stdout = STREAM_USART;	/* Assign STDOUT to UART */
@@ -452,7 +452,7 @@ main(void)
 
 	while (1) {
 		/* Transmit Tx Buffer? */
-		if (!TX_EOF() && (TXSTA & _TRMT)) {
+		if (!TX_EOF() && (TXSTA1 & _TRMT)) {
 			TXREG = TX_GETC();
 		}
 
@@ -474,7 +474,7 @@ main(void)
 
 #if 1
 			/* Transmit Tx Buffer? */
-			if (TXSTA & _TRMT) {
+			if (TXSTA1 & _TRMT) {
 				TXREG = TX_GETC();
 			}
 #endif 

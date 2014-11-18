@@ -26,7 +26,7 @@ AS=gpasm
 CC=sdcc
 
 CFLAGS=--disable-warning 85 --Werror
-CFLAGS+=--use-non-free --fomit-frame-pointer --pstack-model=small --std-sdcc99 -mpic16 -p18f26k80
+CFLAGS+=--obanksel=2 --use-non-free --fomit-frame-pointer --pstack-model=small --std-sdcc99 -mpic16 -p18f26k80
 CLIB=-llibc18f.lib
 
 TARGET = easy-can.hex
