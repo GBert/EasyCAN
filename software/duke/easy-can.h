@@ -44,6 +44,7 @@
 #define BRG ((((FOSC / 500000) / 2) - 1) / 2)	/* BAUDRATE GENERATOR */
 
 #define USE_STDIO (0)				/* printf to UART? */
+#define USE_2STOP (0)				/* 2 stop bits?    */
 
 /* Library routines */
 #if USE_STDIO == 1
