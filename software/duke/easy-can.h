@@ -22,8 +22,8 @@
 ;   with The Wellington Boot Loader. If not, see http://www.gnu.org/licenses/
 ;-----------------------------------------------------------------------------*/
 
-#ifndef _PROTON_MKII_H
-#define _PROTON_MKII_H
+#ifndef _EASY_CAN_H
+#define _EASY_CAN_H
 
 #include <pic18fregs.h>
 
@@ -84,4 +84,4 @@
 
 #define CAN_DOUBLE_BUFFER_RX (1)		/* RXB0CON RB0DBEN */
 
-#endif
+#endif	/* _EASY_CAN_H_ */
