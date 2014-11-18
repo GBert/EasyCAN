@@ -468,7 +468,7 @@ main(void)
 
 			TX_PUTC(bin2asc[i]);
 
-#if 0
+#if 1
 			/* Transmit Tx Buffer? */
 			if (TXSTA & _TRMT) {
 				TXREG = TX_GETC();
