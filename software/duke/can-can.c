@@ -61,14 +61,22 @@
 #endif
 
 /*
- * Input inbuf
+ * Input buffer
  */
-#define BUFLEN (8192)
+#define BUFLEN (128)
 
 /*
  * I/O time out in seconds
  */
 #define TIMEOUT (2)
+
+/*
+ * Baud rate lookup
+ */
+typedef struct {
+	uint32_t baud;
+	speed_t speed;
+} baudrate_t;
 
 /*
  * Can-can session
@@ -78,6 +86,7 @@ typedef struct {
 	int fdtty;	/* TTY descriptor                   */
 	int csock;	/* CAN socket                       */
 	int cid;        /* CAN bus id                       */ 
+	uint32_t delay; /* Rate delay in microseconds       */
 } session_t;
 
 /*******************************************************************************
@@ -93,12 +102,17 @@ openDevice(const char *dev, speed_t speed)
 	unsigned int arg, status;
 
 	fd = open(dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
-	if (fd < 0)
+	if (fd < 0) {
 		return fd;
-
-	fcntl(fd, F_SETFL, O_NONBLOCK | fcntl(fd, F_GETFL));
-
-	tcgetattr(fd, &options);
+	}
+	if (fcntl(fd, F_SETFL, O_NONBLOCK | fcntl(fd, F_GETFL)) < 0) {
+		close(fd);
+		return -1;
+	}
+	if (tcgetattr(fd, &options) < 0) {
+		close(fd);
+		return -1;
+	}
 
 	/*
 	 * Raw mode
@@ -115,19 +129,27 @@ openDevice(const char *dev, speed_t speed)
 	options.c_cc[VMIN] = 0;
 	options.c_cc[VTIME] = 0;
 
-	cfsetispeed(&options, speed);
-	cfsetospeed(&options, speed);
+	if (cfsetispeed(&options, speed) < 0) {
+		close(fd);
+		return -1;
+	}
+	if (cfsetospeed(&options, speed) < 0) {
+		close(fd);
+		return -1;
+	}
+	if (tcsetattr(fd, TCSANOW, &options) < 0) {
+		close(fd);
+		return -1;
+	}
+	if (tcflush(fd, TCIOFLUSH) < 0) {
+		close(fd);
+		return -1;
+	}
 
-	tcsetattr(fd, TCSANOW, &options);
-
-	tcflush(fd, TCIOFLUSH);
-
-	status = ioctl(fd, TIOCMGET, &arg);
 	/* modify RTS for EasyCAN */
+	status = ioctl(fd, TIOCMGET, &arg);
 	arg &= ~TIOCM_RTS;
 	ioctl(fd, TIOCMSET, &arg);
-
-	return fd;
 
 	return fd;
 }
@@ -140,22 +162,96 @@ openDevice(const char *dev, speed_t speed)
 speed_t
 serial_speed(uint32_t baudrate)
 {
-	static uint32_t rates[] = {
-		0, 75, 110, 300, 1200, 2400, 4800, 9600,
-		19200, 38400, 57600, 115200,
-		230400, 460800, 500000, 921600, 2000000, UINT32_MAX
-	};
-	static speed_t speeds[] = {
-		B0, B75, B110, B300, B1200, B2400, B4800, B9600,
-		B19200, B38400, B57600, B115200,
-		B230400, B460800, B500000, B921600, B921600, B2000000
+	static baudrate_t rates[] = {
+	{0, B0},
+	{50, B50},
+	{75, B75},
+	{110, B110},
+	{134, B134},
+	{150, B150},
+	{200, B200},
+	{300, B300},
+	{600, B600},
+	{1200, B1200},
+	{1800, B1800},
+	{2400, B2400},
+	{4800, B4800},
+#ifdef B7200
+	{7200, B7200},
+#endif
+	{9600, B9600},
+#ifdef B14400
+	{14400, B14400},
+#endif
+#ifdef B19200
+	{19200, B19200},
+#else
+	{19200, EXTA},
+#endif
+#ifdef B28800
+	{28800, B28800},
+#endif
+#ifdef B38400
+	{38400, B38400},
+#else
+	{38400, EXTB},
+#endif
+#ifdef B57600
+	{57600, B57600},
+#endif
+#ifdef B76800
+	{76800, B76800},
+#endif
+#ifdef B115200
+	{115200, B115200},
+#endif
+#ifdef B230400
+	{230400, B230400},
+#endif
+#ifdef B460800
+	{460800, B460800},
+#endif
+#ifdef B500000
+	{500000, B500000},
+#endif
+#ifdef B576000
+	{576000, B576000},
+#endif
+#ifdef B921600
+	{921600, B921600},
+#endif
+#ifdef B1000000
+	{1000000, B1000000},
+#endif
+#ifdef B1152000
+	{1152000, B1152000},
+#endif
+#ifdef B1500000
+	{1500000, B1500000},
+#endif
+#ifdef B2000000
+	{2000000, B2000000},
+#endif
+#ifdef B2500000
+	{2500000, B2500000},
+#endif
+#ifdef B3000000
+	{3000000, B3000000},
+#endif
+#ifdef B3500000
+	{3500000, B3500000},
+#endif
+#ifdef B4000000
+	{4000000, B4000000},
+#endif
+	{UINT32_MAX, B9600},
 	};
 	int i = 0;
 
-	while (baudrate > rates[i++])
+	while (baudrate > rates[i++].baud)
 		;
 
-	return speeds[--i];
+	return rates[--i].speed;
 }
 
 /*******************************************************************************
@@ -310,6 +406,8 @@ hex2byt(char *s)
  *
  * Count Strings
  *
+ *  Display packets per second.
+ *
  ******************************************************************************/
 static inline void
 count_str(void)
@@ -317,6 +415,7 @@ count_str(void)
 	static struct timeval tv1 = {0};
 	static uint32_t count = 0;
 	struct timeval tv2, tv3;
+	double pps;
 
 	if (count == 0) {
 		gettimeofday(&tv1, NULL);
@@ -325,7 +424,9 @@ count_str(void)
 		gettimeofday(&tv2, NULL);
 		timersub(&tv2, &tv1, &tv3);
 		if (tv3.tv_sec >= 1) {
-			printf("%u pps\n", count);
+			pps = (double)count /
+				((double)tv3.tv_sec + tv3.tv_usec / 1000000.);
+			printf("%.2f pps\n", pps);
 			count = 0;
 		} else {
 			count++;
@@ -337,12 +438,14 @@ count_str(void)
  *
  * Process String t0008B905000000000000
  *
+ *  FIXME Only works on Little-Endian
+ *
  ******************************************************************************/
 static inline void
 process_str(char *s)
 {
-	static uint64_t prev = -1;
-	uint64_t this = 0;
+	static int64_t prev = -1;
+	int64_t this = 0;
 
 	int i = 5, j = 0;
 	uint8_t *p = (uint8_t *)&this;
@@ -353,7 +456,7 @@ process_str(char *s)
 	}
 
 	if (this != (prev + 1))
-		printf("[%s] %ju != %ju + 1\n", s, this, prev);
+		printf("[%s] %jd != %jd + 1\n", s, this, prev);
 
 	prev = this;
 
@@ -373,14 +476,15 @@ detect_str(char *inbuf, uint32_t *nb)
 
 	if ((cp = strchr(inbuf, '\r')) != NULL) {
 		i = cp - inbuf;
+		assert(i < BUFLEN);
+
 		inbuf[i++] = '\0';
+		(*nb) -= i;
 				
 		if (inbuf[0] == 't' && i == 22)
 			process_str(inbuf);
 
-		(*nb) -= i;
 		assert(*nb >= 0);
-
 		memmove(inbuf, &inbuf[i], *nb);
 
 		assert(*nb < BUFLEN);
@@ -403,11 +507,13 @@ remove_null(char *inbuf, uint32_t *nb)
 	uint32_t i;
 
 	if ((cp = memchr(inbuf, 0, *nb)) != NULL) {
-		i = cp - inbuf + 1;
+		i = cp - inbuf;
+		assert(i < BUFLEN);
 
+		i++;
 		(*nb) -= i;
-		assert(*nb >= 0);
 
+		assert(*nb >= 0);
 		memmove(inbuf, &inbuf[i], *nb);
 
 		assert(*nb < BUFLEN);
@@ -424,15 +530,16 @@ remove_null(char *inbuf, uint32_t *nb)
 void
 can2tty(session_t *c)
 {
+	int fd = (c->csock > c->fdtty) ? c->csock : c->fdtty;
+	fd_set fdread, fdwrite;
+	struct timeval tv;
 	int rc;
 	uint32_t nb = 0;
-	char inbuf[BUFLEN + 1];
-	struct timeval tv;
-	fd_set fdread, fdwrite;
-	int fd = (c->csock > c->fdtty) ? c->csock : c->fdtty;
 	uint64_t seq = 0;
 
-	memset(inbuf, 0, BUFLEN + 1);
+	char inbuf[BUFLEN + 1];
+	memset(inbuf, 0, BUFLEN);
+	inbuf[BUFLEN] = -1;
 
 	while (1) {
 		tv.tv_sec = TIMEOUT;
@@ -450,7 +557,7 @@ can2tty(session_t *c)
 				continue;
 		}
 
-		/* The CAN Bus is down? */
+		/* CAN Bus is down? */
 		if (rc == 0) {
 			fprintf(stderr, "select() TIMED-OUT\n");
 			return;
@@ -466,9 +573,9 @@ can2tty(session_t *c)
 					return;
 				}
 			} else if (rc == 0) {
-				fprintf(stderr, "EOF in Send\n");
+				fprintf(stderr, "EOF in canWrite()\n");
 				return;
-			} else if (rc > 0) {
+			} else {
 				seq++;
 			}
 		}
@@ -483,7 +590,7 @@ can2tty(session_t *c)
 					return;
 				}
 			} else if (rc == 0) {
-				fprintf(stderr, "EOF in Read\n");
+				fprintf(stderr, "EOF in read()\n");
 				return;
 			} else {
 				nb += rc;
@@ -491,6 +598,10 @@ can2tty(session_t *c)
 					;
 			}
 		}
+
+		/* Wait a while... */
+		if (c->delay)
+			usleep(c->delay);
 	}
 }
 
@@ -509,6 +620,7 @@ usage(const char *msg, int err)
 
 	fprintf(stderr, "Options:\n"
 		" -b N use TTY baud rate N\n"
+		" -d N use microsecond rate delay N\n"
 		" -i N use CAN bus message id N\n"
 
 		"\n");
@@ -527,17 +639,21 @@ main(int argc, char **argv)
 	int opt;
 	int nargs = 2;
 	char *candev, *ttydev;
-	uint32_t baudrate = 460800;
+	uint32_t baudrate = 500000;
 
 	session_t c;
 	c.dir = 0;
 	c.cid = 0;
+	c.delay = 0;
 
 	opterr = 0;
-	while ((opt = getopt(argc, argv, "b:i:")) != -1) {
+	while ((opt = getopt(argc, argv, "b:d:i:")) != -1) {
 		switch (opt) {
 		case 'b':
 			baudrate = strtoul(optarg, NULL, 0);
+			break;
+		case 'd':
+			c.delay = strtoul(optarg, NULL, 0);
 			break;
 		case 'i':
 			c.cid = strtol(optarg, NULL, 0);
