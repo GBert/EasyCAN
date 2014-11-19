@@ -44,7 +44,7 @@
 #define BRG ((((FOSC / 500000) / 2) - 1) / 2)	/* BAUDRATE GENERATOR */
 
 #define USE_STDIO (0)				/* printf to UART? */
-#define USE_2STOP (0)				/* 2 stop bits?    */
+#define USE_2STOP (1)				/* 2 stop bits?    */
 
 /* Library routines */
 #if USE_STDIO == 1
@@ -65,7 +65,7 @@
 #define CAN_ID_ALL (1)				/* RX all messages, else   */
 #define CAN_ID (0x666)		 		/* RX only this Message-Id */
 
-/* #define CAN_BRG1 (0x0f)				 125kbaud @ 64 MHz */ 
+/* #define CAN_BRG1 (0x0f)			 125kbaud @ 64 MHz */ 
 #define CAN_BRG1 (0x07)				/* 250kbaud @ 64 MHz */
 #define CAN_BRG2 (0xBC)
 #define CAN_BRG3 (0x01)

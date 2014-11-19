@@ -43,7 +43,7 @@ clean:
 	$(MAKE) -f easy-can.mk clean
 
 flash:
-	$(BOOTLOADER) -r /dev/ttyUSB0 $(MAIN).hex
+	$(BOOTLOADER) -r /dev/ttyUSB0 -q $(MAIN).hex
 
 verify:
 	$(BOOTLOADER) -r /dev/ttyUSB0 -v $(MAIN).hex

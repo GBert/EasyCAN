@@ -34,12 +34,10 @@
 static uint8_t tx_buf[256];
 
 static uint8_t tx_put = 0, tx_get = 0;
-#define TX_EOF()   (tx_put == tx_get)
 #define TX_PUTC(X) (tx_buf[tx_put++] = (X))
 #define TX_GETC()  (tx_buf[tx_get++])
-
-/*****************************************************************************/
-
+#define TX_EOF()   (tx_put == tx_get)
+#define TX_FLUSH() if (PIR1 & _TXIF) { TXREG = TX_GETC(); }
 /*
  * 7-bit ASCII to Binary Lookup Tables
  *
@@ -285,6 +283,9 @@ init_canbus(void)
 	while (CANSTAT & (_OPMODE2 | _OPMODE1))
 		;
 }
+void init_timer1(void) {
+	T1CON = 0x01;	/* internal clock - presacler 0 -> TCY */
+}
 
 /*
  * Can gets() from bufer n
@@ -419,6 +420,43 @@ can_puts(uint8_t *buffer, int8_t blen, uint16_t message_id)
 	return slen;
 }
 
+/*
+ * UART puts()
+ */
+void
+uart_puts(char *buffer, int8_t buflen, uint16_t message_id)
+{
+	int8_t i;
+
+	TX_PUTC('t');
+	TX_FLUSH();
+
+	i = message_id >> 8;
+	TX_PUTC(bin2asc[i & 0x0F]);
+	TX_FLUSH();
+
+	i = message_id & 0xFF;
+	TX_PUTC(bin2asc[i & 0xF0]);
+	TX_FLUSH();
+	TX_PUTC(bin2asc[i & 0x0F]);
+	TX_FLUSH();
+
+	TX_PUTC(bin2asc[buflen]);
+	TX_FLUSH();
+
+	for (i = 0; i < buflen; ++i) {
+		TX_PUTC(bin2asc[buffer[i] & 0xF0]);
+		TX_FLUSH();
+
+		TX_PUTC(bin2asc[buffer[i] & 0x0F]);
+		TX_FLUSH();
+	}
+
+	TX_PUTC('\r');
+	TX_FLUSH();
+}
+
+
 void
 init_ports(void)
 {
@@ -442,49 +480,32 @@ void
 main(void)
 {
 	uint8_t buffer[CAN_LEN] = {0};
+	int8_t buflen;
 	uint16_t message_id = 0;
-	int8_t i = 0, j = 0;
+	int8_t i = 0, j = 0, t1 =1;
+	uint8_t t1_low, t1_high = 0;
 
 	init_ports();
 
+	init_timer1();
 	init_uart();
 	init_canbus();
 
 	while (1) {
-		/* Transmit Tx Buffer? */
-		if (!TX_EOF() && (TXSTA1 & _TRMT)) {
-			TXREG = TX_GETC();
+		/* Get CAN? */
+		buflen = can_gets_rxn(buffer, &message_id, 0);
+		if (buflen >= 0) {
+			uart_puts(buffer, buflen, message_id);
+		}
+		buflen = can_gets_rxn(buffer, &message_id, 1);
+
+		if (buflen >= 0) {
+			uart_puts(buffer, buflen, message_id);
 		}
 
-		i = can_gets(buffer, &message_id);
-		if (i >= 0) {
-			/*
-			 * Create message for slcand
-			 */
-
-			TX_PUTC('t');
-
-			j = message_id >> 8;
-			TX_PUTC(bin2asc[j & 0x0F]);
-			j = message_id & 0xFF;
-			TX_PUTC(bin2asc[j & 0xF0]);
-			TX_PUTC(bin2asc[j & 0x0F]);
-
-			TX_PUTC(bin2asc[i]);
-
-#if 1
-			/* Transmit Tx Buffer? */
-			if (TXSTA1 & _TRMT) {
-				TXREG = TX_GETC();
-			}
-#endif 
-
-			for (j = 0; j < i; ++j) {
-				TX_PUTC(bin2asc[buffer[j] & 0xF0]);
-				TX_PUTC(bin2asc[buffer[j] & 0x0F]);
-			}
-
-			TX_PUTC('\r');
+		/* Send UART? */
+		if (!TX_EOF()) {
+			TX_FLUSH();
 		}
 		LED = COMSTAT;
 	}
