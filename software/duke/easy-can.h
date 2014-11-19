@@ -41,10 +41,12 @@
 #define LED             (LATAbits.LATA0)
 
 /* Serial UART */
-#define BRG ((((FOSC / 500000) / 2) - 1) / 2)	/* BAUDRATE GENERATOR */
+#define UART_SPEED (500000)
+
+#define BRG ((((FOSC / UART_SPEED) / 2) - 1) / 2)	/* BAUDRATE GENERATOR */
 
 #define USE_STDIO (0)				/* printf to UART? */
-#define USE_2STOP (1)				/* 2 stop bits?    */
+#define USE_2STOP (0)				/* 2 stop bits?    */
 
 /* Library routines */
 #if USE_STDIO == 1
