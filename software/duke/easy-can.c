@@ -37,7 +37,7 @@ static uint8_t tx_put = 0, tx_get = 0;
 #define TX_PUTC(X) (tx_buf[tx_put++] = (X))
 #define TX_GETC()  (tx_buf[tx_get++])
 #define TX_EOF()   (tx_put == tx_get)
-#define TX_FLUSH() if (PIR1 & _TXIF) { TXREG = TX_GETC(); }
+#define TX_WRITE() if (PIR1 & _TXIF) { TXREG = TX_GETC(); }
 /*
  * 7-bit ASCII to Binary Lookup Tables
  *
@@ -429,31 +429,25 @@ uart_puts(char *buffer, int8_t buflen, uint16_t message_id)
 	int8_t i;
 
 	TX_PUTC('t');
-	TX_FLUSH();
 
 	i = message_id >> 8;
 	TX_PUTC(bin2asc[i & 0x0F]);
-	TX_FLUSH();
 	
 	i = message_id & 0xFF;
 	TX_PUTC(bin2asc[i & 0xF0]);
-	TX_FLUSH();
 	TX_PUTC(bin2asc[i & 0x0F]);
-	TX_FLUSH();
 
 	TX_PUTC(bin2asc[buflen]);
-	TX_FLUSH();
+	TX_WRITE();
 
 	for (i = 0; i < buflen; ++i) {
 		TX_PUTC(bin2asc[buffer[i] & 0xF0]);
-		TX_FLUSH();
-
 		TX_PUTC(bin2asc[buffer[i] & 0x0F]);
-		TX_FLUSH();
+		TX_WRITE();
 	}
 
 	TX_PUTC('\r');
-	TX_FLUSH();
+	TX_WRITE();
 }
 
 
@@ -505,7 +499,7 @@ main(void)
 
 		/* Send UART? */
 		if (!TX_EOF()) {
-			TX_FLUSH();
+			TX_WRITE();
 		}
 		LED = COMSTAT;
 	}
