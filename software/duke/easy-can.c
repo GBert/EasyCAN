@@ -185,8 +185,8 @@ init_uart(void)
 
 	BAUDCON1 = _BRG16;	/* 16-bit Baudrate */
 
-	SPBRGH1 = BRG >> 8;	/* Baudrate */
-	SPBRG1  = BRG & 0xFF;
+	SPBRGH1 = UART_BRG >> 8;	/* Baudrate */
+	SPBRG1  = UART_BRG & 0xFF;
 
 #if USE_2STOP == 1
 	/* 9-Bit Enable + Enable Transmit + High Speed Mode + 9th Bit High */

@@ -43,10 +43,17 @@
 /* Serial UART */
 #define UART_SPEED (500000)
 
-#define BRG ((((FOSC / UART_SPEED) / 2) - 1) / 2)	/* BAUDRATE GENERATOR */
+#define UART_BRG ((((FOSC / UART_SPEED) / 2) - 1) / 2)	/* BAUDRATE GENERATOR */
 
 #define USE_STDIO (0)				/* printf to UART? */
 #define USE_2STOP (0)				/* 2 stop bits?    */
+
+#define DC1 (0x11) /* device control 1 */
+#define DC2 (0x12) /* device control 2 */
+#define DC3 (0x13) /* device control 3 */
+#define DC4 (0x14) /* device control 4 */
+#define XON  (DC1)
+#define XOFF (DC3)
 
 /* Library routines */
 #if USE_STDIO == 1
