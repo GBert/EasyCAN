@@ -27,17 +27,29 @@
 /*****************************************************************************/
 
 /*
+ * Rx buffer
+ */
+
+#pragma udata bank3 rx_buf
+static uint8_t rx_buf[256];
+static uint8_t rx_put = 0, rx_get = 0;
+#define RX_PUTC(X) (rx_buf[rx_put++] = (X))
+#define RX_GETC()  (rx_buf[rx_get++])
+#define RX_EOF()   (rx_put == rx_get)
+#define RX_READ()  if (PIR1 & _RCIF1) { RX_PUTC(RCREG); }
+
+/*
  * Tx buffer
  */
 
-#pragma udata bank3 tx_buf
+#pragma udata bank4 tx_buf
 static uint8_t tx_buf[256];
-
 static uint8_t tx_put = 0, tx_get = 0;
 #define TX_PUTC(X) (tx_buf[tx_put++] = (X))
 #define TX_GETC()  (tx_buf[tx_get++])
 #define TX_EOF()   (tx_put == tx_get)
-#define TX_WRITE() if (PIR1 & _TXIF) { TXREG = TX_GETC(); }
+#define TX_WRITE() if (PIR1 & _TXIF) { TXREG1 = TX_GETC(); }
+
 /*
  * 7-bit ASCII to Binary Lookup Tables
  *
