@@ -434,7 +434,7 @@ uart_puts(char *buffer, int8_t buflen, uint16_t message_id)
 	i = message_id >> 8;
 	TX_PUTC(bin2asc[i & 0x0F]);
 	TX_FLUSH();
-
+	
 	i = message_id & 0xFF;
 	TX_PUTC(bin2asc[i & 0xF0]);
 	TX_FLUSH();
