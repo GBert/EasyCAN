@@ -1,6 +1,6 @@
 /*------------------------------------------------------------------------------
 ;
-; Title:	Can-Can Act 1
+; Title:	Can-Can Act 1 and Act 2, part 1.
 ;
 ; Copyright:	Copyright (c) 2014 The Duke of Welling Town
 ;
@@ -63,7 +63,7 @@
 /*
  * Input buffer
  */
-#define BUFLEN (128)
+#define BUFLEN (256)
 
 /*
  * I/O time out in seconds
@@ -85,7 +85,8 @@ typedef struct {
 	int dir;	/* Direction 0=can->tty, 1=tty->can */
 	int fdtty;	/* TTY descriptor                   */
 	int csock;	/* CAN socket                       */
-	int cid;        /* CAN bus id                       */ 
+	uint16_t scid;  /* CAN bus id to send               */ 
+	uint16_t rcid;  /* CAN bus id received              */ 
 	uint32_t delay; /* Rate delay in microseconds       */
 } session_t;
 
@@ -99,7 +100,6 @@ openDevice(const char *dev, speed_t speed)
 {
 	int fd;
 	struct termios options;
-	unsigned int arg, status;
 
 	fd = open(dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (fd < 0) {
@@ -114,8 +114,9 @@ openDevice(const char *dev, speed_t speed)
 		return -1;
 	}
 
+#if 0
 	/*
-	 * Raw mode
+	 * Raw Mode 8N2
 	 *
 	 *  Linux TERMIOS(3)
 	 */
@@ -123,12 +124,30 @@ openDevice(const char *dev, speed_t speed)
 	options.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
 	options.c_oflag &= ~(OPOST);
 	options.c_cflag &= ~(CSIZE | PARENB);
-	options.c_cflag |= (CS8);
+	options.c_cflag |= (CS8 | CSTOPB);
 	options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
 
 	options.c_cc[VMIN] = 0;
 	options.c_cc[VTIME] = 0;
+#else
+	/*
+	 * Raw Mode 8N2
+	 *
+	 *  `slcand'
+	 */
 
+	if (tcgetattr(fd, &options) < 0) {
+		close(fd);
+		return -1;
+	}
+
+ 	cfmakeraw(&options);
+
+	options.c_cflag &= ~(CRTSCTS);
+	options.c_iflag &= ~(IXOFF);
+
+	options.c_cflag |= (CSTOPB);
+#endif
 	if (cfsetispeed(&options, speed) < 0) {
 		close(fd);
 		return -1;
@@ -146,17 +165,21 @@ openDevice(const char *dev, speed_t speed)
 		return -1;
 	}
 
-	/* modify RTS for EasyCAN */
-	status = ioctl(fd, TIOCMGET, &arg);
-	arg &= ~TIOCM_RTS;
-	ioctl(fd, TIOCMSET, &arg);
-
 	return fd;
 }
 
 /*******************************************************************************
  *
  * Return `speed_t' for Given Baud Rate
+ *
+ *  Speed May Not be Supported On Target Hardware.
+ *
+ *  Eg. PL2303 Supported Rates:
+ *
+ *	75,     150,     300,     600,     1200,   1800,  2400, 3600,
+ *      4800,   7200,    9600,    14400,   19200,  28800, 38400,
+ *      57600,  115200,  230400,  460800,  614400,
+ *      921600, 1228800, 2457600, 3000000, 6000000
  *
  ******************************************************************************/
 speed_t
@@ -176,74 +199,26 @@ serial_speed(uint32_t baudrate)
 	{1800, B1800},
 	{2400, B2400},
 	{4800, B4800},
-#ifdef B7200
-	{7200, B7200},
-#endif
 	{9600, B9600},
-#ifdef B14400
-	{14400, B14400},
-#endif
-#ifdef B19200
 	{19200, B19200},
-#else
 	{19200, EXTA},
-#endif
-#ifdef B28800
-	{28800, B28800},
-#endif
-#ifdef B38400
 	{38400, B38400},
-#else
 	{38400, EXTB},
-#endif
-#ifdef B57600
 	{57600, B57600},
-#endif
-#ifdef B76800
-	{76800, B76800},
-#endif
-#ifdef B115200
 	{115200, B115200},
-#endif
-#ifdef B230400
 	{230400, B230400},
-#endif
-#ifdef B460800
 	{460800, B460800},
-#endif
-#ifdef B500000
 	{500000, B500000},
-#endif
-#ifdef B576000
 	{576000, B576000},
-#endif
-#ifdef B921600
 	{921600, B921600},
-#endif
-#ifdef B1000000
 	{1000000, B1000000},
-#endif
-#ifdef B1152000
 	{1152000, B1152000},
-#endif
-#ifdef B1500000
 	{1500000, B1500000},
-#endif
-#ifdef B2000000
 	{2000000, B2000000},
-#endif
-#ifdef B2500000
 	{2500000, B2500000},
-#endif
-#ifdef B3000000
 	{3000000, B3000000},
-#endif
-#ifdef B3500000
 	{3500000, B3500000},
-#endif
-#ifdef B4000000
 	{4000000, B4000000},
-#endif
 	{UINT32_MAX, B9600},
 	};
 	int i = 0;
@@ -318,7 +293,7 @@ canWrite(session_t *c, uint8_t *inbuf, int buflen)
 
 	bzero(&frame, sizeof(frame));
 
-	frame.can_id = c->cid;
+	frame.can_id = c->scid;
 	frame.can_dlc = buflen;
 	memcpy(frame.data, inbuf, buflen);
 
@@ -358,6 +333,8 @@ canRead(session_t *c, uint8_t *inbuf, int buflen)
 		return rc;
 	if (rc != sizeof(frame))
 		return -1;
+
+	c->rcid = frame.can_id;
 
 	memcpy(inbuf, frame.data, frame.can_dlc);
 
@@ -438,8 +415,6 @@ count_str(void)
  *
  * Process String t0008B905000000000000
  *
- *  FIXME Only works on Little-Endian
- *
  ******************************************************************************/
 static inline void
 process_str(char *s)
@@ -456,11 +431,47 @@ process_str(char *s)
 	}
 
 	if (this != (prev + 1))
-		printf("[%s] %jd != %jd + 1\n", s, this, prev);
+		printf("[%s] %jd != %jd\n", s, this, prev + 1);
 
 	prev = this;
 
 	count_str();
+}
+
+
+/*******************************************************************************
+ *
+ * `strchr' with length limit
+ *
+ ******************************************************************************/
+char *
+strnchr(char *s, char c, int n)
+{
+	int i = 0;
+
+	while (s[i] && i < n) {
+		if (s[i] == c)
+			return &s[i];
+		i++;
+	}
+	return NULL;
+}
+
+/*******************************************************************************
+ *
+ * Dump String as Hex
+ *
+ ******************************************************************************/
+void
+dump_str(char *s, int n)
+{
+	int i = 0;
+
+	while (i < n) {
+		printf("0x%02X ", s[i]);
+		i++;
+	}
+	printf("\n");
 }
 
 /*******************************************************************************
@@ -469,55 +480,49 @@ process_str(char *s)
  *
  ******************************************************************************/
 static inline char *
-detect_str(char *inbuf, uint32_t *nb)
+detect_str(char *inbuf, int *incnt)
 {
 	char *cp;
-	uint32_t i;
+	int i;
 
-	if ((cp = strchr(inbuf, '\r')) != NULL) {
+	if ((cp = strnchr(inbuf, '\r', *incnt)) != NULL) {
 		i = cp - inbuf;
 		assert(i < BUFLEN);
 
 		inbuf[i++] = '\0';
-		(*nb) -= i;
+		(*incnt) -= i;
+		assert(*incnt >= 0 && *incnt < BUFLEN);
 				
 		if (inbuf[0] == 't' && i == 22)
 			process_str(inbuf);
 
-		assert(*nb >= 0);
-		memmove(inbuf, &inbuf[i], *nb);
-
-		assert(*nb < BUFLEN);
-		inbuf[*nb] = '\0';
+		memmove(inbuf, &inbuf[i], *incnt);
 	}
 	return cp;
 }
 
 /*******************************************************************************
  *
- * Detect Overrun and Remove
+ * Detect Error and Remove
  *
- *  Linux will insert a null byte when an overrun is detected.
+ *  Linux will insert a NUL when an error is detected.
  *
  ******************************************************************************/
 static inline char *
-remove_null(char *inbuf, uint32_t *nb)
+remove_nul(char *inbuf, int *incnt)
 {
 	char *cp;
-	uint32_t i;
+	int i;
 
-	if ((cp = memchr(inbuf, 0, *nb)) != NULL) {
+	if ((cp = memchr(inbuf, '\0', *incnt)) != NULL) {
 		i = cp - inbuf;
 		assert(i < BUFLEN);
 
 		i++;
-		(*nb) -= i;
+		(*incnt) -= i;
+		assert(*incnt >= 0 && *incnt < BUFLEN);
 
-		assert(*nb >= 0);
-		memmove(inbuf, &inbuf[i], *nb);
-
-		assert(*nb < BUFLEN);
-		inbuf[*nb] = '\0';
+		memmove(inbuf, &inbuf[i], *incnt);
 	}
 	return cp;
 }
@@ -533,13 +538,11 @@ can2tty(session_t *c)
 	int fd = (c->csock > c->fdtty) ? c->csock : c->fdtty;
 	fd_set fdread, fdwrite;
 	struct timeval tv;
-	int rc;
-	uint32_t nb = 0;
 	uint64_t seq = 0;
+	int rc;
 
-	char inbuf[BUFLEN + 1];
-	memset(inbuf, 0, BUFLEN);
-	inbuf[BUFLEN] = -1;
+	char inbuf[BUFLEN];
+	int incnt = 0;
 
 	while (1) {
 		tv.tv_sec = TIMEOUT;
@@ -582,7 +585,7 @@ can2tty(session_t *c)
 
 		/* Receive on Serial UART */
 		if (FD_ISSET(c->fdtty, &fdread)) {
-			rc = read(c->fdtty, &inbuf[nb], BUFLEN - nb);
+			rc = read(c->fdtty, &inbuf[incnt], BUFLEN - incnt);
 			if (rc < 0) {
 				if (errno != EINTR && errno != EAGAIN) {
 					fprintf(stderr, "read() FAILED [%s]\n",
@@ -593,12 +596,117 @@ can2tty(session_t *c)
 				fprintf(stderr, "EOF in read()\n");
 				return;
 			} else {
-				nb += rc;
-				while (detect_str(inbuf, &nb) || remove_null(inbuf, &nb))
+				incnt += rc;
+				while (detect_str(inbuf, &incnt) || remove_nul(inbuf, &incnt))
 					;
 			}
 		}
 
+		/* Wait a while... */
+		if (c->delay)
+			usleep(c->delay);
+	}
+}
+
+/*******************************************************************************
+ *
+ * TTY -> CAN
+ *
+ ******************************************************************************/
+void
+tty2can(session_t *c)
+{
+	int fd = (c->csock > c->fdtty) ? c->csock : c->fdtty;
+	fd_set fdread, fdwrite;
+	struct timeval tv;
+	uint64_t seq = 0;
+	int rc;
+
+	char inbuf[BUFLEN];
+	int incnt = 0;
+
+	char outbuf[BUFLEN];
+	int outcnt = 0, outlen = 0;
+
+	while (1) {
+		tv.tv_sec = TIMEOUT;
+		tv.tv_usec = 0;
+
+		FD_ZERO(&fdread);
+		FD_ZERO(&fdwrite);
+
+		FD_SET(c->csock, &fdread);
+		FD_SET(c->fdtty, &fdread);
+		FD_SET(c->fdtty, &fdwrite);
+
+		rc = select(fd + 1, &fdread, &fdwrite, NULL, &tv);
+		if (rc < 0) {
+			if (errno == EINTR)
+				continue;
+		}
+
+		/* UART disconnected? */
+		if (rc == 0) {
+			fprintf(stderr, "select() TIMED-OUT\n");
+			return;
+		}
+
+		/* Send on Serial UART */
+		if (FD_ISSET(c->fdtty, &fdwrite)) {
+			if (outcnt == outlen) {
+				snprintf(outbuf, BUFLEN, "t%03X8%016jX\r", c->scid, seq++);
+				outcnt = 0;
+				outlen = strlen(outbuf);
+			}
+			rc = write(c->fdtty, &outbuf[outcnt], outlen - outcnt);
+			if (rc < 0) {
+				if (errno != EINTR && errno != EAGAIN) {
+					fprintf(stderr, "write() FAILED [%s]\n",
+						strerror(errno));
+					return;
+				}
+			} else if (rc == 0) {
+				fprintf(stderr, "EOF in write()\n");
+				return;
+			} else {
+				outcnt += rc;
+			}
+		}
+
+		/* Receive on Serial UART */
+		if (FD_ISSET(c->fdtty, &fdread)) {
+			rc = read(c->fdtty, &inbuf[incnt], BUFLEN - incnt);
+			if (rc < 0) {
+				if (errno != EINTR && errno != EAGAIN) {
+					fprintf(stderr, "read() FAILED [%s]\n",
+						strerror(errno));
+					return;
+				}
+			} else if (rc == 0) {
+				fprintf(stderr, "EOF in read()\n");
+				return;
+			} else {
+				/* Nothing to do */
+			}
+		}
+#if 0
+		/* Receive on Can Bus */
+		if (FD_ISSET(c->csock, &fdread)) {
+			rc = canRead(c, inbuf, 8);
+			if (rc < 0) {
+				if (errno != EINTR && errno != EAGAIN) {
+					fprintf(stderr, "read() FAILED [%s]\n",
+						strerror(errno));
+					return;
+				}
+			} else if (rc == 0) {
+				fprintf(stderr, "EOF in read()\n");
+				return;
+			} else {
+				/* FIXME */
+			}
+		}
+#endif
 		/* Wait a while... */
 		if (c->delay)
 			usleep(c->delay);
@@ -620,8 +728,8 @@ usage(const char *msg, int err)
 
 	fprintf(stderr, "Options:\n"
 		" -b N use TTY baud rate N\n"
-		" -d N use microsecond rate delay N\n"
 		" -i N use CAN bus message id N\n"
+		" -m N use microsecond rate delay N\n"
 
 		"\n");
 
@@ -630,7 +738,7 @@ usage(const char *msg, int err)
 
 /*******************************************************************************
  *
- * Can Everybody Can-Can?
+ * Doing the Can-Can...
  *
  ******************************************************************************/
 int
@@ -643,27 +751,27 @@ main(int argc, char **argv)
 
 	session_t c;
 	c.dir = 0;
-	c.cid = 0;
+	c.scid = 0;
 	c.delay = 0;
 
 	opterr = 0;
-	while ((opt = getopt(argc, argv, "b:d:i:")) != -1) {
+	while ((opt = getopt(argc, argv, "b:i:m:")) != -1) {
 		switch (opt) {
 		case 'b':
 			baudrate = strtoul(optarg, NULL, 0);
 			break;
-		case 'd':
-			c.delay = strtoul(optarg, NULL, 0);
-			break;
 		case 'i':
-			c.cid = strtol(optarg, NULL, 0);
+			c.scid = strtoul(optarg, NULL, 0);
+			break;
+		case 'm':
+			c.delay = strtoul(optarg, NULL, 0);
 			break;
 		}
 	}
 	argc -= optind;
 	argv += optind;
-	if (argc < nargs) {
-		usage("Missing args", EX_USAGE);
+	if (argc != nargs) {
+		usage("Invalid args.", EX_USAGE);
 	}
 
 	if (argv[0][0] == '/') {
@@ -690,11 +798,10 @@ main(int argc, char **argv)
 
 	setpriority(PRIO_PROCESS, 0, -20); /* Needs permission to succeed */
 
-	sleep(1);
 	if (c.dir == 0)
 		can2tty(&c);
 	else
-		fprintf(stderr, "Unimplemented\n");
+		tty2can(&c);
 
 	close(c.fdtty);
 	close(c.csock);
