@@ -1,25 +1,25 @@
 /*------------------------------------------------------------------------------
 ;
-; Title:	Can-Can Acts 1 & 2
+; Title:	Do the Can-can Rehearsal
 ;
-; Copyright:	Copyright (c) 2014 The Duke of Welling Town
+; Copyright:    Copyright (c) 2014 Darron M Broad
 ;
 ;------------------------------------------------------------------------------
 
 ;------------------------------------------------------------------------------
-;   This file is part of The Wellington Boot Loader.
+;   This file is part of Can-can.
 ;
-;   The Wellington Boot Loader is free software: you can redistribute it and/or
+;   Can-can is free software: you can redistribute it and/or
 ;   modify it under the terms of the GNU General Public License as published
 ;   by the Free Software Foundation.
 ;
-;   The Wellington Boot Loader is distributed in the hope that it will be
+;   Can-can is distributed in the hope that it will be
 ;   useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ;   GNU General Public License for more details.
 ;
 ;   You should have received a copy of the GNU General Public License along
-;   with The Wellington Boot Loader. If not, see http://www.gnu.org/licenses/
+;   with Can-can. If not, see http://www.gnu.org/licenses/
 ;-----------------------------------------------------------------------------*/
 
 /*
