@@ -202,20 +202,26 @@ INIT
                 CLRF    PIE1
                 CLRF    PIR1
 
-                BANKSEL ANCON0
                 CLRF    ANCON0              ; analog off
-                BANKSEL ANCON1
                 CLRF    ANCON1              ; analog off
 
-                BANKSEL LATA
+                CLRF    ADCON0              ; disable adc
+                CLRF    ADCON1              ; disable adc
+                CLRF    ADCON2              ; disable adc
+
+                CLRF    CM1CON, B
+                CLRF    CM2CON
+
                 CLRF    LATA                ; Init. LEDs
                 CLRF    TRISA
 
                 CLRF    LATB
+                CLRF    TRISB
                 BSF     TRISB,3             ; enable CAN RB3 RX
 
                 CLRF    LATC
-                BSF     TRISC,7             ; enable UART C7
+                CLRF    TRISC
+                BSF     TRISC,7             ; enable UART RC7 RX
 
                 RCALL   INITUART            ; Init. UART
                 RCALL   INITTMR2            ; Init. Timer2
