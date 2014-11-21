@@ -44,7 +44,8 @@ $(AOBJECT):$(AHEADER) Makefile
 	$(AS) $< -o $@
 
 upload:build
-	easy-loader -v /dev/ttyPL2303 $(AOBJECT)
+#	easy-loader -v /dev/ttyPL2303 $(AOBJECT)
+	easy-loader -r -v /dev/ttyUSB0 $(AOBJECT)
 
 install:build
 

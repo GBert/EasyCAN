@@ -28,7 +28,7 @@
 ; Device
 ;------------------------------------------------------------------------------
 
-                PROCESSOR  18f4685
+                PROCESSOR  18f26k80
 
 ;------------------------------------------------------------------------------
 ; Device Constants
@@ -43,7 +43,7 @@
 ;------------------------------------------------------------------------------
 
 ; FCY
-#DEFINE         CLOCK   40000000
+#DEFINE         CLOCK   64000000
 
 ; Baud Rate
 #DEFINE         BRG     ((((CLOCK / 460800) / 2) - 1) / 2)
@@ -105,7 +105,7 @@
 ;  Affects RXPUT, TXGET, do not use elsewhere.
 ;------------------------------------------------------------------------------
 ISR
-                BTG     LATD,0              ; Blink LED 1!
+                BTG     LATA,0              ; Blink LED 1!
 
                 BTFSS   PIR1,RCIF           ; Rx
                 BRA     ISRTX
@@ -127,7 +127,7 @@ ISRTX
                 INCF    TXGET,F
                 BCF     TXGET,7
 ISREND
-                BTG     LATD,1              ; Blink LED 2!
+                BTG     LATA,1              ; Blink LED 2!
 
                 BCF     PIR1,TMR2IF
                 RETFIE  FAST
@@ -137,10 +137,10 @@ ISREND
 ;------------------------------------------------------------------------------
 INITUART
                 MOVLW   (1 << BRG16)
-                MOVWF   BAUDCON
+                MOVWF   BAUDCON1
 
                 MOVLW   HIGH (BRG)
-                MOVWF   SPBRGH
+                MOVWF   SPBRGH1
                 MOVLW   LOW  (BRG)
                 MOVWF   SPBRG
 
@@ -202,8 +202,20 @@ INIT
                 CLRF    PIE1
                 CLRF    PIR1
 
-                CLRF    LATD                ; Init. LEDs
-                CLRF    TRISD
+                BANKSEL ANCON0
+                CLRF    ANCON0              ; analog off
+                BANKSEL ANCON1
+                CLRF    ANCON1              ; analog off
+
+                BANKSEL LATA
+                CLRF    LATA                ; Init. LEDs
+                CLRF    TRISA
+
+                CLRF    LATB
+                BSF     TRISB,3             ; enable CAN RB3 RX
+
+                CLRF    LATC
+                BSF     TRISC,7             ; enable UART C7
 
                 RCALL   INITUART            ; Init. UART
                 RCALL   INITTMR2            ; Init. Timer2
@@ -216,7 +228,7 @@ INIT
 ; Main
 ;------------------------------------------------------------------------------
 MAIN
-                BTG     LATD,2              ; Blink LED 3!
+                BTG     LATA,2              ; Blink LED 3!
 
                 BTFSC   RCSTA,OERR
                 BRA     RXERR
