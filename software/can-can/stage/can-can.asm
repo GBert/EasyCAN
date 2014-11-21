@@ -35,7 +35,7 @@
 ;------------------------------------------------------------------------------
 
 #INCLUDE        "devices.inc"               ; Wellington Boot Loader
-                ERRORLEVEL -302
+                ERRORLEVEL  -302
                 LIST
 
 ;------------------------------------------------------------------------------
@@ -43,16 +43,32 @@
 ;------------------------------------------------------------------------------
 
 ; FCY
-#DEFINE         CLOCK   64000000
-
-; Baud Rate
-#DEFINE         BRG     ((((CLOCK / 460800) / 2) - 1) / 2)
+#DEFINE         CLOCK       64000000
 
 ; TMR2 Interval
-#DEFINE         _10US   (CLOCK / 400000)    ; 100 @ 40 Mhz
-#DEFINE         _13US   (CLOCK / 300000)    ; 133 @ 40 Mhz
-#DEFINE         _15US   (CLOCK / 266666)    ; 150 @ 40 MHz
-#DEFINE         TMR2_PR (_15US)
+#DEFINE         _10US       (CLOCK / 400000)    ; 100 @ 40 Mhz
+#DEFINE         _13US       (CLOCK / 300000)    ; 133 @ 40 Mhz
+#DEFINE         _15US       (CLOCK / 266666)    ; 150 @ 40 MHz
+#DEFINE         TMR2_PR     (_15US)
+
+; Advanced LED Diags.
+#DEFINE         LLED        LATA
+#DEFINE         LTRIS       TRISA
+
+; UART
+#DEFINE         UPIR        PIR1                ; 1 or 3
+#DEFINE         URCIF       RCIF
+#DEFINE         UTXIF       TXIF
+#DEFINE         UTXSTA      TXSTA
+#DEFINE         URCSTA      RCSTA
+#DEFINE         UTXREG      TXREG
+#DEFINE         URCREG      RCREG
+#DEFINE         UBAUDCON    BAUDCON1
+#DEFINE         USPBRGH     SPBRGH1
+#DEFINE         USPBRG      SPBRG
+
+; UART Baud Rate
+#DEFINE         UBAUD       ((((CLOCK / 460800) / 2) - 1) / 2)
 
 ;------------------------------------------------------------------------------
 ; Variables
@@ -105,17 +121,17 @@
 ;  Affects RXPUT, TXGET, do not use elsewhere.
 ;------------------------------------------------------------------------------
 ISR
-                BTG     LATA,0              ; Blink LED 1!
+                BTG     LLED,0              ; Blink LED 1!
 
-                BTFSS   PIR1,RCIF           ; Rx
+                BTFSS   UPIR,URCIF          ; Rx
                 BRA     ISRTX
 
                 MOVF    RXPUT,W
-                MOVFF   RCREG,PLUSW2
+                MOVFF   URCREG,PLUSW2
                 INCF    RXPUT,F
                 BSF     RXPUT,7
 ISRTX
-                BTFSS   PIR1,TXIF           ; Tx
+                BTFSS   UPIR,UTXIF          ; Tx
                 BRA     ISREND
 
                 MOVF    TXGET,W
@@ -123,13 +139,13 @@ ISRTX
                 BZ      ISREND
 
                 MOVF    TXGET,W
-                MOVFF   PLUSW2,TXREG
+                MOVFF   PLUSW2,UTXREG
                 INCF    TXGET,F
                 BCF     TXGET,7
 ISREND
-                BTG     LATA,1              ; Blink LED 2!
+                BTG     LLED,2              ; Blink LED 2!
 
-                BCF     PIR1,TMR2IF
+                BCF     PIR1,TMR2IF         ; Clear TMR2 ISR
                 RETFIE  FAST
 
 ;------------------------------------------------------------------------------
@@ -137,27 +153,27 @@ ISREND
 ;------------------------------------------------------------------------------
 INITUART
                 MOVLW   (1 << BRG16)
-                MOVWF   BAUDCON1
+                MOVWF   UBAUDCON
 
-                MOVLW   HIGH (BRG)
-                MOVWF   SPBRGH1
-                MOVLW   LOW  (BRG)
-                MOVWF   SPBRG
+                MOVLW   HIGH (UBAUD)
+                MOVWF   USPBRGH
+                MOVLW   LOW  (UBAUD)
+                MOVWF   USPBRG
 
                 ; Enable transmit + high speed mode
                 MOVLW   (1 << TXEN) + (1 << BRGH)
-                MOVWF   TXSTA
+                MOVWF   UTXSTA
 INITUARTAGAIN
                 ; Enable serial port
                 MOVLW   (1 << SPEN)
-                MOVWF   RCSTA
+                MOVWF   URCSTA
 
                 ; Enable receiver
-                BSF     RCSTA,CREN
+                BSF     URCSTA,CREN
 
-                MOVF    RCREG,W
-                MOVF    RCREG,W
-                MOVF    RCREG,W
+                MOVF    URCREG,W
+                MOVF    URCREG,W
+                MOVF    URCREG,W
 
                 RETURN
 
@@ -202,26 +218,8 @@ INIT
                 CLRF    PIE1
                 CLRF    PIR1
 
-                CLRF    ANCON0              ; analog off
-                CLRF    ANCON1              ; analog off
-
-                CLRF    ADCON0              ; disable adc
-                CLRF    ADCON1              ; disable adc
-                CLRF    ADCON2              ; disable adc
-
-                CLRF    CM1CON, B
-                CLRF    CM2CON
-
-                CLRF    LATA                ; Init. LEDs
-                CLRF    TRISA
-
-                CLRF    LATB
-                CLRF    TRISB
-                BSF     TRISB,3             ; enable CAN RB3 RX
-
-                CLRF    LATC
-                CLRF    TRISC
-                BSF     TRISC,7             ; enable UART RC7 RX
+                CLRF    LLED                ; Init. LEDs
+                CLRF    LTRIS
 
                 RCALL   INITUART            ; Init. UART
                 RCALL   INITTMR2            ; Init. Timer2
@@ -234,12 +232,12 @@ INIT
 ; Main
 ;------------------------------------------------------------------------------
 MAIN
-                BTG     LATA,2              ; Blink LED 3!
+                BTG     LLED,1              ; Blink LED 3!
 
-                BTFSC   RCSTA,OERR
+                BTFSC   URCSTA,OERR
                 BRA     RXERR
 
-                BTFSC   RCSTA,FERR
+                BTFSC   URCSTA,FERR
                 BRA     RXERR
 
                 RCALL   RXGETW
@@ -248,6 +246,8 @@ MAIN
                 RCALL   TXPUTW
                 BRA     MAIN
 RXERR
+                BTG     LLED,3              ; Blink LED 4!
+
                 RCALL   INITUARTAGAIN
                 BRA     MAIN
 

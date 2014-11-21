@@ -99,6 +99,7 @@ openDevice(const char *dev, speed_t speed)
 {
 	int fd;
 	struct termios options;
+	int status, arg;
 
 	fd = open(dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (fd < 0) {
@@ -163,6 +164,10 @@ openDevice(const char *dev, speed_t speed)
 		close(fd);
 		return -1;
 	}
+        status = ioctl(fd, TIOCMGET, &arg);
+        arg &= ~TIOCM_RTS;
+        ioctl(fd, TIOCMSET, &arg);
+
 
 	return fd;
 }
@@ -539,9 +544,13 @@ detect_str(char *inbuf, int *incnt)
 		inbuf[i++] = '\0';
 		(*incnt) -= i;
 		assert(*incnt >= 0 && *incnt < BUFLEN);
-				
+#if 0				
 		if (inbuf[0] == 't' && i == 22)
 			process_str(inbuf);
+#endif
+	if (strcmp(inbuf, "Hello world!") != 0)
+		printf("ERROR!\n");
+	count_str();
 
 		memmove(inbuf, &inbuf[i], *incnt);
 	}
@@ -602,10 +611,11 @@ can2can(session_t *c)
 
 		FD_ZERO(&fdread);
 		FD_ZERO(&fdwrite);
-
+#if 0
 		FD_SET(c->csock, &fdread);
-		FD_SET(c->fdtty, &fdread);
 		FD_SET(c->csock, &fdwrite);
+#endif
+		FD_SET(c->fdtty, &fdread);
 		FD_SET(c->fdtty, &fdwrite);
 
 		rc = select(fd + 1, &fdread, &fdwrite, NULL, &tv);
@@ -623,7 +633,8 @@ can2can(session_t *c)
 		/* Send on Serial UART */
 		if (FD_ISSET(c->fdtty, &fdwrite)) {
 			if (outcnt == outlen) {
-				snprintf(outbuf, BUFLEN, "t%03X8%016jX\r", c->scid, ttyseq++);
+				//snprintf(outbuf, BUFLEN, "t%03X8%016jX\r", c->scid, ttyseq++);
+				snprintf(outbuf, BUFLEN, "Hello world!\r");
 				outcnt = 0;
 				outlen = strlen(outbuf);
 			}
@@ -783,6 +794,7 @@ main(int argc, char **argv)
 
 	setpriority(PRIO_PROCESS, 0, -20); /* Needs permission to succeed */
 
+	sleep(1);
 	can2can(&c);
 
 	close(c.fdtty);
