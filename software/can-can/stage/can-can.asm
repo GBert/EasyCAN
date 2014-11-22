@@ -34,7 +34,7 @@
 ; Device Constants
 ;------------------------------------------------------------------------------
 
-#INCLUDE        "devices.inc"               ; Wellington Boot Loader
+#INCLUDE        "devices.inc"                   ; Wellington Boot Loader
                 ERRORLEVEL  -302
                 LIST
 
@@ -81,6 +81,7 @@
                 TXPUT   : 1
 
                 TEMP1   : 1
+                TEMP2   : 1
                 ENDC
 
 ;0100:  80 81 82 83 84 85 86 87 88 89 8a 8b 8c 8d 8e 8f    ................
@@ -143,7 +144,7 @@ ISRTX
                 INCF    TXGET,F
                 BCF     TXGET,7
 ISREND
-                BTG     LLED,2              ; Blink LED 2!
+                BTG     LLED,1              ; Blink LED 2!
 
                 BCF     PIR1,TMR2IF         ; Clear TMR2 ISR
                 RETFIE  FAST
@@ -232,7 +233,7 @@ INIT
 ; Main
 ;------------------------------------------------------------------------------
 MAIN
-                BTG     LLED,1              ; Blink LED 3!
+                BTG     LLED,2              ; Blink LED 3!
 
                 BTFSC   URCSTA,OERR
                 BRA     RXERR
@@ -281,6 +282,53 @@ TXPUTW
                 INCF    TXPUT,F
                 BCF     TXPUT,7
 
+                RETURN
+
+;------------------------------------------------------------------------------
+; ASCII hexadecimal to binary, by Peter F.
+;
+; Convert 2 hex ASCII characters to an 8-bit value.
+;
+; ASCII stored in TEMP1/2, result returned in W, TEMP1/2 are unchanged.
+;------------------------------------------------------------------------------
+ASCII2BYTE
+                SWAPF   TEMP1,W             ; swap hi nibble into result
+                BTFSC   TEMP1,6             ; check if in range 'A'-'F'
+                ADDLW   0x8F                ; add correction SWAPF ('1'-'A'+1)
+                ADDWF   TEMP2,W             ; add lo nibble
+                BTFSC   TEMP2,6             ; check if in range 'A'-'F'
+                ADDLW   0xF9                ; add correction '9'-'A'+1
+                ADDLW   0xCD                ; adjust final result -0x33
+                RETURN
+
+;------------------------------------------------------------------------------
+; 8 Bit Binary to 2 ASCII digits, by Scott Dattalo
+;
+; Take a number in the range of 0x00 to 0xFF in W and output two ASCII
+; characters, the most significant character into CHAR_HI and the least
+; significant into W. No other registers can be used.
+;------------------------------------------------------------------------------
+BYTE2ASCII
+                MOVWF   TEMP1
+                SWAPF   TEMP1,W
+
+                ANDLW   0x0f
+                ADDLW   6
+                BTFSC   STATUS,DC
+                ADDLW   'A'-('9'+1)
+                ADDLW   '0'-6
+
+                XORWF   TEMP1,W
+                XORWF   TEMP1,F
+                XORWF   TEMP1,W
+
+                ANDLW   0x0f
+                ADDLW   6
+                BTFSC   STATUS,DC
+                ADDLW   'A'-('9'+1)
+                ADDLW   '0'-6
+
+                MOVWF   TEMP2
                 RETURN
 
 ;------------------------------------------------------------------------------
