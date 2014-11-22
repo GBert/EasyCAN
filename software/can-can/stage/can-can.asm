@@ -42,14 +42,16 @@
 ; MCU Settings
 ;------------------------------------------------------------------------------
 
-; FCY
+; Clock Rates
 #DEFINE         CLOCK       64000000
+#DEFINE         TCY         (CLOCK / 4)
+#DEFINE         BAUDRATE    (460800)
 
-; TMR2 Interval
-#DEFINE         _10US       (CLOCK / 400000)    ; 100 @ 40 Mhz
-#DEFINE         _13US       (CLOCK / 300000)    ; 133 @ 40 Mhz
-#DEFINE         _15US       (CLOCK / 266666)    ; 150 @ 40 MHz
-#DEFINE         TMR2_PR     (_15US)
+; TMR2 Interval. 1:1 Postscale, Prescaler 16.
+;
+; PR = (TCY / (BAUDRATE / 10) / SCALER) - 1
+;
+#DEFINE         TMR2_PR     (TCY / (BAUDRATE / 10) / 16) - 1
 
 ; Advanced LED Diags.
 #DEFINE         LLED        LATA
@@ -57,6 +59,7 @@
 
 ; UART
 #DEFINE         UPIR        PIR1                ; 1 or 3
+#DEFINE         UPIE        PIE1                ; Unused
 #DEFINE         URCIF       RCIF
 #DEFINE         UTXIF       TXIF
 #DEFINE         UTXSTA      TXSTA
@@ -68,17 +71,22 @@
 #DEFINE         USPBRG      SPBRG
 
 ; UART Baud Rate
-#DEFINE         UBAUD       ((((CLOCK / 460800) / 2) - 1) / 2)
+#DEFINE         UBAUD       ((((CLOCK / BAUDRATE) / 2) - 1) / 2)
+
+; SLCAND Protocol
+#DEFINE         EOLNCHAR    0x0D                ; CR
 
 ;------------------------------------------------------------------------------
 ; Variables
 ;------------------------------------------------------------------------------
 
                 CBLOCK  0x0000
-                RXGET   : 1
+                RXGET   : 1                     ; Rx Ring
                 RXPUT   : 1
-                TXGET   : 1
+                TXGET   : 1                     ; Tx Ring
                 TXPUT   : 1
+
+                EOLNCNT : 1                     ; EOLN Counter
 
                 TEMP1   : 1
                 TEMP2   : 1
@@ -119,34 +127,37 @@
 ;------------------------------------------------------------------------------
 ; ISR
 ; 
-;  Affects RXPUT, TXGET, do not use elsewhere.
+;  Affects RXPUT, TXGET & uses FSR2; do not use these elsewhere.
 ;------------------------------------------------------------------------------
 ISR
                 BTG     LLED,0              ; Blink LED 1!
 
-                BTFSS   UPIR,URCIF          ; Rx
-                BRA     ISRTX
-
-                MOVF    RXPUT,W
-                MOVFF   URCREG,PLUSW2
-                INCF    RXPUT,F
-                BSF     RXPUT,7
-ISRTX
-                BTFSS   UPIR,UTXIF          ; Tx
-                BRA     ISREND
-
-                MOVF    TXGET,W
+                MOVF    TXGET,W             ; Data?
                 XORWF   TXPUT,W
-                BZ      ISREND
+                BZ      ISRRX
+
+                BTFSS   UPIR,UTXIF          ; Tx?
+                BRA     ISRRX
 
                 MOVF    TXGET,W
                 MOVFF   PLUSW2,UTXREG
                 INCF    TXGET,F
                 BCF     TXGET,7
-ISREND
-                BTG     LLED,1              ; Blink LED 2!
+ISRRX
+                BTFSS   UPIR,URCIF          ; Rx?
+                BRA     ISREND
 
-                BCF     PIR1,TMR2IF         ; Clear TMR2 ISR
+                MOVF    RXPUT,W
+                MOVFF   URCREG,PLUSW2
+                INCF    RXPUT,F
+                BSF     RXPUT,7
+
+                MOVF    PLUSW2,W            ; EOLN?
+                XORLW   EOLNCHAR
+                BNZ     ISREND
+                INCF    EOLNCNT
+ISREND
+                BCF     PIR1,TMR2IF         ; Reset TMR2 ISR
                 RETFIE  FAST
 
 ;------------------------------------------------------------------------------
@@ -161,15 +172,15 @@ INITUART
                 MOVLW   LOW  (UBAUD)
                 MOVWF   USPBRG
 
-                ; Enable transmit + high speed mode
+                ; Enable Transmit + High Speed Mode
                 MOVLW   (1 << TXEN) + (1 << BRGH)
                 MOVWF   UTXSTA
 INITUARTAGAIN
-                ; Enable serial port
+                ; Enable Serial Port
                 MOVLW   (1 << SPEN)
                 MOVWF   URCSTA
 
-                ; Enable receiver
+                ; Enable Receiver
                 BSF     URCSTA,CREN
 
                 MOVF    URCREG,W
@@ -179,15 +190,16 @@ INITUARTAGAIN
                 RETURN
 
 ;------------------------------------------------------------------------------
-; Init. TMR2
+; Init. TMR2. 1:1 Postscale, Prescaler 16.
 ;------------------------------------------------------------------------------
 INITTMR2
-                CLRF    T2CON
                 CLRF    TMR2               
                 MOVLW   TMR2_PR
                 MOVWF   PR2
 
-                BSF     T2CON,TMR2ON
+                MOVLW   (1 << TMR2ON) + (1 << T2CKPS1)
+                MOVWF   T2CON
+
                 BSF     PIR1,TMR2IF
                 BSF     PIE1,TMR2IE
 
@@ -197,6 +209,8 @@ INITTMR2
 ; Init. Rx/Tx Ring
 ;------------------------------------------------------------------------------
 INITRING
+                CLRF    EOLNCNT             ; Reset EOLN Counter
+
                 LFSR    2,TXBUF             ; FSR2 H/L Reserved for Ring
 
                 MOVLW   0x80                ; Rx Index 0
@@ -233,19 +247,30 @@ INIT
 ; Main
 ;------------------------------------------------------------------------------
 MAIN
-                BTG     LLED,2              ; Blink LED 3!
+                BTG     LLED,1              ; Blink LED 2!
 
                 BTFSC   URCSTA,OERR
                 BRA     RXERR
 
                 BTFSC   URCSTA,FERR
                 BRA     RXERR
+HELLOWORLD
+                MOVF    EOLNCNT,W
+                BZ      MAIN
+
+                BTG     LLED,2              ; Blink LED 3!
 
                 RCALL   RXGETW
                 BZ      MAIN
  
                 RCALL   TXPUTW
+
+                XORLW   EOLNCHAR
+                BNZ     HELLOWORLD
+
+                DECF    EOLNCNT
                 BRA     MAIN
+
 RXERR
                 BTG     LLED,3              ; Blink LED 4!
 
@@ -282,6 +307,7 @@ TXPUTW
                 INCF    TXPUT,F
                 BCF     TXPUT,7
 
+                MOVF    TEMP1,W
                 RETURN
 
 ;------------------------------------------------------------------------------
@@ -302,7 +328,7 @@ ASCII2BYTE
                 RETURN
 
 ;------------------------------------------------------------------------------
-; 8 Bit Binary to 2 ASCII digits, by Scott Dattalo
+; 8 Bit Binary to 2 ASCII digits, by Scott Dattalo.
 ;
 ; Take a number in the range of 0x00 to 0xFF in W and output two ASCII
 ; characters, the most significant character into CHAR_HI and the least
