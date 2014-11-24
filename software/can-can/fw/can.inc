@@ -46,15 +46,12 @@
 #DEFINE         EXTDATA     'T'
 #DEFINE         EXTRTR      'r'
 
-; CANCON bits missing for PIC18FXXK80
+; Bits missing for PIC18FXXK80
 ;
 #IFNDEF REQOP0
 REQOP0          EQU     H'0005'
 REQOP1          EQU     H'0006'
 REQOP2          EQU     H'0007'
-#ENDIF
-
-#IFNDEF RXB0DBEN
 RXB0DBEN        EQU     H'0002'
 #ENDIF
 
@@ -67,28 +64,24 @@ RXB0DBEN        EQU     H'0002'
 #DEFINE         CAN_WIN_TXB1 0x06           ; 011X
 #DEFINE         CAN_WIN_TXB2 0x04           ; 010X
 
-; 125kbaud @ 40MHz
-;
-;#DEFINE         BRG1    0x09
-;#DEFINE         BRG2    0xBC
-;#DEFINE         BRG3    0x01
+#IF CLOCK == 40000000
+    ; 125kbaud
+    ;#DEFINE         BRG1    0x09
+    ;#DEFINE         BRG2    0xBC
+    ;#DEFINE         BRG3    0x01
 
-; 250kbaud @ 40MHz
-;
-;#DEFINE BRG1 0x04
-;#DEFINE BRG2 0xBC
-;#DEFINE BRG3 0x01
+    ; 250kbaud
+    #DEFINE BRG1 0x04
+    #DEFINE BRG2 0xBC
+    #DEFINE BRG3 0x01
+#ENDIF
 
-; X kbaud @ 64MHz
-;
-;#DEFINE BRG1 0x01          ; 1000 kbaud
-;#DEFINE BRG1 0x03          ;  500 kbaud
-#DEFINE BRG1 0x07          ;  250 kbaud
-;#DEFINE BRG1 0x0f          ;  125 kbaud
-;#DEFINE BRG1 0x13          ;  100 kbaud
-;#DEFINE BRG1 0x27          ;   50 kbaud
-#DEFINE BRG2 0xBC
-#DEFINE BRG3 0x01
+#IF CLOCK == 64000000
+    ; 250kbaud
+    #DEFINE BRG1 0x07
+    #DEFINE BRG2 0xBC
+    #DEFINE BRG3 0x01
+#ENDIF
 
 ; MCHP CAN ID
 ;

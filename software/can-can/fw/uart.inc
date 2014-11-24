@@ -20,21 +20,28 @@
 ; UART settings
 ;------------------------------------------------------------------------------
 
-; UART Baud Rate
-#DEFINE         BAUDRATE    (460800)
-
 ; UART
-#DEFINE         UPIR        PIR1                ; 1 or 3
-#DEFINE         UPIE        PIE1                ; Unused
-#DEFINE         URCIF       RCIF
-#DEFINE         UTXIF       TXIF
-#DEFINE         UTXSTA      TXSTA
-#DEFINE         URCSTA      RCSTA
-#DEFINE         UTXREG      TXREG
-#DEFINE         URCREG      RCREG
-#DEFINE         UBAUDCON    BAUDCON1
-#DEFINE         USPBRGH     SPBRGH1
-#DEFINE         USPBRG      SPBRG
+#IFDEF UART1
+    #DEFINE     UPIR        PIR1
+    #DEFINE     UPIE        PIE1
+    #DEFINE     URCIF       RCIF
+    #DEFINE     UTXIF       TXIF
+    #DEFINE     UTXSTA      TXSTA
+    #DEFINE     URCSTA      RCSTA
+    #DEFINE     UTXREG      TXREG
+    #DEFINE     URCREG      RCREG
+    #IFNDEF TXREG1
+        #DEFINE UBAUDCON    BAUDCON
+        #DEFINE USPBRGH     SPBRGH
+    #ELSE
+        #DEFINE UBAUDCON    BAUDCON1
+        #DEFINE USPBRGH     SPBRGH1
+    #ENDIF
+    #DEFINE     USPBRG      SPBRG
+#ENDIF
+
+#IFDEF UART2
+#ENDIF
 
 ; UART Baud Rate Generator
 #DEFINE         UBAUD       ((((CLOCK / BAUDRATE) / 2) - 1) / 2)

@@ -23,8 +23,8 @@ WELLINGTON:=../../wellington/include
 
 AS:=gpasm -a inhx32 -e on -I $(WELLINGTON)
 
-ASOURCE:=firmware.asm
-AHEADER:=ascii.inc can.inc ring.inc timer.inc uart.inc
+ASOURCE:=$(filter-out template.asm, $(wildcard *.asm))
+AHEADER:=$(wildcard *.inc)
 AOBJECT:=$(ASOURCE:.asm=.hex)
 
 build:$(AOBJECT)
@@ -36,8 +36,7 @@ $(AOBJECT):$(AHEADER) Makefile
 	$(AS) $< -o $@
 
 upload:build
-#	easy-loader -v /dev/ttyPL2303 $(AOBJECT)
-	easy-loader -r -v /dev/ttyUSB0 $(AOBJECT)
+	easy-loader -v /dev/ttyPL2303 $(AOBJECT)
 
 install:build
 

@@ -91,7 +91,6 @@ openDevice(const char *dev, speed_t speed)
 {
 	int fd;
 	struct termios options;
-	int arg, status;
 
 	fd = open(dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (fd < 0) {
@@ -128,13 +127,7 @@ openDevice(const char *dev, speed_t speed)
 	 *  `slcand'
 	 */
 
-	if (tcgetattr(fd, &options) < 0) {
-		close(fd);
-		return -1;
-	}
-
  	cfmakeraw(&options);
-
 	options.c_cflag &= ~(CRTSCTS);
 	options.c_iflag &= ~(IXOFF);
 
@@ -156,9 +149,6 @@ openDevice(const char *dev, speed_t speed)
 		close(fd);
 		return -1;
 	}
-	status = ioctl(fd, TIOCMGET, &arg);
-	arg &= ~TIOCM_RTS;
-	ioctl(fd, TIOCMSET, &arg);
 
 	return fd;
 }
@@ -412,23 +402,22 @@ dump_hex(uint8_t *s, int n)
  *
  ******************************************************************************/
 static void
-count_pps(char *instr, uint32_t *count)
+count_pps(char *instr, uint32_t *count, struct timeval *tv1)
 {
-	static struct timeval tv1 = {0};
 	struct timeval tv2, tv3;
 	double pps;
 
-	if ((*count) == 0) {
-		gettimeofday(&tv1, NULL);
-		(*count) = 1;
+	if (*count == 0) {
+		gettimeofday(tv1, NULL);
+		*count = 1;
 	} else {
 		gettimeofday(&tv2, NULL);
-		timersub(&tv2, &tv1, &tv3);
+		timersub(&tv2, tv1, &tv3);
 		if (tv3.tv_sec >= 1) {
 			pps = (double)(*count) /
 				((double)tv3.tv_sec + tv3.tv_usec / 1000000.);
 			printf("%s %.2f pps\n", instr, pps);
-			(*count) = 0;
+			*count = 0;
 		} else {
 			(*count)++;
 		}
@@ -443,6 +432,7 @@ count_pps(char *instr, uint32_t *count)
 static inline void
 uartinput_process(uint8_t *inbuf)
 {
+	static struct timeval tv = {0};
 	static uint32_t count = 0;
 	static uint64_t prev = -1;
 	uint64_t this = 0;
@@ -455,7 +445,7 @@ uartinput_process(uint8_t *inbuf)
 
 	prev = this;
 
-	count_pps("[CAN OUT/UART IN]", &count);
+	count_pps("[CAN OUT/UART IN]", &count, &tv);
 }
 
 /*******************************************************************************
@@ -537,6 +527,7 @@ uartinput_nul(uint8_t *inbuf, int *incnt)
 static inline void
 caninput_str(uint8_t *canbuf, uint8_t cancnt)
 {
+	static struct timeval tv = {0};
 	static uint32_t count = 0;
 	static uint64_t prev = -1;
 	uint64_t this = 0;
@@ -550,7 +541,7 @@ caninput_str(uint8_t *canbuf, uint8_t cancnt)
 
 	prev = this;
 
-	count_pps("[UART OUT/CAN IN]", &count);
+	count_pps("[UART OUT/CAN IN]", &count, &tv);
 }
 
 /*******************************************************************************
@@ -771,8 +762,6 @@ main(int argc, char **argv)
 		fprintf(stderr, "Failed to open tty device [%s].\n", ttydev);
 		exit(EX_OSERR);
 	}
-	sleep(2);
-	printf("start load ...\n");
 
 	can2can(&c);
 
