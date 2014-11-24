@@ -1,26 +1,18 @@
-/*------------------------------------------------------------------------------
-;
-; Title:	Do the Can-can Rehearsal
-;
-; Copyright:    Copyright (c) 2014 Darron M Broad
-;
-;------------------------------------------------------------------------------
-
-;------------------------------------------------------------------------------
-;   This file is part of Can-can.
-;
-;   Can-can is free software: you can redistribute it and/or
-;   modify it under the terms of the GNU General Public License as published
-;   by the Free Software Foundation.
-;
-;   Can-can is distributed in the hope that it will be
-;   useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-;   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-;   GNU General Public License for more details.
-;
-;   You should have received a copy of the GNU General Public License along
-;   with Can-can. If not, see http://www.gnu.org/licenses/
-;-----------------------------------------------------------------------------*/
+/******************************************************************************
+ 
+  Can-Can test application
+ 
+  Copyright (c) 2014 Darron M Broad
+ 
+*******************************************************************************
+ 
+  This file is part of the Can-Can CAN bus interface project.
+ 
+  Can-Can is licensed under the CC BY-NC-SA 4.0.
+ 
+  See file /LICENSE for details.
+  
+******************************************************************************/
 
 /*
  * DISCLAIMER:
@@ -94,12 +86,12 @@ typedef struct {
  * Open serial device
  *
  ******************************************************************************/
-int
+static int
 openDevice(const char *dev, speed_t speed)
 {
 	int fd;
 	struct termios options;
-	int status, arg;
+	int arg, status;
 
 	fd = open(dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (fd < 0) {
@@ -164,10 +156,10 @@ openDevice(const char *dev, speed_t speed)
 		close(fd);
 		return -1;
 	}
-        status = ioctl(fd, TIOCMGET, &arg);
-        arg &= ~TIOCM_RTS;
-        ioctl(fd, TIOCMSET, &arg);
 
+	status = ioctl(fd, TIOCMGET, &arg);
+	arg &= ~TIOCM_RTS;
+	ioctl(fd, TIOCMSET, &arg);
 
 	return fd;
 }
@@ -186,7 +178,7 @@ openDevice(const char *dev, speed_t speed)
  *      921600, 1228800, 2457600, 3000000, 6000000
  *
  ******************************************************************************/
-speed_t
+static speed_t
 serial_speed(uint32_t baudrate)
 {
 	static baudrate_t rates[] = {
@@ -286,7 +278,7 @@ serial_speed(uint32_t baudrate)
  * Open Linux CAN socket
  *
  ******************************************************************************/
-int
+static int
 openCanSock(const char *dev)
 {
 #ifdef __linux
@@ -333,7 +325,7 @@ openCanSock(const char *dev)
  *	ip link set can0 txqueuelen 1024
  *
  ******************************************************************************/
-int
+static int
 canWrite(session_t *c, uint8_t *inbuf, int buflen)
 {
 #ifdef __linux
@@ -368,7 +360,7 @@ canWrite(session_t *c, uint8_t *inbuf, int buflen)
  * Read message from Linux CAN socket
  *
  ******************************************************************************/
-int
+static int
 canRead(session_t *c, uint8_t *inbuf, int buflen)
 {
 #ifdef __linux
@@ -400,46 +392,28 @@ canRead(session_t *c, uint8_t *inbuf, int buflen)
 
 /*******************************************************************************
  *
- * Read Hex Nibble
- *
- ******************************************************************************/
-uint8_t
-hex2nib(char c)
-{
-	uint8_t n = 0;
-
-	if (c >= 'a' && c <= 'f') {
-		 n = c - 'a' + 10;
-	}
-	else if (c >= 'A' && c <= 'F') {
-		 n = c - 'A' + 10;
-	}
-	else if (c >= '0' && c <= '9') {
-		 n = c - '0';
-	}
-	return n;
-}
-
-/*******************************************************************************
- *
- * Read Hex Byte
- *
- ******************************************************************************/
-static inline uint8_t
-hex2byt(char *s)
-{
-	return hex2nib(s[0]) << 4 | hex2nib(s[1]);
-}
-
-/*******************************************************************************
- *
- * Count Strings
- *
- *  Display packets per second.
+ * Dump Bytes as Hex
  *
  ******************************************************************************/
 static inline void
-count_str(void)
+dump_hex(uint8_t *s, int n)
+{
+	int i = 0;
+
+	while (i < n) {
+		printf("0x%02X ", s[i]);
+		i++;
+	}
+	printf("\n");
+}
+
+/*******************************************************************************
+ *
+ * Count & Display packets per second
+ *
+ ******************************************************************************/
+static void
+count_pps(char *instr)
 {
 	static struct timeval tv1 = {0};
 	static uint32_t count = 0;
@@ -455,7 +429,7 @@ count_str(void)
 		if (tv3.tv_sec >= 1) {
 			pps = (double)count /
 				((double)tv3.tv_sec + tv3.tv_usec / 1000000.);
-			printf("%.2f pps\n", pps);
+			printf("%s %.2f pps\n", instr, pps);
 			count = 0;
 		} else {
 			count++;
@@ -465,39 +439,33 @@ count_str(void)
 
 /*******************************************************************************
  *
- * Process String t0008B905000000000000
+ * Process UART Input; Eg. t0008B905000000000000
  *
  ******************************************************************************/
 static inline void
-process_str(char *s)
+uartinput_process(uint8_t *inbuf)
 {
-	static int64_t prev = -1;
-	int64_t this = 0;
+	static uint64_t prev = -1;
+	uint64_t this = 0;
+	uint32_t id = 0;
 
-	int i = 5, j = 0;
-	uint8_t *p = (uint8_t *)&this;
-
-	while (j < 8) {
-		p[j++] = hex2byt(&s[i]);
-		i += 2;
-	}
+	sscanf((char *)inbuf, "t%03X8%016jX\r", &id, &this);
 
 	if (this != (prev + 1))
-		printf("[%s] %jd != %jd\n", s, this, prev + 1);
+		printf("[CAN OUT/UART IN] 0x%016jX != 0x%016jX (%s)\n", this, prev + 1, inbuf);
 
 	prev = this;
 
-	count_str();
+	count_pps("[CAN OUT/UART IN]");
 }
-
 
 /*******************************************************************************
  *
  * `strchr' with length limit
  *
  ******************************************************************************/
-char *
-strnchr(char *s, char c, int n)
+static uint8_t *
+strnchr(uint8_t *s, uint8_t c, int n)
 {
 	int i = 0;
 
@@ -511,30 +479,13 @@ strnchr(char *s, char c, int n)
 
 /*******************************************************************************
  *
- * Dump String as Hex
+ * Detect String on UART Input and Process
  *
  ******************************************************************************/
-void
-dump_str(char *s, int n)
+static inline uint8_t *
+uartinput_str(uint8_t *inbuf, int *incnt)
 {
-	int i = 0;
-
-	while (i < n) {
-		printf("0x%02X ", s[i]);
-		i++;
-	}
-	printf("\n");
-}
-
-/*******************************************************************************
- *
- * Detect String and Process
- *
- ******************************************************************************/
-static inline char *
-detect_str(char *inbuf, int *incnt)
-{
-	char *cp;
+	uint8_t *cp;
 	int i;
 
 	if ((cp = strnchr(inbuf, '\r', *incnt)) != NULL) {
@@ -544,13 +495,9 @@ detect_str(char *inbuf, int *incnt)
 		inbuf[i++] = '\0';
 		(*incnt) -= i;
 		assert(*incnt >= 0 && *incnt < BUFLEN);
-#if 0				
+
 		if (inbuf[0] == 't' && i == 22)
-			process_str(inbuf);
-#endif
-	if (strcmp(inbuf, "Hello world!") != 0)
-		printf("ERROR!\n");
-	count_str();
+			uartinput_process(inbuf);
 
 		memmove(inbuf, &inbuf[i], *incnt);
 	}
@@ -559,15 +506,15 @@ detect_str(char *inbuf, int *incnt)
 
 /*******************************************************************************
  *
- * Detect Error and Remove
+ * Detect Error on UART Input and Remove
  *
  *  Linux will insert a NUL when an error is detected.
  *
  ******************************************************************************/
-static inline char *
-remove_nul(char *inbuf, int *incnt)
+static inline uint8_t *
+uartinput_nul(uint8_t *inbuf, int *incnt)
 {
-	char *cp;
+	uint8_t *cp;
 	int i;
 
 	if ((cp = memchr(inbuf, '\0', *incnt)) != NULL) {
@@ -585,7 +532,30 @@ remove_nul(char *inbuf, int *incnt)
 
 /*******************************************************************************
  *
- * CAN <-> CAN
+ * Inspect Packet on CAN Input and Process
+ *
+ ******************************************************************************/
+static inline void
+caninput_str(uint8_t *canbuf, uint8_t cancnt)
+{
+	static uint64_t prev = -1;
+	uint64_t this = 0;
+	uint8_t i = 0;
+
+	while (i < cancnt)
+		this = (this << 8) | canbuf[i++];
+
+	if (this != (prev + 1))
+		printf("[UART OUT/CAN IN] 0x%016jX != 0x%016jX\n", this, prev + 1);
+
+	prev = this;
+
+	count_pps("[UART OUT/CAN IN]");
+}
+
+/*******************************************************************************
+ *
+ * CAN - CAN
  *
  ******************************************************************************/
 void
@@ -594,16 +564,20 @@ can2can(session_t *c)
 	int fd = (c->csock > c->fdtty) ? c->csock : c->fdtty;
 	fd_set fdread, fdwrite;
 	struct timeval tv;
-	uint64_t ttyseq = 0, canseq = 0;
-	int rc;
+	uint64_t ttyseq = 0, this, canseq = 0;
+	int rc, i, j = 0;
 
-	char inbuf[BUFLEN];
+	uint8_t inbuf[BUFLEN];
 	int incnt = 0;
 
-	char outbuf[BUFLEN];
+	uint8_t outbuf[BUFLEN];
 	int outcnt = 0, outlen = 0;
 
-	char canbuf[BUFLEN];
+	uint8_t canbuf[BUFLEN];
+
+	bzero(inbuf, BUFLEN);
+	bzero(outbuf, BUFLEN);
+	bzero(canbuf, BUFLEN);
 
 	while (1) {
 		tv.tv_sec = TIMEOUT;
@@ -611,12 +585,17 @@ can2can(session_t *c)
 
 		FD_ZERO(&fdread);
 		FD_ZERO(&fdwrite);
-#if 0
-		FD_SET(c->csock, &fdread);
-		FD_SET(c->csock, &fdwrite);
-#endif
-		FD_SET(c->fdtty, &fdread);
-		FD_SET(c->fdtty, &fdwrite);
+
+		if (j == 0) {
+			/* CAN OUT/UART IN */
+			FD_SET(c->csock, &fdwrite);
+			FD_SET(c->fdtty, &fdread);
+		} else {
+			/* UART OUT/CAN IN */
+			FD_SET(c->fdtty, &fdwrite);
+			FD_SET(c->csock, &fdread);
+		}
+		j = 1 - j;
 
 		rc = select(fd + 1, &fdread, &fdwrite, NULL, &tv);
 		if (rc < 0) {
@@ -633,10 +612,9 @@ can2can(session_t *c)
 		/* Send on Serial UART */
 		if (FD_ISSET(c->fdtty, &fdwrite)) {
 			if (outcnt == outlen) {
-				//snprintf(outbuf, BUFLEN, "t%03X8%016jX\r", c->scid, ttyseq++);
-				snprintf(outbuf, BUFLEN, "Hello world!\r");
+				snprintf((char *)outbuf, BUFLEN, "t%03X8%016jX\r", c->scid, ttyseq++);
 				outcnt = 0;
-				outlen = strlen(outbuf);
+				outlen = strlen((char *)outbuf);
 			}
 			rc = write(c->fdtty, &outbuf[outcnt], outlen - outcnt);
 			if (rc < 0) {
@@ -667,14 +645,19 @@ can2can(session_t *c)
 				return;
 			} else {
 				incnt += rc;
-				while (detect_str(inbuf, &incnt) || remove_nul(inbuf, &incnt))
+				while (uartinput_str(inbuf, &incnt) || uartinput_nul(inbuf, &incnt))
 					;
 			}
 		}
 
 		/* Send on CAN Bus */
 		if (FD_ISSET(c->csock, &fdwrite)) {
-			rc = canWrite(c, (uint8_t *)&canseq, 8);
+			this = canseq;
+			for (i = 7; i >= 0; i--) {
+				canbuf[i] = (uint8_t)(this);
+				this >>= 8;
+			}
+			rc = canWrite(c, canbuf, 8);
 			if (rc < 0) {
 				if (errno != EINTR && errno != EAGAIN) {
 					fprintf(stderr, "canWrite() FAILED [%s]\n",
@@ -691,7 +674,7 @@ can2can(session_t *c)
 
 		/* Receive on Can Bus */
 		if (FD_ISSET(c->csock, &fdread)) {
-			rc = canRead(c, (uint8_t *)canbuf, 8);
+			rc = canRead(c, canbuf, 8);
 			if (rc < 0) {
 				if (errno != EINTR && errno != EAGAIN) {
 					fprintf(stderr, "canRead() FAILED [%s]\n",
@@ -702,11 +685,11 @@ can2can(session_t *c)
 				fprintf(stderr, "EOF in canRead()\n");
 				return;
 			} else {
-				/* TODO */
+				caninput_str(canbuf, rc);
 			}
 		}
 
-		/* Wait a while... */
+		/* Wait a while? */
 		if (c->delay)
 			usleep(c->delay);
 	}
@@ -737,7 +720,7 @@ usage(const char *msg, int err)
 
 /*******************************************************************************
  *
- * Doing the Can-Can...
+ * Do the Can-Can...
  *
  ******************************************************************************/
 int
@@ -792,9 +775,8 @@ main(int argc, char **argv)
 		exit(EX_OSERR);
 	}
 
-	setpriority(PRIO_PROCESS, 0, -20); /* Needs permission to succeed */
-
 	sleep(1);
+
 	can2can(&c);
 
 	close(c.fdtty);

@@ -14,19 +14,32 @@
 # 
 #------------------------------------------------------------------------------
 
-build:
-	cd fw && $(MAKE) build
-	cd test && $(MAKE) build
+BINDIR=/usr/local/bin
+BINFILE=can-can
+
+CC=gcc
+CFLAGS=-Os -std=gnu99 -pedantic-errors -Wall -ggdb
+CLIB=-lm
+
+CSOURCE=can-can.c
+COBJECT=can-can.o
+CTARGET=can-can
+
+build:$(COBJECT) $(CTARGET)
+
+$(CTARGET):$(COBJECT)
+	$(CC) $(COBJECT) -o $(CTARGET) $(CLIB)
+
+$(COBJECT):$(CHEADER) Makefile
+
+%.o:%.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 install:build
-	cd fw && $(MAKE) install
-	cd test && $(MAKE) install
-
-clean:
-	cd fw && $(MAKE) clean
-	cd test && $(MAKE) clean
-	rm -f *~
+	mkdir -p $(BINDIR)
+	cp $(CTARGET) $(BINDIR)/$(BINFILE)
 
 uninstall:clean
-	cd fw && $(MAKE) uninstall
-	cd test && $(MAKE) uninstall
+
+clean:
+	rm -f *.o *~ $(CTARGET)
