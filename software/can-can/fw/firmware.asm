@@ -80,6 +80,18 @@ INIT
                 CLRF    PIE1
                 CLRF    PIR1
 
+		BSF	OSCTUNE,PLLEN
+		MOVLW	b'00100000'
+		MOVWF	OSCCON
+
+		CLRF	ANCON0
+		CLRF	ANCON1
+		CLRF	ADCON0
+		CLRF	ADCON1
+		CLRF	ADCON2
+		CLRF	CM1CON
+		CLRF	CM2CON
+
                 CLRF    LLED                ; Init. Diag. LEDs
                 CLRF    LTRIS
 

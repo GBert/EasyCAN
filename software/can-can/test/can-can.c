@@ -156,7 +156,6 @@ openDevice(const char *dev, speed_t speed)
 		close(fd);
 		return -1;
 	}
-
 	status = ioctl(fd, TIOCMGET, &arg);
 	arg &= ~TIOCM_RTS;
 	ioctl(fd, TIOCMSET, &arg);
@@ -413,26 +412,25 @@ dump_hex(uint8_t *s, int n)
  *
  ******************************************************************************/
 static void
-count_pps(char *instr)
+count_pps(char *instr, uint32_t *count)
 {
 	static struct timeval tv1 = {0};
-	static uint32_t count = 0;
 	struct timeval tv2, tv3;
 	double pps;
 
-	if (count == 0) {
+	if ((*count) == 0) {
 		gettimeofday(&tv1, NULL);
-		count = 1;
+		(*count) = 1;
 	} else {
 		gettimeofday(&tv2, NULL);
 		timersub(&tv2, &tv1, &tv3);
 		if (tv3.tv_sec >= 1) {
-			pps = (double)count /
+			pps = (double)(*count) /
 				((double)tv3.tv_sec + tv3.tv_usec / 1000000.);
 			printf("%s %.2f pps\n", instr, pps);
-			count = 0;
+			(*count) = 0;
 		} else {
-			count++;
+			(*count)++;
 		}
 	}
 }
@@ -445,6 +443,7 @@ count_pps(char *instr)
 static inline void
 uartinput_process(uint8_t *inbuf)
 {
+	static uint32_t count = 0;
 	static uint64_t prev = -1;
 	uint64_t this = 0;
 	uint32_t id = 0;
@@ -456,7 +455,7 @@ uartinput_process(uint8_t *inbuf)
 
 	prev = this;
 
-	count_pps("[CAN OUT/UART IN]");
+	count_pps("[CAN OUT/UART IN]", &count);
 }
 
 /*******************************************************************************
@@ -538,6 +537,7 @@ uartinput_nul(uint8_t *inbuf, int *incnt)
 static inline void
 caninput_str(uint8_t *canbuf, uint8_t cancnt)
 {
+	static uint32_t count = 0;
 	static uint64_t prev = -1;
 	uint64_t this = 0;
 	uint8_t i = 0;
@@ -550,7 +550,7 @@ caninput_str(uint8_t *canbuf, uint8_t cancnt)
 
 	prev = this;
 
-	count_pps("[UART OUT/CAN IN]");
+	count_pps("[UART OUT/CAN IN]", &count);
 }
 
 /*******************************************************************************
@@ -565,7 +565,7 @@ can2can(session_t *c)
 	fd_set fdread, fdwrite;
 	struct timeval tv;
 	uint64_t ttyseq = 0, this, canseq = 0;
-	int rc, i, j = 0;
+	int rc, i;
 
 	uint8_t inbuf[BUFLEN];
 	int incnt = 0;
@@ -586,16 +586,13 @@ can2can(session_t *c)
 		FD_ZERO(&fdread);
 		FD_ZERO(&fdwrite);
 
-		if (j == 0) {
-			/* CAN OUT/UART IN */
-			FD_SET(c->csock, &fdwrite);
-			FD_SET(c->fdtty, &fdread);
-		} else {
-			/* UART OUT/CAN IN */
-			FD_SET(c->fdtty, &fdwrite);
-			FD_SET(c->csock, &fdread);
-		}
-		j = 1 - j;
+		/* CAN OUT/UART IN */
+		FD_SET(c->csock, &fdwrite);
+		FD_SET(c->fdtty, &fdread);
+
+		/* UART OUT/CAN IN */
+		FD_SET(c->fdtty, &fdwrite);
+		FD_SET(c->csock, &fdread);
 
 		rc = select(fd + 1, &fdread, &fdwrite, NULL, &tv);
 		if (rc < 0) {
@@ -774,8 +771,8 @@ main(int argc, char **argv)
 		fprintf(stderr, "Failed to open tty device [%s].\n", ttydev);
 		exit(EX_OSERR);
 	}
-
-	sleep(1);
+	sleep(2);
+	printf("start load ...\n");
 
 	can2can(&c);
 
