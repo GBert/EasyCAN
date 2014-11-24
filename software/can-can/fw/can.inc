@@ -81,10 +81,12 @@ RXB0DBEN        EQU     H'0002'
 
 ; X kbaud @ 64MHz
 ;
-;#DEFINE BRG1 0x01          ; 1000kbaud
-;#DEFINE BRG1 0x03          ;  500kbaud
-#DEFINE BRG1 0x07          ;  250kbaud
-;#DEFINE BRG1 0x0f          ;  125kbaud
+;#DEFINE BRG1 0x01          ; 1000 kbaud
+;#DEFINE BRG1 0x03          ;  500 kbaud
+#DEFINE BRG1 0x07          ;  250 kbaud
+;#DEFINE BRG1 0x0f          ;  125 kbaud
+;#DEFINE BRG1 0x13          ;  100 kbaud
+;#DEFINE BRG1 0x27          ;   50 kbaud
 #DEFINE BRG2 0xBC
 #DEFINE BRG3 0x01
 

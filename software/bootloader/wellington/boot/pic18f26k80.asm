@@ -74,7 +74,7 @@
 
 #DEFINE         USE_UART1   1           ;XXX uncomment to use uart1
 ;#DEFINE        USE_UART2   1           ;XXX uncomment to use uart2
-#DEFINE         BAUDRATE    115200      ;XXX baudrate
+#DEFINE         BAUDRATE    460800      ;XXX baudrate
 
 ;------------------------------------------------------------------------------
 ; CAN comms.
