@@ -91,6 +91,7 @@ openDevice(const char *dev, speed_t speed)
 {
 	int fd;
 	struct termios options;
+	int arg, status;
 
 	fd = open(dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (fd < 0) {
@@ -105,7 +106,7 @@ openDevice(const char *dev, speed_t speed)
 		return -1;
 	}
 
-#if 0
+#if 1
 	/*
 	 * Raw Mode 8N2
 	 *
@@ -149,6 +150,10 @@ openDevice(const char *dev, speed_t speed)
 		close(fd);
 		return -1;
 	}
+        status = ioctl(fd, TIOCMGET, &arg);
+        arg &= ~TIOCM_RTS;
+        ioctl(fd, TIOCMSET, &arg);
+
 
 	return fd;
 }
@@ -762,7 +767,7 @@ main(int argc, char **argv)
 		fprintf(stderr, "Failed to open tty device [%s].\n", ttydev);
 		exit(EX_OSERR);
 	}
-
+	sleep(1);
 	can2can(&c);
 
 	close(c.fdtty);

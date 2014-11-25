@@ -38,16 +38,18 @@
         ERROR           "Both uarts are specified"
     #ENDIF
 
-    #DEFINE PIRRCIF_    PIR1        ;uart interrupt status register
-    #DEFINE RCIF_       RCIF
+    #DEFINE PIR_        PIR1        ;uart interrupt status register
+    #DEFINE RCIF_       RCIF        ;uart rx isr
 
     #IFNDEF TXSTA1
+        #DEFINE         TXIF_       TXIF    ;uart tx isr
         #DEFINE         TXSTA_      TXSTA   ;uart status
         #DEFINE         RCSTA_      RCSTA   ;uart status
         #DEFINE         SPBRG_      SPBRG   ;uart baudrate
         #DEFINE         TXREG_      TXREG   ;uart transmit
         #DEFINE         RCREG_      RCREG   ;uart receive
     #ELSE
+        #DEFINE         TXIF_       TX1IF   ;uart tx isr
         #DEFINE         TXSTA_      TXSTA1  ;uart status
         #DEFINE         RCSTA_      RCSTA1  ;uart status
         #DEFINE         SPBRG_      SPBRG1  ;uart baudrate
@@ -74,8 +76,9 @@
         ERROR           "UART2 specified for a device that only has uart1"
     #ENDIF
 
-    #DEFINE             PIRRCIF_    PIR3    ;uart interrupt status register
-    #DEFINE             RCIF_       RC2IF
+    #DEFINE             PIR_        PIR3    ;uart interrupt status register
+    #DEFINE             RCIF_       RC2IF   ;uart rx isr
+    #DEFINE             TXIF_       TX2IF   ;uart tx isr
 
     #DEFINE             TXSTA_      TXSTA2  ;uart status
     #DEFINE             RCSTA_      RCSTA2  ;uart status
@@ -86,15 +89,11 @@
     #DEFINE             SPBRGH_     SPBRGH2 ;uart baudrate
 #ENDIF
 
-#IFDEF USE_TXENABLE
-    #DEFINE TXE_DELAY_CNT ((TXE_DELAY * OSCF) / (4000000 * 3))
-#ENDIF
-
 ;------------------------------------------------------------------------------
 ; Baud Rate Config
 ;------------------------------------------------------------------------------
 
-#DEFINE     UBRG ((((OSCF / BAUDRATE) / 2) - 1) / 2) ;Baudrate
+#DEFINE UBRG ((((CLOCK / BAUDRATE) / 2) - 1) / 2)
 
 #IF UBRG > 65535
     ERROR       "SPBRG is too large"
@@ -134,6 +133,7 @@ COMMINIT
 
                 MOVF    RCREG_,W            ;Clear Receiver
                 MOVF    RCREG_,W
+                MOVF    RCREG_,W
 
                 MOVLB   0
                 RETURN
@@ -155,11 +155,11 @@ COMMEXIT        BANKSEL RCSTA_
 ;------------------------------------------------------------------------------
 
 Receive
-                BEGINTO
-RecvLoop        BTFSC   PIRRCIF_,RCIF_
+                BEGINTO TO1
+RecvLoop        BTFSC   PIR_,RCIF_
                 BRA     Received
                 LOOPTO  RecvLoop
-                BRA     Exit                ;timed-out
+                BRA     TIMEDOUT
 Received
                 BANKSEL RCREG_
                 MOVF    RCREG_,W            ;RETURN read data in W
@@ -176,14 +176,17 @@ Send
 #IFDEF USE_TXENABLE
                 BCF     RCSTA_,CREN         ;disable serial receiver
                 BSF     LATR_TXE,LATB_TXE   ;enable external transceiver
-
-                MOVWF   io2                 ;save data byte
-                MOVLW   TXE_DELAY_CNT       ;wait a while
-                MOVWF   io1
-txe_del_lo      DECFSZ  io1
+#IFDEF TXE_DELAY
+                MOVWF   temp1               ;save data byte
+                MOVLW   TXE_DELAY           ;Wait a While
+                MOVWF   temp2
+txe_del_lo      DECFSZ  temp2
                 BRA     txe_del_lo
-                MOVF    io2,W               ;restore data byte
-
+                MOVF    temp1,W             ;restore data byte
+#IFDEF KICK_WD
+                CLRWDT
+#ENDIF
+#ENDIF
                 ; Send data byte
                 MOVWF   TXREG_
 

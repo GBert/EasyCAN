@@ -31,26 +31,35 @@
 ; Device
 ;------------------------------------------------------------------------------
 
-                PROCESSOR   18f26K80    ;XXX MCU
+                PROCESSOR   18f4550     ;XXX MCU
+
+                ; Estimate of the Boot Loader Project's Size in Bytes
+BOOTSIZE        EQU         (320)       ;5 x 64
 
 ;------------------------------------------------------------------------------
-; PIC18F26K80 Device Pinout
+; PIC18F4550 Device Pinout
 ;------------------------------------------------------------------------------
 ;
-; !MCLR        1-----28 RB7 PGD RX2
-; RA0          2     27 RB6 PGC TX2
-; RA1          3     26 RB5
-; RA2          4     25 RB4
-; RA3          5     24 RB3
-; VDDCORE/VCAP 6     23 RB2
-; RA5          7     22 RB1
-; VSS GND      8     21 RB0
-; RA7 CLKIN    9     20 VDD VCC
-; RA6 CLKOUT   10    19 VSS GND
-; RC0          11    18 RC7 RX1
-; RC1          12    17 RC6 TX1
-; RC2          13    16 RC5
-; RC3          14----15 RC4
+; !MCLR/VPP RE3            1-----40 RB7/PGD KBI3
+; RA0 AN0                  2     39 RB6/PGC KBI2
+; RA1 AN1                  3     38 RB5/PGM KBI1
+; RA2 AN2 VREF- CVREF      4     37 RB4 AN11 KBI0 CSSPP
+; RA3 AN3 VREF+            5     36 RB3 AN9 CCP2 VPO
+; RA4 T0CKI C1OUT RCV      6     35 RB2 AN8 INT2 VMO
+; RA5 AN4 !SS HLVDIN C2OUT 7     34 RB1 AN10 INT1 SCK SCL
+; RE0 AN5 CK1SPP           8     33 RB0 AN12 INT0 FLT0 SDI SDA
+; RE1 AN6 CK2SPP           9     32 VDD/VCC
+; RE2 AN7 OESPP            10    31 VSS/GND
+; VDD/VCC                  11    30 RD7 SPP7 P1D
+; VSS/GND                  12    29 RD6 SPP6 P1C
+; OSC1 CLKI                13    28 RD5 SPP5 P1B
+; OSC2 CLKO RA6            14    27 RD4 SPP4
+; RC0 T1OSO T13CKI         15    26 RC7 RX DT SDO
+; RC1 T1OSI CCP2 !UOE      16    25 RC6 TX CK
+; RC2 CCP1 P1A             17    24 RC5 D+ VP
+; VUSB                     18    23 RC4 D- VM
+; RD0 SPP0                 19    22 RD3 SPP3
+; RD1 SPP1                 20----21 RD2 SPP2
 ;
 ;------------------------------------------------------------------------------
 ; Device Constants
@@ -62,9 +71,9 @@
 ; MCU Settings
 ;------------------------------------------------------------------------------
 
-#DEFINE         OSCF        64000000    ;XXX oscillator frequency (inc. pll)
+#DEFINE         CLOCK       10000000    ;XXX oscillator frequency (inc. pll)
 
-;#DEFINE        KICK_WD     1           ;XXX uncomment to kick the wd during
+#DEFINE         KICK_WD     1           ;XXX uncomment to kick the wd during
                                         ;    busy loops; only enable this when
                                         ;    the watchdog timer is enabled
 
@@ -73,94 +82,81 @@
 ;------------------------------------------------------------------------------
 
 #DEFINE         USE_UART1   1           ;XXX uncomment to use uart1
-;#DEFINE        USE_UART2   1           ;XXX uncomment to use uart2
-#DEFINE         BAUDRATE    460800      ;XXX baudrate
-
-;------------------------------------------------------------------------------
-; CAN comms.
-;------------------------------------------------------------------------------         
-
-;#define USE_CAN                        ;xxx uncomment to use CAN instead of UART
-#define         ID_PIC      1           ;xxx node number for this device
-#define         ID_LOADER   0x7ff       ;xxx node number of the easy Loader
+#DEFINE         BAUDRATE    115200      ;XXX baudrate
 
 ;------------------------------------------------------------------------------
 ; MCU Configuration
 ;------------------------------------------------------------------------------
 
-; VREG Sleep Enable bit:
-                CONFIG    RETEN=ON
-; LF-INTOSC Low-power Enable bit:
-;               CONFIG    INTOSCSEL=LOW
-; SOSC Power Selection and mode Configuration bits:
-                CONFIG    SOSCSEL=DIG
-; Extended Instruction Set:
-                CONFIG    XINST=OFF
-; Oscillator:
-                CONFIG    FOSC=HS2 ;CLKOUT on OSC2
-; PLL x4 Enable bit:
-                CONFIG    PLLCFG=ON
+; PLL Prescaler Selection bits:
+                CONFIG    PLLDIV=1
+; CPU System Clock Postscaler:
+                CONFIG    CPUDIV=OSC1_PLL2
+; USB Clock Selection bit (used in Full Speed USB mode only; UCFG:FSEN = 1):
+                CONFIG    USBDIV=1
+; Oscillator Selection:
+                CONFIG    FOSC=HS
 ; Fail-Safe Clock Monitor:
                 CONFIG    FCMEN=OFF
-; Internal External Oscillator Switch Over Mode:
+; Internal External Switch Over mode:
                 CONFIG    IESO=OFF
 ; Power-up Timer:
-                CONFIG    PWRTEN=OFF
-; Brown-out Detect:
-                CONFIG    BOREN=OFF
-; Brown-out Reset Voltage bits:
-                CONFIG    BORV=1
-; BORMV Power level:
-;               CONFIG    BORPWR=LOW
+                CONFIG    PWRT=OFF
+; Brown-out Reset:
+                CONFIG    BOR=OFF
+; Brown-out Voltage:
+                CONFIG    BORV=2
 ; Watchdog Timer:
-                CONFIG    WDTEN=ON
+                CONFIG    WDT=ON
 ; Watchdog Postscaler:
                 CONFIG    WDTPS=1024
-; ECAN Mux bit:
-                CONFIG    CANMX=PORTB
-; MSSP address masking:
-                CONFIG    MSSPMSK=MSK5
-; Master Clear Enable:
+; MCLR Enable:
                 CONFIG    MCLRE=ON
-; Stack Overflow Reset:
+; PORTB A/D Enable:
+                CONFIG    PBADEN=OFF
+; CCP2 Pin Function:
+                CONFIG    CCP2MX=OFF
+; Stack Full/Overflow Reset:
                 CONFIG    STVREN=ON
-; Boot Block Size:
-                CONFIG    BBSIZ=BB1K
-; Code Protect 00800-03FFF:
+; Low Voltage ICSP:
+                CONFIG    LVP=OFF
+; Background Debugger Enable:
+                CONFIG    DEBUG=OFF
+; Code Protection Block 0:
                 CONFIG    CP0=OFF
-; Code Protect 04000-07FFF:
+; Code Protection Block 1:
                 CONFIG    CP1=OFF
-; Code Protect 08000-0BFFF:
+; Code Protection Block 2:
                 CONFIG    CP2=OFF
-; Code Protect 0C000-0FFFF:
+; Code Protection Block 3:
                 CONFIG    CP3=OFF
-; Code Protect Boot:
+; Boot Block Code Protection:
                 CONFIG    CPB=OFF
-; Data EE Read Protect:
+; Data EEPROM Code Protection:
                 CONFIG    CPD=OFF
-; Table Write Protect 00800-03FFF:
+; Write Protection Block 0:
                 CONFIG    WRT0=OFF
-; Table Write Protect 04000-07FFF:
+; Write Protection Block 1:
                 CONFIG    WRT1=OFF
-; Table Write Protect 08000-0BFFF:
+; Write Protection Block 2:
                 CONFIG    WRT2=OFF
-; Table Write Protect 0C000-0FFFF:
+; Write Protection Block 3:
                 CONFIG    WRT3=OFF
-; Config. Write Protect:
-                CONFIG    WRTC=OFF
-; Table Write Protect Boot:
+; Boot Block Write Protection:
                 CONFIG    WRTB=OFF
-; Data EE Write Protect:
+; Configuration Register Write Protection:
+                CONFIG    WRTC=OFF
+; Data EEPROM Write Protection:
                 CONFIG    WRTD=OFF
-; Table Read Protect 00800-03FFF:
+; Table Read Protection Block 0:
                 CONFIG    EBTR0=OFF
-; Table Read Protect 04000-07FFF:
+; Table Read Protection Block 1:
                 CONFIG    EBTR1=OFF
-; Table Read Protect 08000-0BFFF:
+; Table Read Protection Block 2:
                 CONFIG    EBTR2=OFF
-; Table Read Protect 0C000-0FFFF:
+; Table Read Protection Block 3:
                 CONFIG    EBTR3=OFF
-; Table Read Protect Boot:
+; Boot Block Table Read Protection:
                 CONFIG    EBTRB=OFF
 
 ;------------------------------------------------------------------------------
@@ -168,28 +164,14 @@
 ;------------------------------------------------------------------------------
 
 PROCINIT        MACRO
-
-                MOVLB   0x0F
                 BCF     RCON,IPEN
 
-                BSF     OSCTUNE,PLLEN
-
-#DEFINE         _16MHZ  b'01110000'     ;64MHZ PLLx4
-#DEFINE         _8MHZ   b'01100000'     ;32MHZ PLLx4
-#DEFINE         _4MHZ   b'01010000'
-#DEFINE         _2MHZ   b'01000000'
-#DEFINE         _1MHZ   b'00110000'
-#DEFINE         _HS2    b'00100000'	;ext crystal
-
-                MOVLW   _HS2
-                MOVWF   OSCCON
-
-;INITHFIOFS      BTFSS   OSCCON,HFIOFS
-;                GOTO    INITHFIOFS
-
-                CLRF    ADCON0
-                CLRF    ANCON1
-                MOVLB   0
+                MOVLW   b'00000111'
+                MOVWF   CMCON
+                MOVLW   b'00000000'
+                MOVWF   ADCON0
+                MOVLW   b'00001111'
+                MOVWF   ADCON1
 
                 ENDM
 
@@ -200,7 +182,7 @@ PROCINIT        MACRO
 ERRORLEVEL      -302
 #INCLUDE        "boot.inc"
 
-;------------------------------------------------------------------------------    
+;------------------------------------------------------------------------------
 THE
                 END
 ;------------------------------------------------------------------------------    

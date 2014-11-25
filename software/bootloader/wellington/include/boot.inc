@@ -33,9 +33,6 @@
 ; Boot Loader Origin
 ;------------------------------------------------------------------------------
 
-                ; Estimate of the Boot Loader's Size in Bytes
-BOOTSIZE        EQU         (320) ; 5 x 64
-
 #IF BOOTSIZE % ERASESIZE
 ERASEROWS       EQU         (BOOTSIZE / ERASESIZE) + 1
 #ELSE
@@ -61,49 +58,10 @@ STARTADDR       EQU         MAX_FLASH - (ERASEROWS * ERASESIZE)
 #DEFINE         EE_READ     4       ;16
 
 ;------------------------------------------------------------------------------
-; I/O Timeout
+; Macros
 ;------------------------------------------------------------------------------
 
-#DEFINE         TIMEOUT 1 * (OSCF / 1000000)
-
-#IF TIMEOUT > 255
-    ERROR       "TIMEOUT Too Large"
-#ENDIF
-#IF TIMEOUT == 0
-    ERROR       "TIMEOUT Too Small"
-#ENDIF
-
-;------------------------------------------------------------------------------
-; I/O Timeout Macros
-;------------------------------------------------------------------------------
-
-; TIME ~= 800ms
-;
-; For OSCF =  1MHz TIMEOUT =  1
-; For OSCF = 64MHz TIMEOUT = 64
-
-BEGINTO         MACRO
-
-                MOVLW   TIMEOUT
-                MOVWF   io1
-                CLRF    io2
-                CLRF    io3
-
-                ENDM
-
-LOOPTO          MACRO   TO
-                DECFSZ  io3
-                BRA     TO
-#IFDEF KICK_WD
-                CLRWDT
-#ENDIF
-                DECFSZ  io2
-                BRA     TO
-                DECFSZ  io1
-                BRA     TO
-
-                ; Timed-out If We Got Here
-                ENDM
+#INCLUDE        "macro.inc"
 
 ;------------------------------------------------------------------------------
 ; Variables
@@ -115,9 +73,10 @@ CBLOCK 0
     csum        : 1             ;Receive Checksum
     cmd         : 1             ;Command
     cnt         : 1             ;Counter
-    io1         : 1             ;I/O Time-out or I/O Temp.
-    io2         : 1             ;I/O Time-out or I/O Temp.
-    io3         : 1             ;I/O Time-out or I/O Temp.
+    temp1       : 1             ;Temporary
+    temp2       : 1             ;   "
+    temp3       : 1             ;   "
+    temp4       : 1             ;   "
 ENDC
 
 ;------------------------------------------------------------------------------
@@ -147,28 +106,6 @@ ENDC
                 PROCINIT            ;Initialise MCU
 
 ;------------------------------------------------------------------------------
-; Trouble Shooting
-;------------------------------------------------------------------------------
-
-#IF 0
-                ; Toggle Pin Quickly
-                BCF     TRISA,0
-TSLOOP          BTG     LATA,0
-                BRA     TSLOOP
-#ENDIF
-
-#IF 0
-                ; Toggle Pin Slowly
-                BCF     TRISA,0
-TSLOOP0         BTG     LATA,0
-
-                BEGINTO
-TSLOOP1         LOOPTO  TSLOOP1
-
-                BRA     TSLOOP0
-#ENDIF
-
-;------------------------------------------------------------------------------
 ; Init Comms.
 ;------------------------------------------------------------------------------
 
@@ -180,7 +117,7 @@ TSLOOP1         LOOPTO  TSLOOP1
 
                 RCALL   Receive
                 SUBLW   HELLO
-                BNZ     Exit
+                BNZ     TIMEDOUT
 
 ;------------------------------------------------------------------------------
 ; Send Device and Boot Loader Params.
@@ -399,13 +336,22 @@ WriteWait       BTFSC   EECON1,WR
                 RETURN
 
 ;------------------------------------------------------------------------------
-; Exit
+; End of Boot Loader
 ;------------------------------------------------------------------------------
 
-Exit            ; Invalid Hello or Time-out in Receive
+TIMEDOUT
 
-                RCALL   COMMEXIT        ;Reset Comms.
-                BRA     STARTADDR - 4   ;Run Application
+;------------------------------------------------------------------------------
+; Shutdown Comms.
+;------------------------------------------------------------------------------
+
+                RCALL   COMMEXIT
+
+;------------------------------------------------------------------------------
+; Run App.
+;------------------------------------------------------------------------------
+
+                BRA     STARTADDR - 4
 
 ;------------------------------------------------------------------------------
 ; Comms.
