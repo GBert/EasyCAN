@@ -22,25 +22,44 @@
 
 ; UART
 #IFDEF UART1
-    #DEFINE     UPIR        PIR1
-    #DEFINE     UPIE        PIE1
-    #DEFINE     URCIF       RCIF
-    #DEFINE     UTXIF       TXIF
-    #DEFINE     UTXSTA      TXSTA
-    #DEFINE     URCSTA      RCSTA
-    #DEFINE     UTXREG      TXREG
-    #DEFINE     URCREG      RCREG
-    #IFNDEF TXREG1
+    #IFNDEF TXSTA1
+        #DEFINE UPIR        PIR1
+        #DEFINE UPIE        PIE1
+        #DEFINE URCIF       RCIF
+        #DEFINE UTXIF       TXIF
+        #DEFINE UTXSTA      TXSTA
+        #DEFINE URCSTA      RCSTA
+        #DEFINE UTXREG      TXREG
+        #DEFINE URCREG      RCREG
         #DEFINE UBAUDCON    BAUDCON
         #DEFINE USPBRGH     SPBRGH
+        #DEFINE USPBRG      SPBRG
     #ELSE
+        #DEFINE UPIR        PIR1
+        #DEFINE UPIE        PIE1
+        #DEFINE URCIF       RC1IF
+        #DEFINE UTXIF       TX1IF
+        #DEFINE UTXSTA      TXSTA1
+        #DEFINE URCSTA      RCSTA1
+        #DEFINE UTXREG      TXREG1
+        #DEFINE URCREG      RCREG1
         #DEFINE UBAUDCON    BAUDCON1
         #DEFINE USPBRGH     SPBRGH1
+        #DEFINE USPBRG      SPBRG1
     #ENDIF
-    #DEFINE     USPBRG      SPBRG
 #ENDIF
-
 #IFDEF UART2
+        #DEFINE UPIR        PIR3
+        #DEFINE UPIE        PIE3
+        #DEFINE URCIF       RC2IF
+        #DEFINE UTXIF       TX2IF
+        #DEFINE UTXSTA      TXSTA2
+        #DEFINE URCSTA      RCSTA2
+        #DEFINE UTXREG      TXREG2
+        #DEFINE URCREG      RCREG2
+        #DEFINE UBAUDCON    BAUDCON2
+        #DEFINE USPBRGH     SPBRGH2
+        #DEFINE USPBRG      SPBRG2
 #ENDIF
 
 ; UART Baud Rate Generator
@@ -62,6 +81,8 @@ INITUART
                 MOVLW   (1 << TXEN) + (1 << BRGH)
                 MOVWF   UTXSTA
 INITUARTAGAIN
+                BTG     LLED,1              ; LED2
+
                 ; Enable Serial Port
                 MOVLW   (1 << SPEN)
                 MOVWF   URCSTA

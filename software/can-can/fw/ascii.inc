@@ -21,7 +21,7 @@
 ;------------------------------------------------------------------------------
 
                 CBLOCK
-                ATEMP   : 1
+                ASCTEMP : 1
                 ENDC
 
 ;------------------------------------------------------------------------------
@@ -69,9 +69,9 @@ ASC2BIN
 ASC2BIN1
                 GETC                        ; W = <RXBUF>,RXGET++
 
-                MOVWF   ATEMP
+                MOVWF   ASCTEMP
                 ANDLW   0x0F
-                BTFSS   ATEMP,6
+                BTFSS   ASCTEMP,6
                 RETURN
 
                 ADDLW   9

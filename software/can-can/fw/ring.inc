@@ -88,9 +88,7 @@ PUTC            MACRO
 ;------------------------------------------------------------------------------
 ISR
                 BTG     LLED,0              ; LED1
-
                 MOVLB   0x0F                ; Default to Bank 15
-
 #IF 0
                 MOVFF   FSR2H,FSR2H_SAVE
                 MOVFF   FSR2L,FSR2L_SAVE
@@ -99,10 +97,14 @@ ISR
                 MOVF    TXGET,W             ; Data?
                 XORWF   TXPUT,W
                 BZ      ISRRX
-
-                BTFSS   UPIR,UTXIF          ; Tx?
+#IFDEF __18F4685
+                BTFSS   UPIR,UTXIF          ; Poll TXIF; Tx?
                 BRA     ISRRX
-
+#ENDIF
+#IFDEF __18F26K80
+                BTFSS   UTXSTA,TRMT         ; Poll TRMT; Tx?
+                BRA     ISRRX
+#ENDIF
                 MOVF    TXGET,W
                 MOVFF   PLUSW2,UTXREG
                 INCF    TXGET,F
@@ -125,7 +127,7 @@ ISREND
                 MOVFF   FSR2H_SAVE,FSR2H
                 MOVFF   FSR2L_SAVE,FSR2L
 #ENDIF
-                BCF     PIR1,TMR2IF         ; Reset TMR2 Rx/Tx ring INT
+                BCF     PIR1,TMR2IF         ; Reset TMR2 Rx/Tx ring IRQ
                 RETFIE  FAST
 
 ;------------------------------------------------------------------------------

@@ -20,15 +20,19 @@
 ; TMR2 Settings
 ;------------------------------------------------------------------------------
 
-; 1 count period
-;
 #DEFINE         TCY         (CLOCK / 4)
 
 ; TMR2 Interval. 1:1 Postscale, Prescaler 16.
-;
-; PR = (TCY / (BAUDRATE / 10) / SCALER) - 1
-;
+
+; For the 18F4685 we poll TXIF.
+#IFDEF __18F4685
 #DEFINE         TMR2_PR     (TCY / (BAUDRATE / 10) / 16) - 1
+#ENDIF
+
+; For the 18F26K80 we poll TRMT. This must be done more often than TXIF.
+#IFDEF __18F26K80
+#DEFINE         TMR2_PR     (TCY / (BAUDRATE / 10) / 20)
+#ENDIF
 
 ;------------------------------------------------------------------------------
 ; Init. TMR2. 1:1 Postscale, Prescaler 16.
