@@ -25,5 +25,5 @@ Bootloader ([Wellington](http://hg.kewl.org/pub/wellington/)) is programmed by t
 - working test PCB
 - working Wellington bootloader
 - working easy-loader from Darron Broad
-- wip: SLCAN firmware (early stage: send test CAN frames)
+- wip: SLCAN firmware (thx to Darron Broad sending and receiving standard CAN frames works)
 
