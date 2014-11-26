@@ -19,7 +19,7 @@
 ;------------------------------------------------------------------------------
 ; MCHP CAN ID
 ;------------------------------------------------------------------------------
-
+;
 ; RXB0SIDH
 ; --------
 ; SID10 SID9  SID8  SID7  SID6  SID5  SID4  SID3
@@ -41,7 +41,7 @@
 ; EID7  EID6  EID5  EID4  EID3  EID2  EID1  EID0
 
 ;------------------------------------------------------------------------------
-; MCHP CAN ID macros (WINDOWED MODE)
+; MCHP CAN ID macros
 ;------------------------------------------------------------------------------
 
 ; Take lower 3-bits in W and store in SID10..SID8, SID7..SID3 are RESET
@@ -73,34 +73,31 @@ TXSID_2_0       MACRO
 
 ;------------------------------------------------------------------------------
 
-; Take SID10..SID8 and store in lower 3-bits of TEMP1
+; Take SID10..SID8 and store in lower 3-bits of W
 RXSID_10_8      MACRO
                 MOVF    RXB0SIDH,W
                 ANDLW   b'11100000'
                 RLNCF   WREG,F
                 RLNCF   WREG,F
                 RLNCF   WREG,F
-                MOVWF   TEMP1
                 ENDM
 
-; Take SID7..SID3 and store in upper 5-bits of TEMP1
-RXSID_7_3       MACRO
+; Take SID7..SID3 and store in upper 5-bits of CANID
+RXSID_7_0       MACRO
                 MOVF    RXB0SIDH,W
                 ANDLW   b'00011111'
                 RLNCF   WREG,F
                 RLNCF   WREG,F
                 RLNCF   WREG,F
-                MOVWF   TEMP1
-                ENDM
+                MOVWF   CANID
 
-; Take SID2..SID0 and store in upper 3-bits of TEMP1
-RXSID_2_0       MACRO
+; Take SID2..SID0 and store in upper 3-bits of W, take lower 5-bits from CANID
                 MOVF    RXB0SIDL,W
                 ANDLW   b'11100000'
                 RLNCF   WREG,F
                 RLNCF   WREG,F
                 RLNCF   WREG,F
-                IORWF   TEMP1,F
+                IORWF   CANID,W
                 ENDM
 
 ;------------------------------------------------------------------------------

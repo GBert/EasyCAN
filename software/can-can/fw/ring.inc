@@ -127,6 +127,8 @@ ISREND
                 MOVFF   FSR2H_SAVE,FSR2H
                 MOVFF   FSR2L_SAVE,FSR2L
 #ENDIF
+                BTG     LLED,1              ; LED2
+
                 BCF     PIR1,TMR2IF         ; Reset TMR2 Rx/Tx ring IRQ
                 RETFIE  FAST
 

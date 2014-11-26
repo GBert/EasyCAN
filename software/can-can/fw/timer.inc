@@ -31,7 +31,7 @@
 
 ; For the 18F26K80 we poll TRMT. This must be done more often than TXIF.
 #IFDEF __18F26K80
-#DEFINE         TMR2_PR     (TCY / (BAUDRATE / 10) / 20)
+#DEFINE         TMR2_PR     (TCY / (BAUDRATE / 10) / 22)
 #ENDIF
 
 ;------------------------------------------------------------------------------

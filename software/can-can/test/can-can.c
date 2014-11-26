@@ -106,7 +106,7 @@ openDevice(const char *dev, speed_t speed)
 		return -1;
 	}
 
-#if 1
+#if 0
 	/*
 	 * Raw Mode 8N2
 	 *

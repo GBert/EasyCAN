@@ -83,7 +83,7 @@ MAIN
 #INCLUDE        "timer.inc"                 ; TMR2
 #INCLUDE        "ring.inc"                  ; Rx/Tx Ring
 #INCLUDE        "can.inc"                   ; CAN
-#INCLUDE        "ascii.inc"                 ; ASCII conversions
+#INCLUDE        "ascii.inc"                 ; ASCII I/O
 
 ;------------------------------------------------------------------------------
 ;

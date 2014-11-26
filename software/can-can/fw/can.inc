@@ -21,9 +21,11 @@
 ;------------------------------------------------------------------------------
     
                 CBLOCK
-                TEMP1   : 1
-                TEMP2   : 1
+                CANCMD  : 1
+                CANID   : 1
                 CANCNT  : 1
+                RXWIND  : 1
+                TXWIND  : 1
                 ENDC
 
 ;------------------------------------------------------------------------------
@@ -40,6 +42,16 @@ REQOP2          EQU     H'0007'
 RXB0DBEN        EQU     H'0002'
 #ENDIF
 
+#DEFINE         CAN_WIN_RXB0 0x00           ; 000X
+#DEFINE         CAN_WIN_RXB1 0x0A           ; 101X
+#DEFINE         CAN_WIN_RXSW (CAN_WIN_RXB1 + CAN_WIN_RXB0)
+
+#DEFINE         CAN_WIN_TXB0 0x08           ; 100X
+#DEFINE         CAN_WIN_TXB1 0x06           ; 011X
+#DEFINE         CAN_WIN_TXSW (CAN_WIN_TXB1 + CAN_WIN_TXB0)
+
+#DEFINE         CAN_WIN_TXB2 0x04           ; 010X unused
+
 #INCLUDE        "canrates.inc"
 #INCLUDE        "canid.inc"
 
@@ -47,7 +59,16 @@ RXB0DBEN        EQU     H'0002'
 ; Init. CAN bus
 ;------------------------------------------------------------------------------
 INITCAN
-                CLRF    TRISB
+;                CLRF    ANCON0
+;                CLRF    ANCON1
+;                CLRF    ADCON0
+;                CLRF    ADCON1
+;                CLRF    ADCON2
+;                CLRF    CM1CON
+;                CLRF    CM2CON
+;                CLRF    PIR5
+                
+                BCF     TRISB,RB2
                 BSF     TRISB,RB3           ; Enable CANRX
 
                 MOVLW   (1 << REQOP2)       ; Set configuration mode
@@ -90,6 +111,12 @@ INITCAN2
                 ANDLW   (1 << OPMODE2) + (1 << OPMODE1)
                 BNZ     INITCAN2
 
+                MOVLW   CAN_WIN_RXB0
+                MOVWF   RXWIND
+
+                MOVLW   CAN_WIN_TXB0
+                MOVWF   TXWIND
+
                 RETURN
 
 ;------------------------------------------------------------------------------
@@ -105,10 +132,10 @@ INITCAN2
 ; T--data frame with 29-bit ID
 ; R--RTR  frame with 29-bit ID
 
-#DEFINE         STDDATA     't'
-#DEFINE         STDRTR      'r'
-#DEFINE         EXTDATA     'T'
-#DEFINE         EXTRTR      'r'
+#DEFINE         STDDATA     't'             ; 0x74 0111 0100
+#DEFINE         STDRTR      'r'             ; 0x72 0111 0010
+#DEFINE         EXTDATA     'T'             ; 0x54 0101 0100
+#DEFINE         EXTRTR      'R'             ; 0x52 0101 0010
 
 ; C\r
 ; |
@@ -121,15 +148,6 @@ INITCAN2
 ;------------------------------------------------------------------------------
 ; CAN bus functions
 ;------------------------------------------------------------------------------
-
-; CAN ACCESS Bank Window
-;
-#DEFINE         CAN_WIN_RXB0 0x00           ; 000X
-#DEFINE         CAN_WIN_RXB1 0x0A           ; 101X
-
-#DEFINE         CAN_WIN_TXB0 0x08           ; 100X
-#DEFINE         CAN_WIN_TXB1 0x06           ; 011X
-#DEFINE         CAN_WIN_TXB2 0x04           ; 010X
 
 #INCLUDE        "canrx.inc"
 #INCLUDE        "cantx.inc"

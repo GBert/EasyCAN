@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Can-Can CAN
+; Can-Can CAN standard RX
 ;
 ; Copyright (c) 2014 Darron M Broad
 ;
@@ -17,72 +17,43 @@
                 RADIX   DEC
 
 ;------------------------------------------------------------------------------
-; MCHP CAN
-;------------------------------------------------------------------------------
-
-; RXB0DLC
-; -------
-; X RXRTR 0 0 DLC3 DLC2 DLC2 DLC0
-
-;------------------------------------------------------------------------------
-; CAN RX variables
-;------------------------------------------------------------------------------
-
-;               CBLOCK
-;               ENDC
-
-;------------------------------------------------------------------------------
-; Receive message on CAN bus and send on UART
+; Receive standard message on CAN bus and send on UART
 ;------------------------------------------------------------------------------
 RXCAN
-                MOVLW   CAN_WIN_RXB0
+                MOVF    RXWIND,W
                 MOVWF   CANCON
-                BTFSC   RXB0CON,RXFUL
-                BRA     RXCANRECV           ; RXB0 full...
-
-                MOVLW   CAN_WIN_RXB1
-                MOVWF   CANCON
-                BTFSC   RXB0CON,RXFUL
-                BRA     RXCANRECV           ; RXB1 full...
-
+                SUBLW   CAN_WIN_RXSW
+                MOVWF   RXWIND
+                BTFSS   RXB0CON,RXFUL
                 RETURN
 
-;------------------------------------------------------------------------------
-
-RXCANRECV
-
-RXSTDDATA
-                MOVLW   STDDATA             ; Standard data message
-                PUTC
+                MOVLW   STDDATA             ; Standard data
+                BTFSC   RXB0CON,RXRTRRO_RXB0CON
+                MOVLW   STDRTR              ; Standard rtr
+                PUTC                        ; Tx
  
                 RXSID_10_8                  ; Get SID10..8
-
-                LFSR    FSR0,TEMP1               
                 CALL    NIB2ASC             ; Tx
 
-                RXSID_7_3                   ; Get SID7..3
-                RXSID_2_0                   ; Get SID2..0
-
-                LFSR    FSR0,TEMP1               
+                RXSID_7_0                   ; Get SID7..0
                 CALL    BIN2ASC             ; Tx
 
-                MOVF    RXB0DLC,W
+                MOVF    RXB0DLC,W           ; Get DLC
                 ANDLW   0x0F
-                MOVWF   CANCNT              ; Number of bytes
-
-                IORLW   0x30                ; Convert to ASCII
+                MOVWF   CANCNT
+                IORLW   0x30
                 PUTC                        ; Tx
 
-                MOVF    CANCNT,W
-                BZ      RXSTDDATAEND        ; Empty message...
-
-                LFSR    FSR0,RXB0D0         ; Get message
-RXSTDDATA1
+                MOVF    CANCNT,W            ; Get message
+                BZ      RXSTD2
+                LFSR    FSR0,RXB0D0
+RXSTD1
+                MOVF    POSTINC0,W
                 RCALL   BIN2ASC             ; Tx
-                DJNZ    CANCNT,RXSTDDATA1
-RXSTDDATAEND
-                MOVLW   EOLNCHAR            ; \r
-                PUTC
+                DJNZ    CANCNT,RXSTD1
+RXSTD2
+                MOVLW   EOLNCHAR
+                PUTC                        ; Tx
 
                 BCF     RXB0CON,RXFUL
                 RETURN

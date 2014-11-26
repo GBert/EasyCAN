@@ -69,6 +69,8 @@
 ; Init. UART
 ;------------------------------------------------------------------------------
 INITUART
+                BCF     TRISC,6
+                BSF     TRISC,7
                 MOVLW   (1 << BRG16)
                 MOVWF   UBAUDCON
 
@@ -81,8 +83,6 @@ INITUART
                 MOVLW   (1 << TXEN) + (1 << BRGH)
                 MOVWF   UTXSTA
 INITUARTAGAIN
-                BTG     LLED,1              ; LED2
-
                 ; Enable Serial Port
                 MOVLW   (1 << SPEN)
                 MOVWF   URCSTA
