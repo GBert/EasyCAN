@@ -24,13 +24,21 @@ TXCAN
                 BNZ     TXCAN1
                 RETURN                      ; TX NONE
 TXCAN1
-                MOVF    TXWIND,W
+                MOVLW   CAN_WIN_TXB0
                 MOVWF   CANCON
-                SUBLW   CAN_WIN_TXSW
-                MOVWF   TXWIND
-                BTFSC   RXB0CON,TXREQ
-                RETURN                      ; TX IN USE
+                BTFSS   RXB0CON,TXREQ
+                BRA     TXCAN2
 
+                MOVLW   CAN_WIN_TXB1
+                MOVWF   CANCON
+                BTFSS   RXB0CON,TXREQ
+                BRA     TXCAN2
+
+                MOVLW   CAN_WIN_TXB2
+                MOVWF   CANCON
+                BTFSC   RXB0CON,TXREQ
+                RETURN
+TXCAN2
                 GETC                        ; W = <RXBUF>,RXGET++
                 MOVWF   CANCMD
                 XORLW   STDDATA             ; t?

@@ -44,13 +44,10 @@ RXB0DBEN        EQU     H'0002'
 
 #DEFINE         CAN_WIN_RXB0 0x00           ; 000X
 #DEFINE         CAN_WIN_RXB1 0x0A           ; 101X
-#DEFINE         CAN_WIN_RXSW (CAN_WIN_RXB1 + CAN_WIN_RXB0)
 
 #DEFINE         CAN_WIN_TXB0 0x08           ; 100X
 #DEFINE         CAN_WIN_TXB1 0x06           ; 011X
-#DEFINE         CAN_WIN_TXSW (CAN_WIN_TXB1 + CAN_WIN_TXB0)
-
-#DEFINE         CAN_WIN_TXB2 0x04           ; 010X unused
+#DEFINE         CAN_WIN_TXB2 0x04           ; 010X
 
 #INCLUDE        "canrates.inc"
 #INCLUDE        "canid.inc"
@@ -59,16 +56,7 @@ RXB0DBEN        EQU     H'0002'
 ; Init. CAN bus
 ;------------------------------------------------------------------------------
 INITCAN
-;                CLRF    ANCON0
-;                CLRF    ANCON1
-;                CLRF    ADCON0
-;                CLRF    ADCON1
-;                CLRF    ADCON2
-;                CLRF    CM1CON
-;                CLRF    CM2CON
-;                CLRF    PIR5
-                
-                BCF     TRISB,RB2
+                CLRF    TRISB
                 BSF     TRISB,RB3           ; Enable CANRX
 
                 MOVLW   (1 << REQOP2)       ; Set configuration mode

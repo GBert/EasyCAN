@@ -20,15 +20,18 @@
 ; Receive standard message on CAN bus and send on UART
 ;------------------------------------------------------------------------------
 RXCAN
-                MOVF    RXWIND,W
+                MOVLW   CAN_WIN_RXB0
                 MOVWF   CANCON
-                SUBLW   CAN_WIN_RXSW
-                MOVWF   RXWIND
+                BTFSC   RXB0CON,RXFUL
+                BRA     RXCAN1
+
+                MOVLW   CAN_WIN_RXB1
+                MOVWF   CANCON
                 BTFSS   RXB0CON,RXFUL
                 RETURN
-
+RXCAN1
                 MOVLW   STDDATA             ; Standard data
-                BTFSC   RXB0CON,RXRTRRO_RXB0CON
+                BTFSC   RXB0DLC,RXRTR
                 MOVLW   STDRTR              ; Standard rtr
                 PUTC                        ; Tx
  
