@@ -20,11 +20,11 @@
 ; Receive standard message on UART and send on CAN bus
 ;------------------------------------------------------------------------------
 TXCAN
-                MOVF    EOLNCNT,W
+                MOVF    RXCNT,W             ; If Rx packet counter > 0
                 BNZ     TXCAN1
-                RETURN                      ; TX NONE
+                RETURN
 TXCAN1
-                MOVLW   CAN_WIN_TXB0
+                MOVLW   CAN_WIN_TXB0        ; Find a Tx slot
                 MOVWF   CANCON
                 BTFSS   RXB0CON,TXREQ
                 BRA     TXCAN2
@@ -76,7 +76,7 @@ TXCANEND
                 XORLW   EOLNCHAR
                 BNZ     TXCANEND
 
-                DECF    EOLNCNT,F
+                DECF    RXCNT,F             ; Rx packet counter--
                 RETURN
 
 ;------------------------------------------------------------------------------

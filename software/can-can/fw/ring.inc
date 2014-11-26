@@ -32,13 +32,16 @@
                 RXPUT   : 1
                 TXGET   : 1                 ; Tx ring
                 TXPUT   : 1
-                EOLNCNT : 1                 ; EOLN/Packet Counter
+                RXCNT   : 1                 ; Rx packet counter
+                TXCNT   : 1                 ; Tx packet counter
                 TXTEMP  : 1
                 ENDC
 
 ;------------------------------------------------------------------------------
 ; Rx/Tx ring
 ;------------------------------------------------------------------------------
+
+RXBUF           EQU     0x0180              ; Rx ring FSR1
 
 ;0100:  80 81 82 83 84 85 86 87 88 89 8a 8b 8c 8d 8e 8f    ................
 ;0110:  90 91 92 93 94 95 96 97 98 99 9a 9b 9c 9d 9e 9f    ................
@@ -57,8 +60,7 @@
 ;01e0:  60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f    `abcdefghijklmno
 ;01f0:  70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7f    pqrstuvwxyz.....
 
-RXBUF           EQU     0x0100              ; Rx ring
-TXBUF           EQU     0x0180              ; Tx ring
+TXBUF           EQU     0x0280              ; Tx ring FSR2
 
 ;------------------------------------------------------------------------------
 ; Rx/Tx ring macros
@@ -66,19 +68,15 @@ TXBUF           EQU     0x0180              ; Tx ring
 
 GETC            MACRO
                 MOVF    RXGET,W
-                MOVF    PLUSW2,W
-
+                MOVF    PLUSW1,W
                 INCF    RXGET,F             ; RXGET++
-                BSF     RXGET,7
                 ENDM
 
 PUTC            MACRO
                 MOVWF   TXTEMP
                 MOVF    TXPUT,W
                 MOVFF   TXTEMP,PLUSW2
-
                 INCF    TXPUT,F             ; TXPUT++
-                BCF     TXPUT,7
                 ENDM
 
 ;------------------------------------------------------------------------------
@@ -89,44 +87,38 @@ PUTC            MACRO
 ISR
                 BTG     LLED,0              ; LED1
                 MOVLB   0x0F                ; Default to Bank 15
-#IF 0
-                MOVFF   FSR2H,FSR2H_SAVE
-                MOVFF   FSR2L,FSR2L_SAVE
-                LFSR    FSR2,TXBUF
-#ENDIF
+
+                BTFSS   UTXSTA,TRMT         ; Poll TRMT; Tx?
+                BRA     ISRRX
+
                 MOVF    TXGET,W             ; Data?
                 XORWF   TXPUT,W
                 BZ      ISRRX
-#IFDEF __18F4685
-                BTFSS   UPIR,UTXIF          ; Poll TXIF; Tx?
-                BRA     ISRRX
-#ENDIF
-#IFDEF __18F26K80
-                BTFSS   UTXSTA,TRMT         ; Poll TRMT; Tx?
-                BRA     ISRRX
-#ENDIF
+
                 MOVF    TXGET,W
                 MOVFF   PLUSW2,UTXREG
                 INCF    TXGET,F
-                BCF     TXGET,7
+
+                MOVF    TXGET,W             ; Data?
+                XORWF   TXPUT,W
+                BZ      ISRRX
+
+                MOVF    TXGET,W
+                MOVFF   PLUSW2,UTXREG
+                INCF    TXGET,F
 ISRRX
                 BTFSS   UPIR,URCIF          ; Rx?
                 BRA     ISREND
 
                 MOVF    RXPUT,W
-                MOVFF   URCREG,PLUSW2
+                MOVFF   URCREG,PLUSW1
                 INCF    RXPUT,F
-                BSF     RXPUT,7
 
-                MOVF    PLUSW2,W            ; EOLN?
+                MOVF    PLUSW1,W            ; EOLN?
                 XORLW   EOLNCHAR
                 BNZ     ISREND
-                INCF    EOLNCNT
+                INCF    RXCNT
 ISREND
-#IF 0
-                MOVFF   FSR2H_SAVE,FSR2H
-                MOVFF   FSR2L_SAVE,FSR2L
-#ENDIF
                 BTG     LLED,1              ; LED2
 
                 BCF     PIR1,TMR2IF         ; Reset TMR2 Rx/Tx ring IRQ
@@ -136,17 +128,17 @@ ISREND
 ; Init. Rx/Tx ring
 ;------------------------------------------------------------------------------
 INITRING
-#IF 1
-                LFSR    FSR2,TXBUF          ; FSR2 H/L Reserved for Ring
-#ENDIF
-                MOVLW   0x80                ; Rx Index 0
-                MOVWF   RXGET
-                MOVWF   RXPUT
+                LFSR    FSR1,RXBUF          ; FSR1 H/L Reserved for Rx ring
+                LFSR    FSR2,TXBUF          ; FSR2 H/L Reserved for Tx ring
 
-                CLRF    TXGET               ; Tx Index 0
+                CLRF    RXGET               ; Rx index = 0
+                CLRF    RXPUT
+
+                CLRF    TXGET               ; Tx index = 0
                 CLRF    TXPUT
 
-                CLRF    EOLNCNT             ; Reset EOLN/Packet Counter
+                CLRF    RXCNT               ; Reset Rx packet counter
+                CLRF    TXCNT               ; Reset Tx packet counter
 
                 RETURN
 
