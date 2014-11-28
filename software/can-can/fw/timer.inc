@@ -24,7 +24,8 @@
 
 ; TMR2 Interval. 1:1 Postscale, Prescaler 16.
 ;
-#DEFINE         TMR2_PR     (TCY / (BAUDRATE / 10) / 16) - 1
+;#DEFINE         TMR2_PR     (TCY / (BAUDRATE / 10) / 16) - 1
+#DEFINE         TMR2_PR     (TCY / BAUDRATE / 4) - 1
 
 ;------------------------------------------------------------------------------
 ; Init. TMR2. 1:1 Postscale, Prescaler 16.

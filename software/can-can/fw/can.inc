@@ -24,8 +24,6 @@
                 CANCMD  : 1
                 CANID   : 1
                 CANCNT  : 1
-                RXWIND  : 1
-                TXWIND  : 1
                 ENDC
 
 ;------------------------------------------------------------------------------
@@ -98,12 +96,6 @@ INITCAN2
                 MOVF    CANSTAT,W
                 ANDLW   (1 << OPMODE2) + (1 << OPMODE1)
                 BNZ     INITCAN2
-
-                MOVLW   CAN_WIN_RXB0
-                MOVWF   RXWIND
-
-                MOVLW   CAN_WIN_TXB0
-                MOVWF   TXWIND
 
                 RETURN
 

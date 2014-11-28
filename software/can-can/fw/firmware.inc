@@ -31,6 +31,9 @@ DJNZ            MACRO   REG,LOC
 ;------------------------------------------------------------------------------
 
                 CBLOCK  0x0000              ; ACCESS RAM 0x00..0x5F
+                B_SAVE  : 1                 ; ISR BANK SELECT REGISTER
+                S_SAVE  : 1                 ; ISR STATUS REGISTER
+                W_SAVE  : 1                 ; ISR WORKING REGISTER
                 ENDC
 
 ;------------------------------------------------------------------------------
@@ -40,9 +43,9 @@ DJNZ            MACRO   REG,LOC
                 ORG     0x0000
                 GOTO    INIT
                 ORG     0x0008
-                GOTO    ISR
+                GOTO    ISRHIGH             ; When IPEN = 0 or 1
                 ORG     0x0018
-                GOTO    ISR
+                GOTO    ISRLOW              ; When IPEN = 1
 
 ;------------------------------------------------------------------------------
 ; Init.
@@ -50,8 +53,7 @@ DJNZ            MACRO   REG,LOC
 INIT
                 MOVLB   0x0F                ; Default to Bank 15
 
-                BCF     RCON,IPEN           ; Reset ISR
-                CLRF    INTCON
+                CLRF    INTCON              ; Reset ISR
                 CLRF    PIE1
                 CLRF    PIR1
 
@@ -59,11 +61,11 @@ INIT
                 CLRF    LTRIS
 
                 RCALL   INITUART            ; Init. UART
-                RCALL   INITTMR2            ; Init. Timer2
                 RCALL   INITRING            ; Init. Rx/Tx Ring
                 RCALL   INITCAN             ; Init. CAN Bus
 
-                BSF     INTCON,PEIE         ; Init. TMR2 Rx/Tx Ring ISR
+                BSF     RCON,IPEN           ; Enable priority interrupts
+                BSF     INTCON,PEIE         ; Init. ISR
                 BSF     INTCON,GIE
                
 ;------------------------------------------------------------------------------
@@ -80,7 +82,6 @@ MAIN
 ;------------------------------------------------------------------------------
 
 #INCLUDE        "uart.inc"                  ; UART
-#INCLUDE        "timer.inc"                 ; TMR2
 #INCLUDE        "ring.inc"                  ; Rx/Tx Ring
 #INCLUDE        "can.inc"                   ; CAN
 #INCLUDE        "ascii.inc"                 ; ASCII I/O

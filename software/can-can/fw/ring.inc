@@ -80,35 +80,12 @@ PUTC            MACRO
                 ENDM
 
 ;------------------------------------------------------------------------------
-; Rx/Tx ring ISR
+; Rx ring ISR
 ; 
-;  Affects RXPUT, TXGET & uses FSR2; do not use these elsewhere.
+;  Affects RXPUT & uses FSR1; do not use these elsewhere.
 ;------------------------------------------------------------------------------
-ISR
+ISRHIGH
                 BTG     LLED,0              ; LED1
-                MOVLB   0x0F                ; Default to Bank 15
-
-                BTFSS   UTXSTA,TRMT         ; Poll TRMT; Tx?
-                BRA     ISRRX
-
-                MOVF    TXGET,W             ; Data?
-                XORWF   TXPUT,W
-                BZ      ISRRX
-
-                MOVF    TXGET,W
-                MOVFF   PLUSW2,UTXREG
-                INCF    TXGET,F
-
-                MOVF    TXGET,W             ; Data?
-                XORWF   TXPUT,W
-                BZ      ISRRX
-
-                MOVF    TXGET,W
-                MOVFF   PLUSW2,UTXREG
-                INCF    TXGET,F
-ISRRX
-                BTFSS   UPIR,URCIF          ; Rx?
-                BRA     ISREND
 
                 MOVF    RXPUT,W
                 MOVFF   URCREG,PLUSW1
@@ -116,13 +93,38 @@ ISRRX
 
                 MOVF    PLUSW1,W            ; EOLN?
                 XORLW   EOLNCHAR
-                BNZ     ISREND
-                INCF    RXCNT
-ISREND
+                BNZ     ISRHIGHEND
+                INCF    RXCNT,F             ; Rx packet counter++
+ISRHIGHEND
+                RETFIE  FAST
+
+;------------------------------------------------------------------------------
+; Tx ring ISR
+; 
+;  Affects TXGET & uses FSR2; do not use these elsewhere.
+;------------------------------------------------------------------------------
+ISRLOW
                 BTG     LLED,1              ; LED2
 
-                BCF     PIR1,TMR2IF         ; Reset TMR2 Rx/Tx ring IRQ
-                RETFIE  FAST
+                MOVFF   STATUS,S_SAVE       ; SAVE STATUS
+                MOVWF   W_SAVE              ; SAVE WORKING REGISTER
+
+                MOVF    TXGET,W
+                MOVF    PLUSW2,W
+                INCF    TXGET,F
+ 
+                MOVWF   UTXREG
+                XORLW   EOLNCHAR
+                BNZ     ISRLOWEND
+
+                DECF    TXCNT,F             ; Tx packet counter--
+                BNZ     ISRLOWEND
+                BCF     UPIE,UTXIE          ; Disable Tx ring ISR
+ISRLOWEND       
+                MOVF    W_SAVE,W            ; RESTORE WORKING REGISTER
+                MOVFF   S_SAVE,STATUS       ; RESTORE STATUS
+
+                RETFIE
 
 ;------------------------------------------------------------------------------
 ; Init. Rx/Tx ring

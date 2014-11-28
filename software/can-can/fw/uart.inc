@@ -24,25 +24,43 @@
 #IFDEF UART1
     #IFNDEF TXSTA1
         #DEFINE UPIR        PIR1
-        #DEFINE UPIE        PIE1
         #DEFINE URCIF       RCIF
         #DEFINE UTXIF       TXIF
+
+        #DEFINE UPIE        PIE1
+        #DEFINE URCIE       RCIE
+        #DEFINE UTXIE       TXIE
+
+        #DEFINE UIPR        IPR1
+        #DEFINE URCIP       RCIP
+        #DEFINE UTXIP       TXIP
+
         #DEFINE UTXSTA      TXSTA
         #DEFINE URCSTA      RCSTA
         #DEFINE UTXREG      TXREG
         #DEFINE URCREG      RCREG
+
         #DEFINE UBAUDCON    BAUDCON
         #DEFINE USPBRGH     SPBRGH
         #DEFINE USPBRG      SPBRG
     #ELSE
         #DEFINE UPIR        PIR1
-        #DEFINE UPIE        PIE1
         #DEFINE URCIF       RC1IF
         #DEFINE UTXIF       TX1IF
+
+        #DEFINE UPIE        PIE1
+        #DEFINE URCIE       RC1IE
+        #DEFINE UTXIE       TX1IE
+
+        #DEFINE UIPR        IPR1
+        #DEFINE URCIP       RC1IP
+        #DEFINE UTXIP       TX1IP
+
         #DEFINE UTXSTA      TXSTA1
         #DEFINE URCSTA      RCSTA1
         #DEFINE UTXREG      TXREG1
         #DEFINE URCREG      RCREG1
+
         #DEFINE UBAUDCON    BAUDCON1
         #DEFINE USPBRGH     SPBRGH1
         #DEFINE USPBRG      SPBRG1
@@ -50,13 +68,22 @@
 #ENDIF
 #IFDEF UART2
         #DEFINE UPIR        PIR3
-        #DEFINE UPIE        PIE3
         #DEFINE URCIF       RC2IF
         #DEFINE UTXIF       TX2IF
+
+        #DEFINE UPIE        PIE3
+        #DEFINE URCIE       RC2IE
+        #DEFINE UTXIE       TX2IE
+
+        #DEFINE UIPR        IPR3
+        #DEFINE URCIP       RC2IP
+        #DEFINE UTXIP       TX2IP
+
         #DEFINE UTXSTA      TXSTA2
         #DEFINE URCSTA      RCSTA2
         #DEFINE UTXREG      TXREG2
         #DEFINE URCREG      RCREG2
+
         #DEFINE UBAUDCON    BAUDCON2
         #DEFINE USPBRGH     SPBRGH2
         #DEFINE USPBRG      SPBRG2
@@ -71,6 +98,10 @@
 INITUART
                 BCF     TRISC,6
                 BSF     TRISC,7
+
+                BSF     UIPR,URCIP          ; Rx high priority
+                BCF     UIPR,UTXIP          ; Tx low priority
+
                 MOVLW   (1 << BRG16)
                 MOVWF   UBAUDCON
 
@@ -79,21 +110,28 @@ INITUART
                 MOVLW   LOW  (UBAUD)
                 MOVWF   USPBRG
 
-                ; Enable Transmit + High Speed Mode
-                MOVLW   (1 << TXEN) + (1 << BRGH)
+                ; Enable 9-bit Mode + Enable Transmit + High Speed Mode + BIT9 = 1
+                MOVLW   (1 << TX9) + (1 << TXEN) + (1 << BRGH) + (1 << TX9D)
                 MOVWF   UTXSTA
 INITUARTAGAIN
-                ; Enable Serial Port
+                ; Disable Rx ISR
+                BCF     UPIE,URCIE
+
+                ; Enable Serial Port + Disable Receiver
                 MOVLW   (1 << SPEN)
                 MOVWF   URCSTA
 
                 ; Enable Receiver
                 BSF     URCSTA,CREN
 
+                ; Flush Receiver
                 MOVF    URCREG,W
                 MOVF    URCREG,W
                 MOVF    URCREG,W
                 
+                ; Enable Rx ring ISR
+                BSF     UPIE,URCIE
+
                 RETURN
 
 ;------------------------------------------------------------------------------

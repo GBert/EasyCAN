@@ -20,7 +20,7 @@
 ; Receive standard message on CAN bus and send on UART
 ;------------------------------------------------------------------------------
 RXCAN
-                MOVLW   CAN_WIN_RXB0
+                MOVLW   CAN_WIN_RXB0        ; Find an Rx slot
                 MOVWF   CANCON
                 BTFSC   RXB0CON,RXFUL
                 BRA     RXCAN1
@@ -59,6 +59,10 @@ RXSTD2
                 PUTC                        ; Tx
 
                 BCF     RXB0CON,RXFUL
+
+                INCF    TXCNT,F             ; Tx packet counter++
+                BSF     UPIE,UTXIE          ; Enable Tx ring ISR
+
                 RETURN
 
 ;------------------------------------------------------------------------------
