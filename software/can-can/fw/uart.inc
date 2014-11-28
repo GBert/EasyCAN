@@ -89,14 +89,14 @@
         #DEFINE USPBRG      SPBRG2
 #ENDIF
 
-; UART Baud Rate Generator
+; UART Baud Rate Generator (FOSC / BAUDRATE / 4 - 1)
 #DEFINE         UBAUD       ((((CLOCK / BAUDRATE) / 2) - 1) / 2)
 
 ;------------------------------------------------------------------------------
 ; Init. UART
 ;------------------------------------------------------------------------------
 INITUART
-                BCF     TRISC,6
+                BCF     TRISC,6             ; set UART ports accordingly
                 BSF     TRISC,7
 
                 BSF     UIPR,URCIP          ; Rx high priority

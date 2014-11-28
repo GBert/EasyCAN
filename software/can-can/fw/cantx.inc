@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Can-Can CAN standard TX
+; Can-Can CAN TX
 ;
 ; Copyright (c) 2014 Darron M Broad
 ;
@@ -17,14 +17,17 @@
                 RADIX   DEC
 
 ;------------------------------------------------------------------------------
-; Receive standard message on UART and send on CAN bus
+; Receive message on UART and send on CAN bus
 ;------------------------------------------------------------------------------
 TXCAN
                 MOVF    RXCNT,W             ; If Rx packet counter > 0
                 BNZ     TXCAN1
                 RETURN
+
+;------------------------------------------------------------------------------
 TXCAN1
-                MOVLW   CAN_WIN_TXB0        ; Find a Tx slot
+                ; Find a Tx slot
+                MOVLW   CAN_WIN_TXB0
                 MOVWF   CANCON
                 BTFSS   RXB0CON,TXREQ
                 BRA     TXCAN2
@@ -38,39 +41,91 @@ TXCAN1
                 MOVWF   CANCON
                 BTFSC   RXB0CON,TXREQ
                 RETURN
+
+;------------------------------------------------------------------------------
 TXCAN2
                 GETC                        ; W = <RXBUF>,RXGET++
-                MOVWF   CANCMD
-                XORLW   STDDATA             ; t?
+
+                MOVWF   CANCMD              ; t?
+                XORLW   STDDATA
                 BZ      TXCANSTD
                 MOVF    CANCMD,W            ; r?
                 XORLW   STDRTR
-                BNZ     TXCANEND
+                BZ      TXCANSTD
+
+                MOVF    CANCMD,W            ; T?
+                XORLW   EXTDATA
+                BZ      TXCANEXT
+                MOVF    CANCMD,W            ; r?
+                XORLW   EXTRTR
+                BZ      TXCANEXT
+
+                BRA     TXCANEND            ; Unsupported
+
+;------------------------------------------------------------------------------
 TXCANSTD
                 RCALL   ASC2NIB             ; GETC
                 TXSID_10_8                  ; Set SID10..8
+
                 LFSR    FSR0,CANID
                 RCALL   ASC2BIN             ; GETC, GETC
+
                 MOVF    CANID,W
                 TXSID_7_3                   ; Set SID7..3
                 MOVF    CANID,W
                 TXSID_2_0                   ; Set SID2..0
 
+                BRA     TXCAN3
+
+;------------------------------------------------------------------------------
+TXCANEXT
+                LFSR    FSR0,CANID
+                RCALL   ASC2BIN             ; GETC, GETC
+
+                MOVF    CANID,W
+                TXEXT_28_24                 ; Set EID28..24
+
+                LFSR    FSR0,CANID
+                RCALL   ASC2BIN             ; GETC, GETC
+
+                MOVF    CANID,W
+                TXEXT_23_21                 ; Set EID23..21
+
+                MOVF    CANID,W
+                TXEXT_20_18                 ; Set EID20..18
+
+                MOVF    CANID,W
+                TXEXT_17_16                 ; Set EID17..16
+
+                BSF     RXB0SIDL,EXIDEN     ; Enable Extended Id
+
+                LFSR    FSR0,RXB0EIDH       ; Set EID15..8
+                RCALL   ASC2BIN             ; GETC, GETC
+
+                LFSR    FSR0,RXB0EIDL       ; Set EID7..0
+                RCALL   ASC2BIN             ; GETC, GETC
+
+;------------------------------------------------------------------------------
+TXCAN3
                 CLRF    RXB0DLC             ; Set RTR
-                BTFSC   CANCMD,1            ; r?
-                BSF     RXB0DLC,RXRTR
+                BTFSC   CANCMD,1            ; r or R?
+                BSF     RXB0DLC,TXRTR
 
                 RCALL   ASC2NIB             ; GETC
-                BZ      TXCANSTD2
+                BZ      TXCAN5
                 MOVWF   CANCNT
                 IORWF   RXB0DLC,F           ; Set DLC
 
+;------------------------------------------------------------------------------
+
                 LFSR    FSR0,RXB0D0
-TXCANSTD1
+TXCAN4
                 RCALL   ASC2BIN             ; Set data
-                DJNZ    CANCNT,TXCANSTD1
-TXCANSTD2
+                DJNZ    CANCNT,TXCAN4
+TXCAN5
                 BSF     RXB0CON,TXREQ       ; Tx
+
+;------------------------------------------------------------------------------
 TXCANEND
                 GETC                        ; W = <RXBUF>,RXGET++
                 XORLW   EOLNCHAR

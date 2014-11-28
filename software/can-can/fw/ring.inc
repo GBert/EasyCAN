@@ -85,7 +85,7 @@ PUTC            MACRO
 ;  Affects RXPUT & uses FSR1; do not use these elsewhere.
 ;------------------------------------------------------------------------------
 ISRHIGH
-                BTG     LLED,0              ; LED1
+;               BTG     LLED,0              ; LED1
 
                 MOVF    RXPUT,W
                 MOVFF   URCREG,PLUSW1
@@ -104,7 +104,7 @@ ISRHIGHEND
 ;  Affects TXGET & uses FSR2; do not use these elsewhere.
 ;------------------------------------------------------------------------------
 ISRLOW
-                BTG     LLED,1              ; LED2
+;               BTG     LLED,1              ; LED2
 
                 MOVFF   STATUS,S_SAVE       ; SAVE STATUS
                 MOVWF   W_SAVE              ; SAVE WORKING REGISTER

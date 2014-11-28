@@ -75,6 +75,7 @@ MAIN
                 RCALL   RESETUART           ; UART RESET
                 RCALL   RXCAN               ; RECEIVE CAN
                 RCALL   TXCAN               ; SEND CAN
+                MOVFF   COMSTAT,LLED
                 BRA     MAIN
 
 ;------------------------------------------------------------------------------

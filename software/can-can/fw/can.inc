@@ -40,9 +40,9 @@ REQOP2          EQU     H'0007'
 RXB0DBEN        EQU     H'0002'
 #ENDIF
 
-#DEFINE         CAN_WIN_RXB0 0x00           ; 000X
+#DEFINE         CAN_WIN_OFF  0x00           ; 000X
+#DEFINE         CAN_WIN_RXB0 0x0C           ; 110X
 #DEFINE         CAN_WIN_RXB1 0x0A           ; 101X
-
 #DEFINE         CAN_WIN_TXB0 0x08           ; 100X
 #DEFINE         CAN_WIN_TXB1 0x06           ; 011X
 #DEFINE         CAN_WIN_TXB2 0x04           ; 010X
@@ -64,16 +64,35 @@ INITCAN1
                 ANDLW   (1 << OPMODE2)
                 BZ      INITCAN1
 
-                BANKSEL RXM0SIDH            ; Set standard receive masks
+                BANKSEL RXM0SIDH            ; Set standard receive masks for RXB0/1
                 CLRF    RXM0SIDH
                 CLRF    RXM1SIDH
                 CLRF    RXM0SIDL
                 CLRF    RXM1SIDL
 
-                CLRF    RXM0EIDH            ; Set extended receive masks
+                BANKSEL RXM0EIDH            ; Set extended receive masks for RXB0/1
+                CLRF    RXM0EIDH
                 CLRF    RXM1EIDH
                 CLRF    RXM0EIDL
                 CLRF    RXM1EIDL
+
+                BANKSEL RXF0SIDH            ; Set standard receive filters for RXB0
+                CLRF    RXF0SIDH
+                CLRF    RXF1SIDH
+                MOVLW   (1 << EXIDEN)
+                MOVWF   RXF0SIDL
+                MOVWF   RXF1SIDL
+
+                BANKSEL RXF2SIDH            ; Set standard receive filters for RXB1
+                CLRF    RXF2SIDH
+                CLRF    RXF3SIDH
+                CLRF    RXF4SIDH
+                CLRF    RXF5SIDH
+                MOVLW   0
+                MOVWF   RXF2SIDL
+                MOVWF   RXF3SIDL
+                MOVWF   RXF4SIDL
+                MOVWF   RXF5SIDL
 
                 BANKSEL BRGCON1             ; Set bit rate
                 MOVLW   BRG1
@@ -86,11 +105,8 @@ INITCAN1
                 BANKSEL CIOCON              ; Enable CANTX
                 BSF     CIOCON,ENDRHI
 
-                BSF     RXB0CON,RXB0DBEN    ; Double buffer
-
-                BCF     RXB0CON,RXFUL       ; Reset
-                BCF     RXB1CON,RXFUL       ; Reset
-
+                CLRF    RXB0CON             ; Reset receiver
+                CLRF    RXB1CON             ; Reset receiver
                 CLRF    CANCON              ; Set normal mode
 INITCAN2
                 MOVF    CANSTAT,W

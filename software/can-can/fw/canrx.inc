@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Can-Can CAN standard RX
+; Can-Can CAN RX
 ;
 ; Copyright (c) 2014 Darron M Broad
 ;
@@ -17,44 +17,76 @@
                 RADIX   DEC
 
 ;------------------------------------------------------------------------------
-; Receive standard message on CAN bus and send on UART
+; Receive message on CAN bus and send on UART
 ;------------------------------------------------------------------------------
 RXCAN
-                MOVLW   CAN_WIN_RXB0        ; Find an Rx slot
-                MOVWF   CANCON
+                ; Find an Rx slot
+                CLRF    CANCON              ; Window mode off
                 BTFSC   RXB0CON,RXFUL
                 BRA     RXCAN1
 
-                MOVLW   CAN_WIN_RXB1
+                MOVLW   CAN_WIN_RXB1        ; Window mode on RXB1
                 MOVWF   CANCON
-                BTFSS   RXB0CON,RXFUL
+                BTFSS   RXB1CON,RXFUL
                 RETURN
+
+;------------------------------------------------------------------------------
 RXCAN1
+                BTFSC   RXB0SIDL,EXID
+                BRA     RXEXT
+
                 MOVLW   STDDATA             ; Standard data
                 BTFSC   RXB0DLC,RXRTR
                 MOVLW   STDRTR              ; Standard rtr
                 PUTC                        ; Tx
- 
+
                 RXSID_10_8                  ; Get SID10..8
                 CALL    NIB2ASC             ; Tx
 
                 RXSID_7_0                   ; Get SID7..0
                 CALL    BIN2ASC             ; Tx
 
+                BRA     RXCAN2
+
+;------------------------------------------------------------------------------
+RXEXT
+                MOVLW   EXTDATA             ; Extended data
+                BTFSC   RXB0DLC,RXRTR
+                MOVLW   EXTRTR              ; Extended rtr
+                PUTC                        ; Tx
+
+                RXEXT_28_24                 ; Get EID28..EID24
+                CALL    BIN2ASC             ; Tx
+
+                RXEXT_23_16                 ; Get EID23..EID16
+                CALL    BIN2ASC             ; Tx
+
+                MOVF    RXB0EIDH,W          ; Get EID15..EID8
+                CALL    BIN2ASC             ; Tx
+
+                MOVF    RXB0EIDL,W          ; Get EID7..EID0
+                CALL    BIN2ASC             ; Tx
+
+;------------------------------------------------------------------------------
+RXCAN2
                 MOVF    RXB0DLC,W           ; Get DLC
                 ANDLW   0x0F
                 MOVWF   CANCNT
                 IORLW   0x30
                 PUTC                        ; Tx
 
+;------------------------------------------------------------------------------
+
                 MOVF    CANCNT,W            ; Get message
-                BZ      RXSTD2
+                BZ      RXCAN4
                 LFSR    FSR0,RXB0D0
-RXSTD1
+RXCAN3
                 MOVF    POSTINC0,W
                 RCALL   BIN2ASC             ; Tx
-                DJNZ    CANCNT,RXSTD1
-RXSTD2
+                DJNZ    CANCNT,RXCAN3
+
+;------------------------------------------------------------------------------
+RXCAN4
                 MOVLW   EOLNCHAR
                 PUTC                        ; Tx
 
