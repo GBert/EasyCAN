@@ -19,12 +19,10 @@ ifeq ($(strip $(GPASM)),)
 $(error gputils unavailable)
 endif
 
-WELLINGTON:=../../wellington/include
-
-AS:=gpasm -a inhx32 -e on -I $(WELLINGTON)
+AS:=gpasm -a inhx32 -e on -I ../include/
 
 ASOURCE:=$(filter-out template.asm, $(wildcard *.asm))
-AHEADER:=$(wildcard *.inc)
+AHEADER:=$(wildcard ../include/*.inc)
 AOBJECT:=$(ASOURCE:.asm=.hex)
 
 build:$(AOBJECT)
@@ -36,8 +34,7 @@ $(AOBJECT):$(AHEADER) Makefile
 	$(AS) $< -o $@
 
 upload:build
-#	easy-loader -v /dev/ttyPL2303 $(AOBJECT)
-	easy-loader -r -v /dev/ttyPL2303 $(AOBJECT)
+	easy-loader -v /dev/ttyPL2303 $(AOBJECT)
 
 install:build
 

@@ -28,9 +28,9 @@
 ;
 ; RXB0SIDL
 ; --------
-; SID2  SID1  SID0  SRR   EXID  X     X     X
+; SID2  SID1  SID0  X    EXIDEN X     X     X
 ;
-; EID20 EID19 EID18 SRR   EXID  X     EID17 EID16
+; EID20 EID19 EID18 X    EXIDEN X     EID17 EID16
 ;
 ; RXB0EIDH
 ; --------
@@ -40,12 +40,12 @@
 ; --------
 ; EID7  EID6  EID5  EID4  EID3  EID2  EID1  EID0
 ;
-; STANDARD 11-bit
-; ---------------
+; STANDARD ID 11-bit
+; ------------------
 ; [XX XX XX XX XX 10 09 08]  [07 06 05 04 03 02 01 00]
 ;
-; EXTENDED 29-bit
-; ---------------
+; EXTENDED ID 29-bit
+; ------------------
 ; [XX XX XX 28 27 26 25 24]  [23 22 21 20 19 18 17 16]
 ; [15 14 13 12 11 10 09 08]  [07 06 05 04 03 02 01 00]
 
@@ -54,7 +54,7 @@
 ;------------------------------------------------------------------------------
 
 ; Take lower 3-bits in W and store in SID10..SID8, SID7..SID3 are RESET
-TXSID_10_8      MACRO
+TXSID_10_8      MACRO   
                 ANDLW   b'00000111'
                 RRNCF   WREG,F
                 RRNCF   WREG,F
@@ -63,7 +63,7 @@ TXSID_10_8      MACRO
                 ENDM
 
 ; Take upper 5-bits in W and store in SID7..SID3, SID10..SID8 are UNAFFECTED
-TXSID_7_3       MACRO
+TXSID_7_3       MACRO   
                 ANDLW   b'11111000'
                 RRNCF   WREG,F
                 RRNCF   WREG,F
@@ -114,7 +114,7 @@ RXSID_7_0       MACRO
 ;------------------------------------------------------------------------------
 
 ; Take lower 5-bits in W and store in EID28..EID24, EID23..EID21 are RESET
-TXEXT_28_24     MACRO
+TXEXT_28_24     MACRO   
                 ANDLW   b'00011111'
                 RLNCF   WREG,F
                 RLNCF   WREG,F
@@ -123,7 +123,7 @@ TXEXT_28_24     MACRO
                 ENDM
 
 ; Take upper 3-bits in W and store in EID23..EID21, EID28..EID24 are UNAFFECTED
-TXEXT_23_21     MACRO
+TXEXT_23_21     MACRO   
                 ANDLW   b'11100000'
                 RLNCF   WREG,F
                 RLNCF   WREG,F
@@ -132,7 +132,7 @@ TXEXT_23_21     MACRO
                 ENDM
 
 ; Take 3-bits in W and store in EID20..EID18, EXIDEN & EID17..EID16 are RESET
-TXEXT_20_18     MACRO
+TXEXT_20_18     MACRO   
                 ANDLW   b'00011100'
                 RLNCF   WREG,F
                 RLNCF   WREG,F
@@ -141,7 +141,7 @@ TXEXT_20_18     MACRO
                 ENDM
 
 ; Take lower 2-bits in W and store in EXIDEN & EID17..EID16, EID20..EID18 are UNAFFECTED
-TXEXT_17_16     MACRO
+TXEXT_17_16     MACRO   
                 ANDLW   b'00000011'
                 IORWF   RXB0SIDL,F
                 ENDM

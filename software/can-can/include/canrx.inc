@@ -35,11 +35,13 @@ RXCAN1
                 BTFSC   RXB0SIDL,EXID
                 BRA     RXEXT
 
+;------------------------------------------------------------------------------
+
                 MOVLW   STDDATA             ; Standard data
                 BTFSC   RXB0DLC,RXRTR
                 MOVLW   STDRTR              ; Standard rtr
                 PUTC                        ; Tx
-
+ 
                 RXSID_10_8                  ; Get SID10..8
                 CALL    NIB2ASC             ; Tx
 
@@ -54,7 +56,7 @@ RXEXT
                 BTFSC   RXB0DLC,RXRTR
                 MOVLW   EXTRTR              ; Extended rtr
                 PUTC                        ; Tx
-
+ 
                 RXEXT_28_24                 ; Get EID28..EID24
                 CALL    BIN2ASC             ; Tx
 
@@ -87,10 +89,21 @@ RXCAN3
 
 ;------------------------------------------------------------------------------
 RXCAN4
+                ; Clear RXFUL as per MCHP demo
+                MOVF    CANCON,W
+                BNZ     RXCAN5
+ 
+                BCF     RXB0CON,RXFUL       ; Window mode off
+                BRA     RXCAN6
+RXCAN5
+                BCF     RXB1CON,RXFUL       ; Window mode on RXB1
+
+;------------------------------------------------------------------------------
+RXCAN6
                 MOVLW   EOLNCHAR
                 PUTC                        ; Tx
 
-                BCF     RXB0CON,RXFUL
+;------------------------------------------------------------------------------
 
                 INCF    TXCNT,F             ; Tx packet counter++
                 BSF     UPIE,UTXIE          ; Enable Tx ring ISR

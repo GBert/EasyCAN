@@ -122,6 +122,8 @@ TXCAN3
 TXCAN4
                 RCALL   ASC2BIN             ; Set data
                 DJNZ    CANCNT,TXCAN4
+
+;------------------------------------------------------------------------------
 TXCAN5
                 BSF     RXB0CON,TXREQ       ; Tx
 

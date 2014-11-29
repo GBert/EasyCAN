@@ -96,9 +96,6 @@
 ; Init. UART
 ;------------------------------------------------------------------------------
 INITUART
-                BCF     TRISC,6             ; set UART ports accordingly
-                BSF     TRISC,7
-
                 BSF     UIPR,URCIP          ; Rx high priority
                 BCF     UIPR,UTXIP          ; Tx low priority
 
@@ -114,7 +111,7 @@ INITUART
                 MOVLW   (1 << TX9) + (1 << TXEN) + (1 << BRGH) + (1 << TX9D)
                 MOVWF   UTXSTA
 INITUARTAGAIN
-                ; Disable Rx ISR
+                ; Disable Rx ring ISR
                 BCF     UPIE,URCIE
 
                 ; Enable Serial Port + Disable Receiver
