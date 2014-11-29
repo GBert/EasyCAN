@@ -1,51 +1,32 @@
-SYSTEM:=$(shell uname -s)
+#------------------------------------------------------------------------------
+#
+# Can-Can Makefile
+#
+# Copyright (c) 2014 Darron M Broad
+#
+#------------------------------------------------------------------------------
+#
+# This file is part of the Can-Can CAN bus interface project.
+#
+# Can-Can is licensed under the CC BY-NC-SA 4.0.
+#
+# See file /LICENSE for details.
+# 
+#------------------------------------------------------------------------------
 
-MCU=18f26k80
-CC=sdcc
-CFLAGS=--obanksel=9 --use-non-free --use-crt=crt0iz.o --pstack-model=small -mpic16 -p$(MCU) #-DDEBUG=1
-CLIB=-llibc18f.lib
-
-MAIN=main
-TARGET=main.hex
-SOURCE=main.c timer.c usart.c can.c slcan.c
-OBJECT=$(SOURCE:.c=.o)
-HEADER=$(SOURCE:.c=.h) prototypes.h
-
-BOOTLOADER	= easy-loader
-TERMINAL	= com
-
-build:$(TARGET)
-
-$(TARGET):$(OBJECT)
-	@echo -n "[LINK] "
-	$(CC) $(CFLAGS) $(OBJECT) -o $(TARGET) $(CLIB) -m$(MCU)
-
-$(OBJECT):$(HEADER) Makefile
+build:
+	cd fw && $(MAKE) build
+	cd test && $(MAKE) build
 
 install:build
-
-uninstall:clean
+	cd fw && $(MAKE) install
+	cd test && $(MAKE) install
 
 clean:
-ifneq (,$(findstring Linux,$(SYSTEM)))
-	find . -regextype posix-extended -regex ".*\.(o|asm|cod|err|hex|log|lst)" -delete
-else
-	find -E . -regex ".*\.(o|asm|cod|err|hex|log|lst)" -delete
-endif
+	cd fw && $(MAKE) clean
+	cd test && $(MAKE) clean
+	rm -f *~
 
-%.o:%.c
-	@echo -n "[CC]   "
-	$(CC) $(CFLAGS) -c $< -o $@
-
-flash:
-	$(BOOTLOADER) -r /dev/ttyUSB0 $(MAIN).hex
-
-verify:
-	$(BOOTLOADER) -r /dev/ttyUSB0 -v $(MAIN).hex
-
-com:
-	$(TERMINAL) /dev/ttyUSB0 500000
-
-trial:
-	$(BOOTLOADER) -r /dev/ttyUSB0 -q $(MAIN).hex
-	$(TERMINAL) /dev/ttyUSB0 500000
+uninstall:clean
+	cd fw && $(MAKE) uninstall
+	cd test && $(MAKE) uninstall
