@@ -27,19 +27,19 @@ TXCAN
 ;------------------------------------------------------------------------------
 TXCAN1
                 ; Find a Tx slot
-                MOVLW   CAN_WIN_TXB0
+                MOVLW   CAN_WIN_TXB0        ; Window mode on TXB0
                 MOVWF   CANCON
-                BTFSS   RXB0CON,TXREQ
+                BTFSS   TXB0CON,TXREQ
                 BRA     TXCAN2
 
-                MOVLW   CAN_WIN_TXB1
+                MOVLW   CAN_WIN_TXB1        ; Window mode on TXB1
                 MOVWF   CANCON
-                BTFSS   RXB0CON,TXREQ
+                BTFSS   TXB1CON,TXREQ
                 BRA     TXCAN2
 
-                MOVLW   CAN_WIN_TXB2
+                MOVLW   CAN_WIN_TXB2        ; Window mode on TXB2
                 MOVWF   CANCON
-                BTFSC   RXB0CON,TXREQ
+                BTFSC   TXB2CON,TXREQ
                 RETURN
 
 ;------------------------------------------------------------------------------
@@ -72,6 +72,7 @@ TXCANSTD
 
                 MOVF    CANID,W
                 TXSID_7_3                   ; Set SID7..3
+
                 MOVF    CANID,W
                 TXSID_2_0                   ; Set SID2..0
 

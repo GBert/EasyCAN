@@ -71,7 +71,7 @@ TXSID_7_3       MACRO
                 IORWF   RXB0SIDH,F
                 ENDM
 
-; Take lower 3-bits in W and store in SID2..SID0, SRR & EXID are RESET
+; Take lower 3-bits in W and store in SID2..SID0, EXIDEN is RESET
 TXSID_2_0       MACRO
                 ANDLW   b'00000111'
                 RRNCF   WREG,F

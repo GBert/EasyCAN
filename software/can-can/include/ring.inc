@@ -23,18 +23,25 @@
 ; End of Line Character
 #DEFINE         EOLNCHAR    0x0D            ; CR
 
+; Ring Buffer Flow Control
+#DEFINE         HIGHMARK    (256 / 27)      ; Ring size / Max slcan size
+#DEFINE         LOWMARK     (HIGHMARK - 3)
+
 ;------------------------------------------------------------------------------
 ; Rx/Tx ring variables
 ;------------------------------------------------------------------------------
 
                 CBLOCK
-                RXGET   : 1                 ; Rx ring
-                RXPUT   : 1
-                TXGET   : 1                 ; Tx ring
-                TXPUT   : 1
+                ; Rx ring
+                RXGET   : 1                 ; GETC Main
+                RXPUT   : 1                 ; PUTC ISR
+                RXTRG   : 1                 ; HIGH/LOW trigger
                 RXCNT   : 1                 ; Rx packet counter
+                ; Tx ring
+                TXGET   : 1                 ; GETC ISR
+                TXPUT   : 1                 ; PUTC Main
+                TXTEMP  : 1                 ; PUTC Temp
                 TXCNT   : 1                 ; Tx packet counter
-                TXTEMP  : 1
                 ENDC
 
 ;------------------------------------------------------------------------------
@@ -85,8 +92,6 @@ PUTC            MACRO
 ;  Affects RXPUT & uses FSR1; do not use these elsewhere.
 ;------------------------------------------------------------------------------
 ISRHIGH
-;               BTG     LLED,0              ; LED1
-
                 MOVF    RXPUT,W
                 MOVFF   URCREG,PLUSW1
                 INCF    RXPUT,F
@@ -104,15 +109,13 @@ ISRHIGHEND
 ;  Affects TXGET & uses FSR2; do not use these elsewhere.
 ;------------------------------------------------------------------------------
 ISRLOW
-;               BTG     LLED,1              ; LED2
-
                 MOVFF   STATUS,S_SAVE       ; SAVE STATUS
                 MOVWF   W_SAVE              ; SAVE WORKING REGISTER
 
                 MOVF    TXGET,W
                 MOVF    PLUSW2,W
                 INCF    TXGET,F
- 
+
                 MOVWF   UTXREG
                 XORLW   EOLNCHAR
                 BNZ     ISRLOWEND
@@ -120,7 +123,7 @@ ISRLOW
                 DECF    TXCNT,F             ; Tx packet counter--
                 BNZ     ISRLOWEND
                 BCF     UPIE,UTXIE          ; Disable Tx ring ISR
-ISRLOWEND       
+ISRLOWEND
                 MOVF    W_SAVE,W            ; RESTORE WORKING REGISTER
                 MOVFF   S_SAVE,STATUS       ; RESTORE STATUS
 

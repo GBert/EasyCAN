@@ -39,7 +39,7 @@
 #DEFINE         CLOCK       64000000
 
 ; UART Baud Rate
-#DEFINE         BAUDRATE    460800
+#DEFINE         BAUDRATE    500000
 
 ; UART1 or UART2
 #DEFINE         UART1

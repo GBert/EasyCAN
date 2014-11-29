@@ -32,6 +32,16 @@ RXCAN
 
 ;------------------------------------------------------------------------------
 RXCAN1
+                ; If Tx packet counter == HIGHMARK Then Drop Packet
+                MOVF    TXCNT,W
+                XORLW   HIGHMARK
+                BNZ     RXTST
+                BSF     LLED,0              ; LED1 Overflow
+                BRA     RXCANCLR            ; Drop Packet
+
+;------------------------------------------------------------------------------
+RXTST
+                BCF     LLED,0              ; LED1 Okay
                 BTFSC   RXB0SIDL,EXID
                 BRA     RXEXT
 
@@ -81,33 +91,30 @@ RXCAN2
 
                 MOVF    CANCNT,W            ; Get message
                 BZ      RXCAN4
+
                 LFSR    FSR0,RXB0D0
 RXCAN3
                 MOVF    POSTINC0,W
                 RCALL   BIN2ASC             ; Tx
                 DJNZ    CANCNT,RXCAN3
-
-;------------------------------------------------------------------------------
 RXCAN4
-                ; Clear RXFUL as per MCHP demo
-                MOVF    CANCON,W
-                BNZ     RXCAN5
- 
-                BCF     RXB0CON,RXFUL       ; Window mode off
-                BRA     RXCAN6
-RXCAN5
-                BCF     RXB1CON,RXFUL       ; Window mode on RXB1
-
-;------------------------------------------------------------------------------
-RXCAN6
                 MOVLW   EOLNCHAR
                 PUTC                        ; Tx
-
-;------------------------------------------------------------------------------
 
                 INCF    TXCNT,F             ; Tx packet counter++
                 BSF     UPIE,UTXIE          ; Enable Tx ring ISR
 
+;------------------------------------------------------------------------------
+RXCANCLR
+#IF 0
+                MOVF    CANCON,W            ; Clear RXFUL as per MCHP demo
+                BNZ     RXCANCLR1
+                BCF     RXB0CON,RXFUL
+                RETURN
+RXCANCLR1       BCF     RXB1CON,RXFUL
+                RETURN
+#ENDIF
+                BCF     RXB0CON,RXFUL       ; Clear RXFUL in window
                 RETURN
 
 ;------------------------------------------------------------------------------
