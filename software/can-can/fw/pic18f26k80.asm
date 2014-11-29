@@ -39,13 +39,13 @@
 #DEFINE         CLOCK       64000000
 
 ; UART Baud Rate
-#DEFINE         BAUDRATE    500000
+#DEFINE         BAUDRATE    921600
 
 ; UART1 or UART2
 #DEFINE         UART1
 
 ; CAN Bus Rate
-#DEFINE         CANRATE     250
+#DEFINE         CANRATE     500
 
 ; Advanced LED Diags.
 #DEFINE         LLED        LATA

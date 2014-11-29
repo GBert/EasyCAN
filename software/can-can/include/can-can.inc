@@ -56,6 +56,7 @@ INIT
                 CLRF    INTCON              ; Reset ISR
                 CLRF    PIE1
                 CLRF    PIR1
+                CLRF    PIR3
 
                 CLRF    LLED                ; Init. Diag. LEDs
                 CLRF    LTRIS

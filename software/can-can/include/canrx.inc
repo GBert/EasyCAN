@@ -32,9 +32,9 @@ RXCAN
 
 ;------------------------------------------------------------------------------
 RXCAN1
-                ; If Tx packet counter == HIGHMARK Then Drop Packet
+                ; If Tx packet counter = trigger Then Drop Packet
                 MOVF    TXCNT,W
-                XORLW   HIGHMARK
+                XORLW   TXTRIG
                 BNZ     RXTST
                 BSF     LLED,0              ; LED1 Overflow
                 BRA     RXCANCLR            ; Drop Packet

@@ -23,9 +23,10 @@
 ; End of Line Character
 #DEFINE         EOLNCHAR    0x0D            ; CR
 
-; Ring Buffer Flow Control
-#DEFINE         HIGHMARK    (256 / 27)      ; Ring size / Max slcan size
-#DEFINE         LOWMARK     (HIGHMARK - 3)
+; Rx/Tx ring Flow Control
+#DEFINE         RXTRIGH     (256 / 27 - 1)  ; Rx ring size / Max slcan size - 1
+#DEFINE         RXTRIGL     (256 / 27 - 3)  ; Rx ring size / Max slcan size - 3
+#DEFINE         TXTRIG      (256 / 27)      ; Tx ring size / Max slcan size
 
 ;------------------------------------------------------------------------------
 ; Rx/Tx ring variables
@@ -35,7 +36,7 @@
                 ; Rx ring
                 RXGET   : 1                 ; GETC Main
                 RXPUT   : 1                 ; PUTC ISR
-                RXTRG   : 1                 ; HIGH/LOW trigger
+                RXTRG   : 1                 ; HIGH trigger flag
                 RXCNT   : 1                 ; Rx packet counter
                 ; Tx ring
                 TXGET   : 1                 ; GETC ISR
@@ -92,15 +93,42 @@ PUTC            MACRO
 ;  Affects RXPUT & uses FSR1; do not use these elsewhere.
 ;------------------------------------------------------------------------------
 ISRHIGH
+                MOVF    RXTRG,W             ; Flow control activated?
+                BZ      ISRHIGHOK           ; No...
+
+                MOVF    URCREG,W,ACCESS     ; EOLN?
+                XORLW   EOLNCHAR
+                BNZ     ISRHIGHNAKEND
+
+                MOVF    RXCNT,W             ; Flow control off?
+                SUBLW   RXTRIGL
+                BNC     ISRHIGHNAKEND       ; No, RXCNT > RXTRIGL...
+
+                BCF     LLED,1              ; LED2 Flow control off
+                CLRF    RXTRG               ; Flow control deactivated
+ISRHIGHNAKEND
+                RETFIE  FAST
+
+;------------------------------------------------------------------------------
+
+ISRHIGHOK
                 MOVF    RXPUT,W
                 MOVFF   URCREG,PLUSW1
                 INCF    RXPUT,F
 
                 MOVF    PLUSW1,W            ; EOLN?
                 XORLW   EOLNCHAR
-                BNZ     ISRHIGHEND
+                BNZ     ISRHIGHOKEND
+
                 INCF    RXCNT,F             ; Rx packet counter++
-ISRHIGHEND
+
+                MOVF    RXCNT,W             ; Flow control on?
+                XORLW   RXTRIGH
+                BNZ     ISRHIGHOKEND
+ 
+                BSF     LLED,1              ; LED2 Flow control on
+                SETF    RXTRG               ; Flow control activated
+ISRHIGHOKEND
                 RETFIE  FAST
 
 ;------------------------------------------------------------------------------
@@ -138,6 +166,7 @@ INITRING
 
                 CLRF    RXGET               ; Rx index = 0
                 CLRF    RXPUT
+                CLRF    RXTRG               ; Flow control off
 
                 CLRF    TXGET               ; Tx index = 0
                 CLRF    TXPUT
