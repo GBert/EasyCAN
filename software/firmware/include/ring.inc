@@ -36,7 +36,7 @@
                 ; Rx ring
                 RXGET   : 1                 ; GETC Main
                 RXPUT   : 1                 ; PUTC ISR
-                RXTRG   : 1                 ; HIGH trigger flag
+                RXTRG   : 1                 ; Flow control
                 RXCNT   : 1                 ; Rx packet counter
                 ; Tx ring
                 TXGET   : 1                 ; GETC ISR
@@ -90,7 +90,7 @@ PUTC            MACRO
 ;------------------------------------------------------------------------------
 ; Rx ring ISR
 ; 
-;  Affects RXPUT & uses FSR1; do not use these elsewhere.
+;  Affects RXPUT & RXTRG & uses FSR1; do not use these elsewhere.
 ;------------------------------------------------------------------------------
 ISRHIGH
                 MOVF    RXTRG,W             ; Flow control activated?
@@ -104,7 +104,7 @@ ISRHIGH
                 SUBLW   RXTRIGL
                 BNC     ISRHIGHNAKEND       ; No, RXCNT > RXTRIGL...
 
-                BCF     LLED,1              ; LED2 Flow control off
+                UARTON                      ; UART flow control status LED
                 CLRF    RXTRG               ; Flow control deactivated
 ISRHIGHNAKEND
                 RETFIE  FAST
@@ -124,9 +124,9 @@ ISRHIGHOK
 
                 MOVF    RXCNT,W             ; Flow control on?
                 XORLW   RXTRIGH
-                BNZ     ISRHIGHOKEND
+                BNZ     ISRHIGHOKEND        ; No, RXCNT < RXTRIGH...
  
-                BSF     LLED,1              ; LED2 Flow control on
+                UARTOFF                     ; UART flow control status LED
                 SETF    RXTRG               ; Flow control activated
 ISRHIGHOKEND
                 RETFIE  FAST

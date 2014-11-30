@@ -26,6 +26,22 @@ DJNZ            MACRO   REG,LOC
                 BRA     LOC
                 ENDM
 
+CANOVFL         MACRO
+                BSF     LLED,0              ; LED1 Packet dropped
+                ENDM
+
+CANRECV         MACRO
+                BCF     LLED,0              ; LED1 Packet received
+                ENDM
+
+UARTOFF         MACRO
+                BSF     LLED,1              ; LED2 Flow control activated
+                ENDM
+
+UARTON          MACRO
+                BCF     LLED,1              ; LED2 Flow control deactivated
+                ENDM
+
 ;------------------------------------------------------------------------------
 ; Variables
 ;------------------------------------------------------------------------------
@@ -56,7 +72,6 @@ INIT
                 CLRF    INTCON              ; Reset ISR
                 CLRF    PIE1
                 CLRF    PIR1
-                CLRF    PIR3
 
                 CLRF    LLED                ; Init. Diag. LEDs
                 CLRF    LTRIS
@@ -76,7 +91,6 @@ MAIN
                 RCALL   RESETUART           ; UART RESET
                 RCALL   RXCAN               ; RECEIVE CAN
                 RCALL   TXCAN               ; SEND CAN
-;               MOVFF   COMSTAT,LLED
                 BRA     MAIN
 
 ;------------------------------------------------------------------------------

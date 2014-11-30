@@ -23,7 +23,7 @@ RXCAN
                 ; Find an Rx slot
                 CLRF    CANCON              ; Window mode off
                 BTFSC   RXB0CON,RXFUL
-                BRA     RXCAN1
+                BRA     RXCANLIMIT
 
                 MOVLW   CAN_WIN_RXB1        ; Window mode on RXB1
                 MOVWF   CANCON
@@ -31,22 +31,23 @@ RXCAN
                 RETURN
 
 ;------------------------------------------------------------------------------
-RXCAN1
+RXCANLIMIT
                 ; If Tx packet counter = trigger Then Drop Packet
                 MOVF    TXCNT,W
                 XORLW   TXTRIG
-                BNZ     RXTST
-                BSF     LLED,0              ; LED1 Overflow
-                BRA     RXCANCLR            ; Drop Packet
+                BNZ     RXPACKET
+
+                CANOVFL                     ; CAN packet status LED
+                BCF     RXB0CON,RXFUL       ; Packet dropped
+                RETURN
 
 ;------------------------------------------------------------------------------
-RXTST
-                BCF     LLED,0              ; LED1 Okay
+RXPACKET
                 BTFSC   RXB0SIDL,EXID
                 BRA     RXEXT
 
 ;------------------------------------------------------------------------------
-
+RXSTD
                 MOVLW   STDDATA             ; Standard data
                 BTFSC   RXB0DLC,RXRTR
                 MOVLW   STDRTR              ; Standard rtr
@@ -58,7 +59,7 @@ RXTST
                 RXSID_7_0                   ; Get SID7..0
                 CALL    BIN2ASC             ; Tx
 
-                BRA     RXCAN2
+                BRA     RXCANDLC
 
 ;------------------------------------------------------------------------------
 RXEXT
@@ -80,7 +81,7 @@ RXEXT
                 CALL    BIN2ASC             ; Tx
 
 ;------------------------------------------------------------------------------
-RXCAN2
+RXCANDLC
                 MOVF    RXB0DLC,W           ; Get DLC
                 ANDLW   0x0F
                 MOVWF   CANCNT
@@ -90,14 +91,17 @@ RXCAN2
 ;------------------------------------------------------------------------------
 
                 MOVF    CANCNT,W            ; Get message
-                BZ      RXCAN4
+                BZ      RXCANEOLN
 
                 LFSR    FSR0,RXB0D0
-RXCAN3
+RXCANMESG
                 MOVF    POSTINC0,W
                 RCALL   BIN2ASC             ; Tx
-                DJNZ    CANCNT,RXCAN3
-RXCAN4
+                DJNZ    CANCNT,RXCANMESG
+
+;------------------------------------------------------------------------------
+RXCANEOLN
+
                 MOVLW   EOLNCHAR
                 PUTC                        ; Tx
 
@@ -105,16 +109,9 @@ RXCAN4
                 BSF     UPIE,UTXIE          ; Enable Tx ring ISR
 
 ;------------------------------------------------------------------------------
-RXCANCLR
-#IF 0
-                MOVF    CANCON,W            ; Clear RXFUL as per MCHP demo
-                BNZ     RXCANCLR1
-                BCF     RXB0CON,RXFUL
-                RETURN
-RXCANCLR1       BCF     RXB1CON,RXFUL
-                RETURN
-#ENDIF
-                BCF     RXB0CON,RXFUL       ; Clear RXFUL in window
+
+                CANRECV                     ; CAN packet status LED
+                BCF     RXB0CON,RXFUL       ; Packet received
                 RETURN
 
 ;------------------------------------------------------------------------------
