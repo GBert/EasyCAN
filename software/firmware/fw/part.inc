@@ -9,9 +9,14 @@
                 CLRF    CM2CON
 #ENDIF
 
-                ; UART port setting
+#IFDEF UART2
                 BCF     TRISB,6             ; UART2 TX
                 BSF     TRISB,7             ; UART2 RX
+#ENDIF
+#IFDEF UART1
+                BCF     TRISC,6             ; UART1 TX
+                BSF     TRISC,7             ; UART1 RX
+#ENDIF
 
                 ; CAN port setting
                 BCF     TRISB,2             ; CAN TX
