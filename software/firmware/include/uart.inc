@@ -96,6 +96,15 @@
 ; Init. UART
 ;------------------------------------------------------------------------------
 INITUART
+                ; UART port setting
+#IFDEF UART2
+                BCF     TRISB,6             ; UART2 TX
+                BSF     TRISB,7             ; UART2 RX
+#ENDIF
+#IFDEF UART1
+                BCF     TRISC,6             ; UART1 TX
+                BSF     TRISC,7             ; UART1 RX
+#ENDIF
                 BSF     UIPR,URCIP          ; Rx high priority
                 BCF     UIPR,UTXIP          ; Tx low priority
 

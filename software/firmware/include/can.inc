@@ -54,7 +54,7 @@ RXB0DBEN        EQU     H'0002'
 ; Init. CAN bus
 ;------------------------------------------------------------------------------
 INITCAN
-                CLRF    TRISB
+                BCF     TRISB,RB2           ; set CANTX input
                 BSF     TRISB,RB3           ; Enable CANRX
 
                 MOVLW   (1 << REQOP2)       ; Set configuration mode

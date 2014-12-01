@@ -69,6 +69,18 @@ UARTON          MACRO
 INIT
                 MOVLB   0x0F                ; Default to Bank 15
 
+
+#IFDEF __18F26K80
+                ; disbale all analog
+                CLRF    ANCON0
+                CLRF    ANCON1
+                CLRF    ADCON0              ; disable ADCs
+                CLRF    ADCON1
+                CLRF    ADCON2
+                CLRF    CM1CON              ; disable comperators
+                CLRF    CM2CON
+#ENDIF
+
                 CLRF    INTCON              ; Reset ISR
                 CLRF    PIE1
                 CLRF    PIR1

@@ -1,16 +1,19 @@
-
+#IFDEF __18F26K80
                 ; disbale all analog
-                CLRF  ANCON0
-                CLRF  ANCON1
-                CLRF  ADCON0  ; disable ADC
-                CLRF  ADCON1
-                CLRF  ADCON2
-                CLRF  CM1CON  ; disable comperator
-                CLRF  CM2CON  ; disable comperator
+                CLRF    ANCON0
+                CLRF    ANCON1
+                CLRF    ADCON0              ; disable ADCs
+                CLRF    ADCON1
+                CLRF    ADCON2
+                CLRF    CM1CON              ; disable comperators
+                CLRF    CM2CON
+#ENDIF
+
                 ; UART port setting
-                BCF   TRISB,6 ; output UART2
-                BSF   TRISB,7 ; input UART2
+                BCF     TRISB,6             ; UART2 TX
+                BSF     TRISB,7             ; UART2 RX
+
                 ; CAN port setting
-                BCF   TRISB,2
-                BSF   TRISB,3
+                BCF     TRISB,2             ; CAN TX
+                BSF     TRISB,3             ; CAN RX
 
