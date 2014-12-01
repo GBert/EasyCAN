@@ -170,19 +170,19 @@ PROCINIT        MACRO
                 MOVLB   0x0F
                 BCF     RCON,IPEN
 
-                BSF     OSCTUNE,PLLEN
-
-#DEFINE         _16MHZ  b'01110000'     ;64MHZ PLLx4
-#DEFINE         _8MHZ   b'01100000'     ;32MHZ PLLx4
-#DEFINE         _4MHZ   b'01010000'
-#DEFINE         _2MHZ   b'01000000'
-#DEFINE         _1MHZ   b'00110000'
-
-                MOVLW   _16MHZ
-                MOVWF   OSCCON
-
-INITHFIOFS      BTFSS   OSCCON,HFIOFS
-                GOTO    INITHFIOFS
+;                BSF     OSCTUNE,PLLEN
+;
+;#DEFINE         _16MHZ  b'01110000'     ;64MHZ PLLx4
+;#DEFINE         _8MHZ   b'01100000'     ;32MHZ PLLx4
+;#DEFINE         _4MHZ   b'01010000'
+;#DEFINE         _2MHZ   b'01000000'
+;#DEFINE         _1MHZ   b'00110000'
+;
+;                MOVLW   _16MHZ
+;                MOVWF   OSCCON
+;
+;INITHFIOFS      BTFSS   OSCCON,HFIOFS
+;                GOTO    INITHFIOFS
 
                 CLRF    ADCON0
                 CLRF    ADCON1
