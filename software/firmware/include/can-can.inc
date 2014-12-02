@@ -14,6 +14,7 @@
 ; 
 ;------------------------------------------------------------------------------
 
+                LIST
                 RADIX   DEC
 
 ;------------------------------------------------------------------------------
@@ -27,19 +28,19 @@ DJNZ            MACRO   REG,LOC
                 ENDM
 
 CANOVFL         MACRO
-                BSF     LLED,0              ; LED1 Packet dropped
+                BSF     LLED,0              ; LED1 CAN Packet dropped
                 ENDM
 
 CANRECV         MACRO
-                BCF     LLED,0              ; LED1 Packet received
+                BCF     LLED,0              ; LED1 CAN Packet received
                 ENDM
 
-UARTOFF         MACRO
-                BSF     LLED,1              ; LED2 Flow control activated
+UARTOVFL        MACRO
+                BSF     LLED,1              ; LED2 UART Packet dropped
                 ENDM
 
-UARTON          MACRO
-                BCF     LLED,1              ; LED2 Flow control deactivated
+UARTRECV        MACRO
+                BCF     LLED,1              ; LED2 UART Packet received
                 ENDM
 
 ;------------------------------------------------------------------------------
@@ -69,7 +70,6 @@ UARTON          MACRO
 INIT
                 MOVLB   0x0F                ; Default to Bank 15
 
-
 #IFDEF __18F26K80
                 ; disbale all analog
                 CLRF    ANCON0
@@ -80,7 +80,6 @@ INIT
                 CLRF    CM1CON              ; disable comperators
                 CLRF    CM2CON
 #ENDIF
-
                 CLRF    INTCON              ; Reset ISR
                 CLRF    PIE1
                 CLRF    PIR1

@@ -14,6 +14,7 @@
 ; 
 ;------------------------------------------------------------------------------
 
+                LIST
                 RADIX   DEC
 
 ;------------------------------------------------------------------------------
@@ -34,7 +35,7 @@ RXCAN
 RXCANLIMIT
                 ; If Tx packet counter = trigger Then Drop Packet
                 MOVF    TXCNT,W
-                XORLW   TXTRIG
+                XORLW   TRIGGER
                 BNZ     RXPACKET
 
                 CANOVFL                     ; CAN packet status LED

@@ -14,6 +14,7 @@
 ; 
 ;------------------------------------------------------------------------------
 
+                LIST
                 RADIX   DEC
 
 ;------------------------------------------------------------------------------
@@ -24,9 +25,7 @@
 #DEFINE         EOLNCHAR    0x0D            ; CR
 
 ; Rx/Tx ring Flow Control
-#DEFINE         RXTRIGH     (256 / 27 - 1)  ; Rx ring size / Max slcan size - 1
-#DEFINE         RXTRIGL     (256 / 27 - 3)  ; Rx ring size / Max slcan size - 3
-#DEFINE         TXTRIG      (256 / 27)      ; Tx ring size / Max slcan size
+#DEFINE         TRIGGER     (256 / 27)      ; Rx/Tx ring size / Max slcan size
 
 ;------------------------------------------------------------------------------
 ; Rx/Tx ring variables
@@ -36,7 +35,7 @@
                 ; Rx ring
                 RXGET   : 1                 ; GETC Main
                 RXPUT   : 1                 ; PUTC ISR
-                RXTRG   : 1                 ; Flow control
+                RXOVF   : 1                 ; ISR Overflow
                 RXCNT   : 1                 ; Rx packet counter
                 ; Tx ring
                 TXGET   : 1                 ; GETC ISR
@@ -90,45 +89,45 @@ PUTC            MACRO
 ;------------------------------------------------------------------------------
 ; Rx ring ISR
 ; 
-;  Affects RXPUT & RXTRG & uses FSR1; do not use these elsewhere.
+;  Affects RXPUT & uses FSR1; do not use these elsewhere.
 ;------------------------------------------------------------------------------
 ISRHIGH
-                MOVF    RXTRG,W             ; Flow control activated?
-                BZ      ISRHIGHOK           ; No...
+                ; If Rx packet counter = trigger Then Drop Data
+                MOVF    RXCNT,W
+                XORLW   TRIGGER
+                BNZ     ISRHIGH1
 
-                MOVF    URCREG,W,ACCESS     ; EOLN?
-                XORLW   EOLNCHAR
-                BNZ     ISRHIGHNAKEND
+                MOVF    URCREG,W,ACCESS     ; Data dropped
+                SETF    RXOVF               ; Overflow On
+                UARTOVFL                    ; UART packet status LED
 
-                MOVF    RXCNT,W             ; Flow control off?
-                SUBLW   RXTRIGL
-                BNC     ISRHIGHNAKEND       ; No, RXCNT > RXTRIGL...
-
-                UARTON                      ; UART flow control status LED
-                CLRF    RXTRG               ; Flow control deactivated
-ISRHIGHNAKEND
                 RETFIE  FAST
 
 ;------------------------------------------------------------------------------
+ISRHIGH1
+                MOVF    RXOVF,W
+                BZ      ISRHIGH3
 
-ISRHIGHOK
+                MOVF    URCREG,W,ACCESS     ; Data dropped
+                XORLW   EOLNCHAR
+                BNZ     ISRHIGH2
+                CLRF    RXOVF               ; Overflow Off
+ISRHIGH2
+                RETFIE  FAST
+
+;------------------------------------------------------------------------------
+ISRHIGH3
+                UARTRECV                    ; UART packet status LED
                 MOVF    RXPUT,W
-                MOVFF   URCREG,PLUSW1
+                MOVFF   URCREG,PLUSW1       ; Data Received
                 INCF    RXPUT,F
 
                 MOVF    PLUSW1,W            ; EOLN?
                 XORLW   EOLNCHAR
-                BNZ     ISRHIGHOKEND
+                BNZ     ISRHIGHEND
 
                 INCF    RXCNT,F             ; Rx packet counter++
-
-                MOVF    RXCNT,W             ; Flow control on?
-                XORLW   RXTRIGH
-                BNZ     ISRHIGHOKEND        ; No, RXCNT < RXTRIGH...
- 
-                UARTOFF                     ; UART flow control status LED
-                SETF    RXTRG               ; Flow control activated
-ISRHIGHOKEND
+ISRHIGHEND
                 RETFIE  FAST
 
 ;------------------------------------------------------------------------------
@@ -166,7 +165,7 @@ INITRING
 
                 CLRF    RXGET               ; Rx index = 0
                 CLRF    RXPUT
-                CLRF    RXTRG               ; Flow control off
+                CLRF    RXOVF
 
                 CLRF    TXGET               ; Tx index = 0
                 CLRF    TXPUT

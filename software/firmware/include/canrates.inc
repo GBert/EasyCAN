@@ -14,7 +14,20 @@
 ; 
 ;------------------------------------------------------------------------------
 
+                LIST
                 RADIX   DEC
+
+;------------------------------------------------------------------------------
+
+#IFNDEF CANRATE
+    ERROR       "CAN Bus rate not defined"
+#ENDIF
+
+#IF CLOCK != 40000000
+    #IF CLOCK != 64000000
+        ERROR   "CAN Bus rate not calculated"
+    #ENDIF
+#ENDIF
 
 #IF CLOCK == 40000000
     #IF CANRATE == 500

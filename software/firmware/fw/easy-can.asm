@@ -39,13 +39,16 @@
 #DEFINE         CLOCK       64000000
 
 ; UART Baud Rate
-#DEFINE         BAUDRATE    921600
+#DEFINE         BAUDRATE    460800
 
-; UART1 or UART2
-#DEFINE         UART1
+; UART PORTC or PORTB
+#DEFINE         UART        PORTC
+
+; CAN PORTB or PORTC
+#DEFINE         CAN         PORTB
 
 ; CAN Bus Rate
-#DEFINE         CANRATE     500
+#DEFINE         CANRATE     250
 
 ; Advanced LED Diags.
 #DEFINE         LLED        LATA
@@ -58,6 +61,7 @@
 #INCLUDE        "can-can.inc"
 
 ;------------------------------------------------------------------------------
+THE
                 END
 ;------------------------------------------------------------------------------
 ;

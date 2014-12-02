@@ -38,11 +38,14 @@
 ; Clock Rate
 #DEFINE         CLOCK       64000000
 
+; UART on PORTC or PORTB
+#DEFINE         UART        PORTB
+
 ; UART Baud Rate
 #DEFINE         BAUDRATE    500000
 
-; UART1 or UART2
-#DEFINE         UART2
+; CAN on PORTC or PORTB
+#DEFINE         CAN         PORTB
 
 ; CAN Bus Rate
 #DEFINE         CANRATE     250

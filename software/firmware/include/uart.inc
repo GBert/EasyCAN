@@ -14,14 +14,24 @@
 ; 
 ;------------------------------------------------------------------------------
 
+                LIST
                 RADIX   DEC
 
 ;------------------------------------------------------------------------------
 ; UART settings
 ;------------------------------------------------------------------------------
 
-; UART
-#IFDEF UART1
+#IF UART != PORTC
+    #IF UART != PORTB
+        ERROR   "UART port not configured"
+    #ENDIF
+#ENDIF
+
+#IFNDEF BAUDRATE
+    ERROR       "UART baud rate not defined"
+#ENDIF
+
+#IF UART == PORTC
     #IFNDEF TXSTA1
         #DEFINE UPIR        PIR1
         #DEFINE URCIF       RCIF
@@ -66,7 +76,8 @@
         #DEFINE USPBRG      SPBRG1
     #ENDIF
 #ENDIF
-#IFDEF UART2
+
+#IF UART == PORTB
         #DEFINE UPIR        PIR3
         #DEFINE URCIF       RC2IF
         #DEFINE UTXIF       TX2IF
@@ -89,19 +100,28 @@
         #DEFINE USPBRG      SPBRG2
 #ENDIF
 
+;------------------------------------------------------------------------------
 ; UART Baud Rate Generator (FOSC / BAUDRATE / 4 - 1)
-#DEFINE         UBAUD       ((((CLOCK / BAUDRATE) / 2) - 1) / 2)
+;------------------------------------------------------------------------------
+
+#DEFINE UBAUD   ((((CLOCK / BAUDRATE) / 2) - 1) / 2)
+#IF UBAUD > 65535
+    ERROR       "UART BRG overflow"
+#ENDIF
+#IF UBAUD == 0
+    ERROR       "UART BRG zero"
+#ENDIF
 
 ;------------------------------------------------------------------------------
 ; Init. UART
 ;------------------------------------------------------------------------------
 INITUART
-                ; UART port setting
-#IFDEF UART2
+
+#IF UART == PORTB
                 BCF     TRISB,6             ; UART2 TX
                 BSF     TRISB,7             ; UART2 RX
 #ENDIF
-#IFDEF UART1
+#IF UART == PORTC
                 BCF     TRISC,6             ; UART1 TX
                 BSF     TRISC,7             ; UART1 RX
 #ENDIF

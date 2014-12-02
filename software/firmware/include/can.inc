@@ -14,10 +14,11 @@
 ; 
 ;------------------------------------------------------------------------------
 
+                LIST
                 RADIX   DEC
 
 ;------------------------------------------------------------------------------
-; CAN variables
+; CAN Bus variables
 ;------------------------------------------------------------------------------
     
                 CBLOCK
@@ -27,15 +28,20 @@
                 ENDC
 
 ;------------------------------------------------------------------------------
-; CAN Settings
+; CAN Bus settings
 ;------------------------------------------------------------------------------
+
+#IF CAN != PORTB
+    #IF CAN != PORTC
+        ERROR   "CAN port not configured"
+    #ENDIF
+#ENDIF
 
 #IFNDEF REQOP0
 REQOP0          EQU     H'0005'
 REQOP1          EQU     H'0006'
 REQOP2          EQU     H'0007'
 #ENDIF
-
 #IFNDEF RXB0DBEN
 RXB0DBEN        EQU     H'0002'
 #ENDIF
@@ -54,47 +60,65 @@ RXB0DBEN        EQU     H'0002'
 ; Init. CAN bus
 ;------------------------------------------------------------------------------
 INITCAN
-                BCF     TRISB,RB2           ; set CANTX input
-                BSF     TRISB,RB3           ; Enable CANRX
-
-                MOVLW   (1 << REQOP2)       ; Set configuration mode
+#IF CAN == PORTC
+                BCF     TRISC,6
+                BSF     TRISC,7             ; CANRX I/P
+#ELSE
+                BCF     TRISB,2
+                BSF     TRISB,3             ; CANRX I/P
+#ENDIF
+                ; Set configuration mode
+                MOVLW   (1 << REQOP2)
                 MOVWF   CANCON
 INITCAN1
                 MOVF    CANSTAT,W
                 ANDLW   (1 << OPMODE2)
                 BZ      INITCAN1
 
-                BANKSEL RXM0SIDH            ; Set standard receive masks for RXB0/1
-                CLRF    RXM0SIDH
-                CLRF    RXM1SIDH
+                ; Set mask/filter
+                ;
+                ; Mask  Filter  Message
+                ; 0     x       x       accept
+                ; 1     0       0       accept
+                ; 1     0       1       reject
+                ; 1     1       0       reject
+                ; 1     1       1       accept
+
+                ; Set receive masks
+                BANKSEL RXM0SIDH
+                CLRF    RXM0SIDH            ; RXB0 extended filters 0/1
                 CLRF    RXM0SIDL
+                CLRF    RXM0EIDH
+                CLRF    RXM0EIDL
+
+                CLRF    RXM1SIDH            ; RXB1 standard filters 2/3/4/5
                 CLRF    RXM1SIDL
 
-                BANKSEL RXM0EIDH            ; Set extended receive masks for RXB0/1
-                CLRF    RXM0EIDH
-                CLRF    RXM1EIDH
-                CLRF    RXM0EIDL
-                CLRF    RXM1EIDL
-
-                BANKSEL RXF0SIDH            ; Set standard receive filters for RXB0
+                ; Set extended receive filters for RXB0
+                BANKSEL RXF0SIDH
                 CLRF    RXF0SIDH
+                CLRF    RXF0EIDH
+                CLRF    RXF0EIDL
                 CLRF    RXF1SIDH
-                MOVLW   (1 << EXIDEN)
+                CLRF    RXF1EIDH
+                CLRF    RXF1EIDL
+                MOVLW   (1 << EXIDEN)       ; EXIDEN = 1
                 MOVWF   RXF0SIDL
                 MOVWF   RXF1SIDL
 
-                BANKSEL RXF2SIDH            ; Set standard receive filters for RXB1
+                ; Set standard receive filters for RXB1
+                BANKSEL RXF2SIDH
                 CLRF    RXF2SIDH
                 CLRF    RXF3SIDH
                 CLRF    RXF4SIDH
                 CLRF    RXF5SIDH
-                MOVLW   0
-                MOVWF   RXF2SIDL
-                MOVWF   RXF3SIDL
-                MOVWF   RXF4SIDL
-                MOVWF   RXF5SIDL
+                CLRF    RXF2SIDL            ; EXIDEN = 0
+                CLRF    RXF3SIDL
+                CLRF    RXF4SIDL
+                CLRF    RXF5SIDL
 
-                BANKSEL BRGCON1             ; Set bit rate
+                ; Set bit rate
+                BANKSEL BRGCON1
                 MOVLW   BRG1
                 MOVWF   BRGCON1
                 MOVLW   BRG2
@@ -102,12 +126,16 @@ INITCAN1
                 MOVLW   BRG3
                 MOVWF   BRGCON3
 
-                BANKSEL CIOCON              ; Enable CANTX
+                ; Enable CANTX
+                BANKSEL CIOCON
                 BSF     CIOCON,ENDRHI
 
-                CLRF    RXB0CON             ; Reset receiver
-                CLRF    RXB1CON             ; Reset receiver
-                CLRF    CANCON              ; Set normal mode
+                ; Reset receivers
+                CLRF    RXB0CON
+                CLRF    RXB1CON
+
+                ; Set normal mode
+                CLRF    CANCON
 INITCAN2
                 MOVF    CANSTAT,W
                 ANDLW   (1 << OPMODE2) + (1 << OPMODE1)
