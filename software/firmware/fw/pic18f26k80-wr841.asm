@@ -50,9 +50,12 @@
 ; CAN Bus Rate
 #DEFINE         CANRATE     250
 
-; Advanced LED Diags.
-#DEFINE         LLED        LATA
-#DEFINE         LTRIS       TRISA
+; LED1 RA0 CAN  OVERFLOW
+; LED2 RA1 UART OVERFLOW
+; RTS  RA2 CLEAR TO SEND
+;
+#DEFINE         GPIO        LATA
+#DEFINE         DDR         DDRA
 
 ;------------------------------------------------------------------------------
 ; Device firmware

@@ -25,7 +25,8 @@
 #DEFINE         EOLNCHAR    0x0D            ; CR
 
 ; Rx/Tx ring Flow Control
-#DEFINE         TRIGGER     (256 / 27)      ; Rx/Tx ring size / Max slcan size
+#DEFINE         OVERFLOW    (256 / 27)      ; Rx/Tx ring size / Max slcan size
+#DEFINE         CONTROL     (3)             ; Flow Control
 
 ;------------------------------------------------------------------------------
 ; Rx/Tx ring variables
@@ -92,42 +93,57 @@ PUTC            MACRO
 ;  Affects RXPUT & uses FSR1; do not use these elsewhere.
 ;------------------------------------------------------------------------------
 ISRHIGH
+                ; Read Rx Data & Flush IRQ
+                MOVF    RXPUT,W
+                MOVFF   URCREG,PLUSW1       ; Won't clobber with Overflow On
+
                 ; If Rx packet counter = trigger Then Drop Data
                 MOVF    RXCNT,W
-                XORLW   TRIGGER
+                XORLW   OVERFLOW
                 BNZ     ISRHIGH1
 
-                MOVF    URCREG,W,ACCESS     ; Data dropped
-                SETF    RXOVF               ; Overflow On
-                UARTOVFL                    ; UART packet status LED
+                ; Overflow On
+                SETF    RXOVF
 
+                UARTOVFL                    ; UART packet status LED
                 RETFIE  FAST
 
 ;------------------------------------------------------------------------------
 ISRHIGH1
-                MOVF    RXOVF,W
-                BZ      ISRHIGH3
+                ; If Overflow On Then Drop Data
+                MOVF    RXOVF,W             ; Overflow On?
+                BZ      ISRHIGH3            ; No...
 
-                MOVF    URCREG,W,ACCESS     ; Data dropped
+                ; Disable Overflow When End of Line
+                MOVF    RXPUT,W
+                MOVF    PLUSW1,W            ; EOLN?
                 XORLW   EOLNCHAR
                 BNZ     ISRHIGH2
-                CLRF    RXOVF               ; Overflow Off
+
+                ; Overflow Off
+                CLRF    RXOVF
 ISRHIGH2
                 RETFIE  FAST
 
 ;------------------------------------------------------------------------------
 ISRHIGH3
-                UARTRECV                    ; UART packet status LED
+                ; Save Rx Data
                 MOVF    RXPUT,W
-                MOVFF   URCREG,PLUSW1       ; Data Received
-                INCF    RXPUT,F
+                INCF    RXPUT,F             ; PUTC++
 
                 MOVF    PLUSW1,W            ; EOLN?
                 XORLW   EOLNCHAR
                 BNZ     ISRHIGHEND
 
                 INCF    RXCNT,F             ; Rx packet counter++
+                MOVF    RXCNT,W             ; Flow control on?
+                SUBLW   CONTROL
+                BC      ISRHIGHEND
+
+                ; Not Clear to Send; RXCNT > CONTROL
+                CLRRTS
 ISRHIGHEND
+                UARTRECV                    ; UART packet status LED
                 RETFIE  FAST
 
 ;------------------------------------------------------------------------------

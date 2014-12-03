@@ -28,19 +28,27 @@ DJNZ            MACRO   REG,LOC
                 ENDM
 
 CANOVFL         MACRO
-                BSF     LLED,0              ; LED1 CAN Packet dropped
+                BSF     GPIO,0              ; LED1 CAN Packet dropped
                 ENDM
 
 CANRECV         MACRO
-                BCF     LLED,0              ; LED1 CAN Packet received
+                BCF     GPIO,0              ; LED1 CAN Packet received
                 ENDM
 
 UARTOVFL        MACRO
-                BSF     LLED,1              ; LED2 UART Packet dropped
+                BSF     GPIO,1              ; LED2 UART Packet dropped
                 ENDM
 
 UARTRECV        MACRO
-                BCF     LLED,1              ; LED2 UART Packet received
+                BCF     GPIO,1              ; LED2 UART Packet received
+                ENDM
+
+SETRTS          MACRO
+                BSF     GPIO,2              ; RTS/CTS CLEAR TO SEND
+                ENDM
+
+CLRRTS          MACRO
+                BCF     GPIO,2              ; RTS/CTS NOT CLEAR TO SEND
                 ENDM
 
 ;------------------------------------------------------------------------------
@@ -84,8 +92,9 @@ INIT
                 CLRF    PIE1
                 CLRF    PIR1
 
-                CLRF    LLED                ; Init. Diag. LEDs
-                CLRF    LTRIS
+                CLRF    GPIO                ; Init. LED
+                SETRTS                      ; Init. RTS
+                CLRF    DDR                 ; All O/P
 
                 RCALL   INITUART            ; Init. UART
                 RCALL   INITRING            ; Init. Rx/Tx Ring

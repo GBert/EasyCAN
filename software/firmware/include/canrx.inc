@@ -35,7 +35,7 @@ RXCAN
 RXCANLIMIT
                 ; If Tx packet counter = trigger Then Drop Packet
                 MOVF    TXCNT,W
-                XORLW   TRIGGER
+                XORLW   OVERFLOW
                 BNZ     RXPACKET
 
                 CANOVFL                     ; CAN packet status LED

@@ -136,6 +136,11 @@ TXCANEND
                 BNZ     TXCANEND
 
                 DECF    RXCNT,F             ; Rx packet counter--
+                BNZ     TXCANRET            ; Flow control off?
+
+                ; Clear to Send; RXCNT = 0
+                SETRTS
+TXCANRET
                 RETURN
 
 ;------------------------------------------------------------------------------
