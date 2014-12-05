@@ -44,11 +44,11 @@ UARTRECV        MACRO
                 ENDM
 
 SETRTS          MACRO
-                BSF     GPIO,2              ; RTS/CTS CLEAR TO SEND
+                BCF     GPIO,2              ; RTS/CTS CLEAR TO SEND
                 ENDM
 
 CLRRTS          MACRO
-                BCF     GPIO,2              ; RTS/CTS NOT CLEAR TO SEND
+                BSF     GPIO,2              ; RTS/CTS NOT CLEAR TO SEND
                 ENDM
 
 ;------------------------------------------------------------------------------
