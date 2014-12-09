@@ -103,11 +103,11 @@ by exp-lbrs.ulp</description>
 <package name="SO28W">
 <description>&lt;B&gt;28-Lead Plastic Small Outline (SO) &lt;/B&gt; Wide, 300 mil Body (SOIC)&lt;/B&gt;&lt;p&gt;
 Source: http://ww1.microchip.com/downloads/en/devicedoc/39632c.pdf</description>
-<circle x="-7.239" y="-3.1496" radius="0.5334" width="0.1524" layer="21"/>
-<wire x1="-8.1788" y1="-3.7132" x2="9.4742" y2="-3.7132" width="0.1524" layer="21"/>
-<wire x1="9.4742" y1="-3.7132" x2="9.4742" y2="3.7132" width="0.1524" layer="21"/>
-<wire x1="9.4742" y1="3.7132" x2="-8.1788" y2="3.7132" width="0.1524" layer="21"/>
-<wire x1="-8.1788" y1="3.7132" x2="-8.1788" y2="-3.7132" width="0.1524" layer="21"/>
+<circle x="-7.239" y="-2.54" radius="0.5334" width="0.1524" layer="21"/>
+<wire x1="-8.1788" y1="-3.3" x2="9.4742" y2="-3.3" width="0.1524" layer="21"/>
+<wire x1="9.4742" y1="-3.3" x2="9.4742" y2="3.3" width="0.1524" layer="21"/>
+<wire x1="9.4742" y1="3.3" x2="-8.1788" y2="3.3" width="0.1524" layer="21"/>
+<wire x1="-8.1788" y1="3.3" x2="-8.1788" y2="-3.3" width="0.1524" layer="21"/>
 <rectangle x1="-7.874" y1="-5.2626" x2="-7.366" y2="-3.7386" layer="51"/>
 <rectangle x1="-6.604" y1="-5.2626" x2="-6.096" y2="-3.7386" layer="51"/>
 <rectangle x1="-5.334" y1="-5.2626" x2="-4.826" y2="-3.7386" layer="51"/>
