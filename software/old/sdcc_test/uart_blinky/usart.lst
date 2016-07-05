@@ -1,4 +1,4 @@
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  1
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE  1
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -6,8 +6,8 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
 
                       00001 ;--------------------------------------------------------
                       00002 ; File Created by SDCC : free open source ANSI-C Compiler
-                      00003 ; Version 3.4.1 #9092 (Nov  3 2014) (Linux)
-                      00004 ; This file was generated Thu Nov  6 11:40:32 2014
+                      00003 ; Version 3.5.0 #9253 (Jul  7 2015) (Linux)
+                      00004 ; This file was generated Tue Nov 17 14:29:38 2015
                       00005 ;--------------------------------------------------------
                       00006 ; PIC16 port for the Microchip 16-bit core micros
                       00007 ;--------------------------------------------------------
@@ -57,7 +57,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00051         extern  _RXF8EIDHbits
   0000                00052         extern  _RXF8EIDLbits
   0000                00053         extern  _RXF9SIDHbits
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  2
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE  2
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -116,7 +116,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00104         extern  _B0D1bits
   0000                00105         extern  _B0D2bits
   0000                00106         extern  _B0D3bits
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  3
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE  3
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -175,7 +175,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00157         extern  _B3D6bits
   0000                00158         extern  _B3D7bits
   0000                00159         extern  _CANSTAT_RO6bits
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  4
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE  4
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -234,7 +234,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00210         extern  _RXF4SIDLbits
   0000                00211         extern  _RXF4EIDHbits
   0000                00212         extern  _RXF4EIDLbits
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  5
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE  5
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -293,7 +293,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00263         extern  _TXB0D0bits
   0000                00264         extern  _TXB0D1bits
   0000                00265         extern  _TXB0D2bits
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  6
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE  6
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -352,7 +352,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00316         extern  _RXB0D1bits
   0000                00317         extern  _RXB0D2bits
   0000                00318         extern  _RXB0D3bits
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  7
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE  7
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -411,7 +411,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00369         extern  _CMSTATUSbits
   0000                00370         extern  _CVRCONbits
   0000                00371         extern  _PIE4bits
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  8
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE  8
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -470,7 +470,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00422         extern  _RXF9EIDH
   0000                00423         extern  _RXF9EIDL
   0000                00424         extern  _RXF10SIDH
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE  9
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE  9
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -529,7 +529,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00475         extern  _B0D5
   0000                00476         extern  _B0D6
   0000                00477         extern  _B0D7
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 10
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 10
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -588,7 +588,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00528         extern  _B4CON
   0000                00529         extern  _B4SIDH
   0000                00530         extern  _B4SIDL
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 11
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 11
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -647,7 +647,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00581         extern  _RXF5SIDL
   0000                00582         extern  _RXF5EIDH
   0000                00583         extern  _RXF5EIDL
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 12
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 12
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -706,7 +706,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00634         extern  _TXB0D4
   0000                00635         extern  _TXB0D5
   0000                00636         extern  _TXB0D6
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 13
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 13
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -765,7 +765,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00687         extern  _CM1CON1
   0000                00688         extern  _RXB0CON
   0000                00689         extern  _RXB0SIDH
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 14
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 14
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -824,7 +824,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00740         extern  _IPR1
   0000                00741         extern  _PIE2
   0000                00742         extern  _PIR2
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 15
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 15
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -883,7 +883,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00793         extern  _SSPBUF
   0000                00794         extern  _T2CON
   0000                00795         extern  _PR2
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 16
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 16
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -942,7 +942,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
   0000                00846         extern  _PCL
   0000                00847         extern  _PCLATH
   0000                00848         extern  _PCLATU
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 17
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 17
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -1001,7 +1001,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
                       00899 ;--------------------------------------------------------
                       00900 ; global & static initialisations
                       00901 ;--------------------------------------------------------
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 18
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 18
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
@@ -1056,40 +1056,34 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
                       00947 ;       .line   175; usart.c    source_tail=source_fifo->tail;
 000094 50??           00948         MOVF    r0x00, W
 000096 0F01           00949         ADDLW   0x01
-Message[1301]: Using default destination of 0 (Access Bank).
 000098 6E??           00950         MOVWF   r0x06
 00009A 0E00           00951         MOVLW   0x00
 00009C 20??           00952         ADDWFC  r0x01, W
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 19
+00009E 6E??           00953         MOVWF   r0x07
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 19
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
   VALUE
 
-Message[1301]: Using default destination of 0 (Access Bank).
-00009E 6E??           00953         MOVWF   r0x07
 0000A0 0E00           00954         MOVLW   0x00
 0000A2 20??           00955         ADDWFC  r0x02, W
-Message[1301]: Using default destination of 0 (Access Bank).
 0000A4 6E??           00956         MOVWF   r0x08
 0000A6 C??? F???      00957         MOVFF   r0x06, FSR0L
 0000AA C??? F???      00958         MOVFF   r0x07, PRODL
 0000AE 50??           00959         MOVF    r0x08, W
 0000B0 EC?? F0??      00960         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 0000B4 6E??           00961         MOVWF   r0x09
                       00962 ;       .line   178; usart.c    if ( source_tail == source_fifo->head) {
 0000B6 C??? F???      00963         MOVFF   r0x00, FSR0L
 0000BA C??? F???      00964         MOVFF   r0x01, PRODL
 0000BE 50??           00965         MOVF    r0x02, W
 0000C0 EC?? F0??      00966         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 0000C4 6E??           00967         MOVWF   r0x0a
 0000C6 50??           00968         MOVF    r0x09, W
 0000C8 18??           00969         XORWF   r0x0a, W
 0000CA E1??           00970         BNZ     _00265_DS_
                       00971 ;       .line   179; usart.c    return 0;
-Message[1301]: Using default destination of 0 (Access Bank).
 0000CC 6AE8           00972         CLRF    WREG
 0000CE D???           00973         BRA     _00267_DS_
 0000D0                00974 _00265_DS_:
@@ -1098,7 +1092,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 0000D4 C??? F???      00977         MOVFF   r0x04, PRODL
 0000D8 50??           00978         MOVF    r0x05, W
 0000DA EC?? F0??      00979         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 0000DE 6E??           00980         MOVWF   r0x0a
                       00981 ;       .line   182; usart.c    destination_head++;
 0000E0 2A??           00982         INCF    r0x0a, F
@@ -1109,52 +1102,42 @@ Message[1301]: Using default destination of 0 (Access Bank).
                             source_fifo->head)) {
 0000E6 50??           00987         MOVF    r0x03, W
 0000E8 0F02           00988         ADDLW   0x02
-Message[1301]: Using default destination of 0 (Access Bank).
 0000EA 6E??           00989         MOVWF   r0x0b
 0000EC 0E00           00990         MOVLW   0x00
 0000EE 20??           00991         ADDWFC  r0x04, W
-Message[1301]: Using default destination of 0 (Access Bank).
 0000F0 6E??           00992         MOVWF   r0x0c
 0000F2 0E00           00993         MOVLW   0x00
 0000F4 20??           00994         ADDWFC  r0x05, W
-Message[1301]: Using default destination of 0 (Access Bank).
 0000F6 6E??           00995         MOVWF   r0x0d
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 20
+0000F8 50??           00996         MOVF    r0x00, W
+0000FA 0F02           00997         ADDLW   0x02
+0000FC 6E??           00998         MOVWF   r0x0e
+0000FE 0E00           00999         MOVLW   0x00
+000100 20??           01000         ADDWFC  r0x01, W
+000102 6E??           01001         MOVWF   r0x0f
+000104 0E00           01002         MOVLW   0x00
+000106 20??           01003         ADDWFC  r0x02, W
+000108 6E??           01004         MOVWF   r0x10
+00010A 50??           01005         MOVF    r0x03, W
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 20
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
   VALUE
 
-0000F8 50??           00996         MOVF    r0x00, W
-0000FA 0F02           00997         ADDLW   0x02
-Message[1301]: Using default destination of 0 (Access Bank).
-0000FC 6E??           00998         MOVWF   r0x0e
-0000FE 0E00           00999         MOVLW   0x00
-000100 20??           01000         ADDWFC  r0x01, W
-Message[1301]: Using default destination of 0 (Access Bank).
-000102 6E??           01001         MOVWF   r0x0f
-000104 0E00           01002         MOVLW   0x00
-000106 20??           01003         ADDWFC  r0x02, W
-Message[1301]: Using default destination of 0 (Access Bank).
-000108 6E??           01004         MOVWF   r0x10
-00010A 50??           01005         MOVF    r0x03, W
 00010C 0F01           01006         ADDLW   0x01
-Message[1301]: Using default destination of 0 (Access Bank).
 00010E 6E??           01007         MOVWF   r0x11
 000110 0E00           01008         MOVLW   0x00
 000112 20??           01009         ADDWFC  r0x04, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000114 6E??           01010         MOVWF   r0x12
 000116 0E00           01011         MOVLW   0x00
 000118 20??           01012         ADDWFC  r0x05, W
-Message[1301]: Using default destination of 0 (Access Bank).
 00011A 6E??           01013         MOVWF   r0x13
 00011C                01014 _00261_DS_:
 00011C C??? F???      01015         MOVFF   r0x11, FSR0L
 000120 C??? F???      01016         MOVFF   r0x12, PRODL
 000124 50??           01017         MOVF    r0x13, W
 000126 EC?? F0??      01018         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 00012A 6E??           01019         MOVWF   r0x14
 00012C 50??           01020         MOVF    r0x0a, W
 00012E 18??           01021         XORWF   r0x14, W
@@ -1165,7 +1148,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 000138 C??? F???      01026         MOVFF   r0x01, PRODL
 00013C 50??           01027         MOVF    r0x02, W
 00013E EC?? F0??      01028         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 000142 6E??           01029         MOVWF   r0x14
 000144 50??           01030         MOVF    r0x09, W
 000146 18??           01031         XORWF   r0x14, W
@@ -1178,44 +1160,33 @@ Message[1301]: Using default destination of 0 (Access Bank).
                       01038 ;       .line   187; usart.c    destination_fifo->data[destination_head] = source_fifo->data[source_tail
                             ];
 000150 50??           01039         MOVF    r0x0a, W
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 21
+000152 24??           01040         ADDWF   r0x0b, W
+000154 6E??           01041         MOVWF   r0x14
+000156 6AE8           01042         CLRF    WREG
+000158 20??           01043         ADDWFC  r0x0c, W
+00015A 6E??           01044         MOVWF   r0x15
+00015C 6AE8           01045         CLRF    WREG
+00015E 20??           01046         ADDWFC  r0x0d, W
+000160 6E??           01047         MOVWF   r0x16
+000162 50??           01048         MOVF    r0x09, W
+000164 24??           01049         ADDWF   r0x0e, W
+000166 6E??           01050         MOVWF   r0x17
+000168 6AE8           01051         CLRF    WREG
+00016A 20??           01052         ADDWFC  r0x0f, W
+00016C 6E??           01053         MOVWF   r0x18
+00016E 6AE8           01054         CLRF    WREG
+000170 20??           01055         ADDWFC  r0x10, W
+000172 6E??           01056         MOVWF   r0x19
+000174 C??? F???      01057         MOVFF   r0x17, FSR0L
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 21
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
   VALUE
 
-000152 24??           01040         ADDWF   r0x0b, W
-Message[1301]: Using default destination of 0 (Access Bank).
-000154 6E??           01041         MOVWF   r0x14
-Message[1301]: Using default destination of 0 (Access Bank).
-000156 6AE8           01042         CLRF    WREG
-000158 20??           01043         ADDWFC  r0x0c, W
-Message[1301]: Using default destination of 0 (Access Bank).
-00015A 6E??           01044         MOVWF   r0x15
-Message[1301]: Using default destination of 0 (Access Bank).
-00015C 6AE8           01045         CLRF    WREG
-00015E 20??           01046         ADDWFC  r0x0d, W
-Message[1301]: Using default destination of 0 (Access Bank).
-000160 6E??           01047         MOVWF   r0x16
-000162 50??           01048         MOVF    r0x09, W
-000164 24??           01049         ADDWF   r0x0e, W
-Message[1301]: Using default destination of 0 (Access Bank).
-000166 6E??           01050         MOVWF   r0x17
-Message[1301]: Using default destination of 0 (Access Bank).
-000168 6AE8           01051         CLRF    WREG
-00016A 20??           01052         ADDWFC  r0x0f, W
-Message[1301]: Using default destination of 0 (Access Bank).
-00016C 6E??           01053         MOVWF   r0x18
-Message[1301]: Using default destination of 0 (Access Bank).
-00016E 6AE8           01054         CLRF    WREG
-000170 20??           01055         ADDWFC  r0x10, W
-Message[1301]: Using default destination of 0 (Access Bank).
-000172 6E??           01056         MOVWF   r0x19
-000174 C??? F???      01057         MOVFF   r0x17, FSR0L
 000178 C??? F???      01058         MOVFF   r0x18, PRODL
 00017C 50??           01059         MOVF    r0x19, W
 00017E EC?? F0??      01060         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 000182 6E??           01061         MOVWF   r0x17
 000184 C??? F???      01062         MOVFF   r0x17, POSTDEC1
 000188 C??? F???      01063         MOVFF   r0x14, FSR0L
@@ -1237,12 +1208,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 0001AE D???           01078         BRA     _00261_DS_
 0001B0                01079 _00263_DS_:
                       01080 ;       .line   192; usart.c    source_fifo->tail      = source_tail;                   /* store new poi
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 22
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
                             nter source tail */
 0001B0 C??? F???      01081         MOVFF   r0x09, POSTDEC1
 0001B4 C??? F???      01082         MOVFF   r0x06, FSR0L
@@ -1250,9 +1215,7 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
 0001BC 50??           01084         MOVF    r0x08, W
 0001BE EC?? F0??      01085         CALL    __gptrput1
                       01086 ;       .line   193; usart.c    return source_fifo->data[source_tail];
-Message[1301]: Using default destination of 0 (Access Bank).
 0001C2 6A??           01087         CLRF    r0x00
-Message[1301]: Using default destination of 0 (Access Bank).
 0001C4 6A??           01088         CLRF    r0x01
 0001C6 50??           01089         MOVF    r0x0e, W
 0001C8 26??           01090         ADDWF   r0x09, F
@@ -1264,7 +1227,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 0001D6 C??? F???      01096         MOVFF   r0x00, PRODL
 0001DA 50??           01097         MOVF    r0x01, W
 0001DC EC?? F0??      01098         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 0001E0 6E??           01099         MOVWF   r0x09
 0001E2 50??           01100         MOVF    r0x09, W
 0001E4                01101 _00267_DS_:
@@ -1275,6 +1237,12 @@ Message[1301]: Using default destination of 0 (Access Bank).
 0001F4 CFE4 F000      01106         MOVFF   PREINC1, r0x15
 0001F8 CFE4 F000      01107         MOVFF   PREINC1, r0x14
 0001FC CFE4 F000      01108         MOVFF   PREINC1, r0x13
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 22
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
 000200 CFE4 F000      01109         MOVFF   PREINC1, r0x12
 000204 CFE4 F000      01110         MOVFF   PREINC1, r0x11
 000208 CFE4 F000      01111         MOVFF   PREINC1, r0x10
@@ -1296,12 +1264,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 000248 CFE4 F000      01127         MOVFF   PREINC1, r0x00
 00024C CFE4 FFD9      01128         MOVFF   PREINC1, FSR2L
 000250 0012           01129         RETURN  
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 23
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
                       01130 
                       01131 ; ; Starting pCode block
                       01132 S_usart__puts_rom_fifo  code
@@ -1334,6 +1296,12 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
 00005A CFDB F000      01159         MOVFF   PLUSW2, r0x02
 00005E 0E05           01160         MOVLW   0x05
 000060 CFDB F000      01161         MOVFF   PLUSW2, r0x03
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 23
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
 000064 0E06           01162         MOVLW   0x06
 000066 CFDB F000      01163         MOVFF   PLUSW2, r0x04
 00006A 0E07           01164         MOVLW   0x07
@@ -1343,45 +1311,31 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
 000074 C??? F???      01168         MOVFF   r0x04, PRODL
 000078 50??           01169         MOVF    r0x05, W
 00007A EC?? F0??      01170         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 00007E 6E??           01171         MOVWF   r0x06
                       01172 ;       .line   159; usart.c    while ( ( c = *s++ ) ) {
 000080 50??           01173         MOVF    r0x03, W
 000082 0F01           01174         ADDLW   0x01
-Message[1301]: Using default destination of 0 (Access Bank).
 000084 6E??           01175         MOVWF   r0x07
 000086 0E00           01176         MOVLW   0x00
 000088 20??           01177         ADDWFC  r0x04, W
-Message[1301]: Using default destination of 0 (Access Bank).
 00008A 6E??           01178         MOVWF   r0x08
 00008C 0E00           01179         MOVLW   0x00
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 24
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
 00008E 20??           01180         ADDWFC  r0x05, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000090 6E??           01181         MOVWF   r0x09
 000092 50??           01182         MOVF    r0x03, W
 000094 0F02           01183         ADDLW   0x02
-Message[1301]: Using default destination of 0 (Access Bank).
 000096 6E??           01184         MOVWF   r0x0a
 000098 0E00           01185         MOVLW   0x00
 00009A 20??           01186         ADDWFC  r0x04, W
-Message[1301]: Using default destination of 0 (Access Bank).
 00009C 6E??           01187         MOVWF   r0x0b
 00009E 0E00           01188         MOVLW   0x00
 0000A0 20??           01189         ADDWFC  r0x05, W
-Message[1301]: Using default destination of 0 (Access Bank).
 0000A2 6E??           01190         MOVWF   r0x0c
 0000A4                01191 _00238_DS_:
 0000A4 C??? F???      01192         MOVFF   r0x00, FSR0L
 0000A8 C??? F???      01193         MOVFF   r0x01, PRODL
 0000AC 50??           01194         MOVF    r0x02, W
 0000AE EC?? F0??      01195         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 0000B2 6E??           01196         MOVWF   r0x0d
 0000B4 2A??           01197         INCF    r0x00, F
 0000B6 E3??           01198         BNC     _00252_DS_
@@ -1401,7 +1355,12 @@ Message[1301]: Using default destination of 0 (Access Bank).
 0000CE C??? F???      01212         MOVFF   r0x08, PRODL
 0000D2 50??           01213         MOVF    r0x09, W
 0000D4 EC?? F0??      01214         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 24
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
 0000D8 6E??           01215         MOVWF   r0x0d
 0000DA 50??           01216         MOVF    r0x06, W
 0000DC 18??           01217         XORWF   r0x0d, W
@@ -1409,23 +1368,12 @@ Message[1301]: Using default destination of 0 (Access Bank).
                       01219 ;       .line   163; usart.c    fifo->data[head]=c;
 0000E0 50??           01220         MOVF    r0x06, W
 0000E2 24??           01221         ADDWF   r0x0a, W
-Message[1301]: Using default destination of 0 (Access Bank).
 0000E4 6E??           01222         MOVWF   r0x0d
-Message[1301]: Using default destination of 0 (Access Bank).
 0000E6 6AE8           01223         CLRF    WREG
 0000E8 20??           01224         ADDWFC  r0x0b, W
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 25
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
-Message[1301]: Using default destination of 0 (Access Bank).
 0000EA 6E??           01225         MOVWF   r0x0f
-Message[1301]: Using default destination of 0 (Access Bank).
 0000EC 6AE8           01226         CLRF    WREG
 0000EE 20??           01227         ADDWFC  r0x0c, W
-Message[1301]: Using default destination of 0 (Access Bank).
 0000F0 6E??           01228         MOVWF   r0x10
 0000F2 C??? F???      01229         MOVFF   r0x0e, POSTDEC1
 0000F6 C??? F???      01230         MOVFF   r0x0d, FSR0L
@@ -1435,7 +1383,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 000104 D???           01234         BRA     _00238_DS_
 000106                01235 _00236_DS_:
                       01236 ;       .line   165; usart.c    return -1;
-Message[1301]: Using default destination of 0 (Access Bank).
 000106 68E8           01237         SETF    WREG
 000108 D???           01238         BRA     _00241_DS_
 00010A                01239 _00240_DS_:
@@ -1467,18 +1414,18 @@ Message[1301]: Using default destination of 0 (Access Bank).
 00015A CFE4 F000      01264         MOVFF   PREINC1, r0x01
 00015E CFE4 F000      01265         MOVFF   PREINC1, r0x00
 000162 CFE4 FFD9      01266         MOVFF   PREINC1, FSR2L
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 25
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
 000166 0012           01267         RETURN  
                       01268 
                       01269 ; ; Starting pCode block
                       01270 S_usart__fifo_putchar   code
 000000                01271 _fifo_putchar:
                       01272 ;       .line   141; usart.c    char fifo_putchar(struct serial_buffer * fifo) {
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 26
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
 000000 CFD9 FFE5      01273         MOVFF   FSR2L, POSTDEC1
 000004 CFE1 FFD9      01274         MOVFF   FSR1L, FSR2L
 000008 C??? F???      01275         MOVFF   r0x00, POSTDEC1
@@ -1498,28 +1445,23 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
                       01289 ;       .line   143; usart.c    tail=fifo->tail;
 00003A 50??           01290         MOVF    r0x00, W
 00003C 0F01           01291         ADDLW   0x01
-Message[1301]: Using default destination of 0 (Access Bank).
 00003E 6E??           01292         MOVWF   r0x03
 000040 0E00           01293         MOVLW   0x00
 000042 20??           01294         ADDWFC  r0x01, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000044 6E??           01295         MOVWF   r0x04
 000046 0E00           01296         MOVLW   0x00
 000048 20??           01297         ADDWFC  r0x02, W
-Message[1301]: Using default destination of 0 (Access Bank).
 00004A 6E??           01298         MOVWF   r0x05
 00004C C??? F???      01299         MOVFF   r0x03, FSR0L
 000050 C??? F???      01300         MOVFF   r0x04, PRODL
 000054 50??           01301         MOVF    r0x05, W
 000056 EC?? F0??      01302         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 00005A 6E??           01303         MOVWF   r0x06
                       01304 ;       .line   144; usart.c    if (fifo->head != tail) {
 00005C C??? F???      01305         MOVFF   r0x00, FSR0L
 000060 C??? F???      01306         MOVFF   r0x01, PRODL
 000064 50??           01307         MOVF    r0x02, W
 000066 EC?? F0??      01308         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 00006A 6E??           01309         MOVWF   r0x07
 00006C 50??           01310         MOVF    r0x07, W
 00006E 18??           01311         XORWF   r0x06, W
@@ -1531,35 +1473,30 @@ Message[1301]: Using default destination of 0 (Access Bank).
 000076 16??           01317         ANDWF   r0x06, F
                       01318 ;       .line   147; usart.c    if (putchar(fifo->data[tail])) {
 000078 0E02           01319         MOVLW   0x02
-00007A 26??           01320         ADDWF   r0x00, F
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 27
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 26
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
   VALUE
 
+00007A 26??           01320         ADDWF   r0x00, F
 00007C 0E00           01321         MOVLW   0x00
 00007E 22??           01322         ADDWFC  r0x01, F
 000080 22??           01323         ADDWFC  r0x02, F
 000082 50??           01324         MOVF    r0x06, W
 000084 26??           01325         ADDWF   r0x00, F
-Message[1301]: Using default destination of 0 (Access Bank).
 000086 6AE8           01326         CLRF    WREG
 000088 22??           01327         ADDWFC  r0x01, F
-Message[1301]: Using default destination of 0 (Access Bank).
 00008A 6AE8           01328         CLRF    WREG
 00008C 22??           01329         ADDWFC  r0x02, F
 00008E C??? F???      01330         MOVFF   r0x00, FSR0L
 000092 C??? F???      01331         MOVFF   r0x01, PRODL
 000096 50??           01332         MOVF    r0x02, W
 000098 EC?? F0??      01333         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 00009C 6E??           01334         MOVWF   r0x00
 00009E 50??           01335         MOVF    r0x00, W
-Message[1301]: Using default destination of 0 (Access Bank).
 0000A0 6EE5           01336         MOVWF   POSTDEC1
 0000A2 EC?? F0??      01337         CALL    _putchar
-Message[1301]: Using default destination of 0 (Access Bank).
 0000A6 6E??           01338         MOVWF   r0x00
 0000A8 52E6           01339         MOVF    POSTINC1, F
 0000AA 50??           01340         MOVF    r0x00, W
@@ -1575,7 +1512,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 0000C2 D???           01350         BRA     _00221_DS_
 0000C4                01351 _00220_DS_:
                       01352 ;       .line   152; usart.c    return 0;
-Message[1301]: Using default destination of 0 (Access Bank).
 0000C4 6AE8           01353         CLRF    WREG
 0000C6                01354 _00221_DS_:
 0000C6 CFE4 F000      01355         MOVFF   PREINC1, r0x07
@@ -1591,17 +1527,17 @@ Message[1301]: Using default destination of 0 (Access Bank).
                       01365 
                       01366 ; ; Starting pCode block
                       01367 S_usart__fifo_getchar   code
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 28
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
 000000                01368 _fifo_getchar:
                       01369 ;       .line   122; usart.c    char fifo_getchar(struct serial_buffer * fifo) {
 000000 CFD9 FFE5      01370         MOVFF   FSR2L, POSTDEC1
 000004 CFE1 FFD9      01371         MOVFF   FSR1L, FSR2L
 000008 C??? F???      01372         MOVFF   r0x00, POSTDEC1
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 27
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
 00000C C??? F???      01373         MOVFF   r0x01, POSTDEC1
 000010 C??? F???      01374         MOVFF   r0x02, POSTDEC1
 000014 C??? F???      01375         MOVFF   r0x03, POSTDEC1
@@ -1623,7 +1559,6 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
 000042 C??? F???      01391         MOVFF   r0x01, PRODL
 000046 50??           01392         MOVF    r0x02, W
 000048 EC?? F0??      01393         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 00004C 6E??           01394         MOVWF   r0x03
                       01395 ;       .line   128; usart.c    head++;
 00004E 2A??           01396         INCF    r0x03, F
@@ -1633,29 +1568,19 @@ Message[1301]: Using default destination of 0 (Access Bank).
                       01400 ;       .line   130; usart.c    if (head != fifo->tail) {
 000054 50??           01401         MOVF    r0x00, W
 000056 0F01           01402         ADDLW   0x01
-Message[1301]: Using default destination of 0 (Access Bank).
 000058 6E??           01403         MOVWF   r0x04
 00005A 0E00           01404         MOVLW   0x00
 00005C 20??           01405         ADDWFC  r0x01, W
-Message[1301]: Using default destination of 0 (Access Bank).
 00005E 6E??           01406         MOVWF   r0x05
 000060 0E00           01407         MOVLW   0x00
 000062 20??           01408         ADDWFC  r0x02, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000064 6E??           01409         MOVWF   r0x06
 000066 C??? F???      01410         MOVFF   r0x04, FSR0L
 00006A C??? F???      01411         MOVFF   r0x05, PRODL
 00006E 50??           01412         MOVF    r0x06, W
 000070 EC?? F0??      01413         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 000074 6E??           01414         MOVWF   r0x04
 000076 50??           01415         MOVF    r0x03, W
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 29
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
 000078 18??           01416         XORWF   r0x04, W
 00007A E0??           01417         BZ      _00201_DS_
                       01418 ;       .line   131; usart.c    c=RCREG1;
@@ -1663,22 +1588,23 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
                       01420 ;       .line   132; usart.c    fifo->data[head]=c;
 000080 50??           01421         MOVF    r0x00, W
 000082 0F02           01422         ADDLW   0x02
-Message[1301]: Using default destination of 0 (Access Bank).
 000084 6E??           01423         MOVWF   r0x05
 000086 0E00           01424         MOVLW   0x00
 000088 20??           01425         ADDWFC  r0x01, W
-Message[1301]: Using default destination of 0 (Access Bank).
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 28
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
 00008A 6E??           01426         MOVWF   r0x06
 00008C 0E00           01427         MOVLW   0x00
 00008E 20??           01428         ADDWFC  r0x02, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000090 6E??           01429         MOVWF   r0x07
 000092 50??           01430         MOVF    r0x03, W
 000094 26??           01431         ADDWF   r0x05, F
-Message[1301]: Using default destination of 0 (Access Bank).
 000096 6AE8           01432         CLRF    WREG
 000098 22??           01433         ADDWFC  r0x06, F
-Message[1301]: Using default destination of 0 (Access Bank).
 00009A 6AE8           01434         CLRF    WREG
 00009C 22??           01435         ADDWFC  r0x07, F
 00009E C??? F???      01436         MOVFF   r0x04, POSTDEC1
@@ -1697,7 +1623,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 0000C4 D???           01449         BRA     _00202_DS_
 0000C6                01450 _00201_DS_:
                       01451 ;       .line   137; usart.c    return 0;
-Message[1301]: Using default destination of 0 (Access Bank).
 0000C6 6AE8           01452         CLRF    WREG
 0000C8                01453 _00202_DS_:
 0000C8 CFE4 F000      01454         MOVFF   PREINC1, r0x07
@@ -1709,12 +1634,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 0000E0 CFE4 F000      01460         MOVFF   PREINC1, r0x01
 0000E4 CFE4 F000      01461         MOVFF   PREINC1, r0x00
 0000E8 CFE4 FFD9      01462         MOVFF   PREINC1, FSR2L
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 30
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
 0000EC 0012           01463         RETURN  
                       01464 
                       01465 ; ; Starting pCode block
@@ -1731,6 +1650,12 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
 00001C C??? F???      01476         MOVFF   r0x05, POSTDEC1
 000020 C??? F???      01477         MOVFF   r0x06, POSTDEC1
 000024 C??? F???      01478         MOVFF   r0x07, POSTDEC1
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 29
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
 000028 0E02           01479         MOVLW   0x02
 00002A CFDB F000      01480         MOVFF   PLUSW2, r0x00
 00002E 0E03           01481         MOVLW   0x03
@@ -1744,7 +1669,6 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
 000044 C??? F???      01489         MOVFF   r0x02, PRODL
 000048 50??           01490         MOVF    r0x03, W
 00004A EC?? F0??      01491         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 00004E 6E??           01492         MOVWF   r0x04
                       01493 ;       .line   110; usart.c    head++;
 000050 2A??           01494         INCF    r0x04, F
@@ -1755,27 +1679,17 @@ Message[1301]: Using default destination of 0 (Access Bank).
                       01498 ;       .line   112; usart.c    if (head != fifo->tail) {
 000056 50??           01499         MOVF    r0x01, W
 000058 0F01           01500         ADDLW   0x01
-Message[1301]: Using default destination of 0 (Access Bank).
 00005A 6E??           01501         MOVWF   r0x05
 00005C 0E00           01502         MOVLW   0x00
 00005E 20??           01503         ADDWFC  r0x02, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000060 6E??           01504         MOVWF   r0x06
 000062 0E00           01505         MOVLW   0x00
 000064 20??           01506         ADDWFC  r0x03, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000066 6E??           01507         MOVWF   r0x07
 000068 C??? F???      01508         MOVFF   r0x05, FSR0L
 00006C C??? F???      01509         MOVFF   r0x06, PRODL
 000070 50??           01510         MOVF    r0x07, W
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 31
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
 000072 EC?? F0??      01511         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 000076 6E??           01512         MOVWF   r0x05
 000078 50??           01513         MOVF    r0x04, W
 00007A 18??           01514         XORWF   r0x05, W
@@ -1792,11 +1706,15 @@ Message[1301]: Using default destination of 0 (Access Bank).
 000094 0E00           01525         MOVLW   0x00
 000096 22??           01526         ADDWFC  r0x02, F
 000098 22??           01527         ADDWFC  r0x03, F
-Message[1301]: Using default destination of 0 (Access Bank).
 00009A 6A??           01528         CLRF    r0x05
-Message[1301]: Using default destination of 0 (Access Bank).
 00009C 6A??           01529         CLRF    r0x06
 00009E 50??           01530         MOVF    r0x01, W
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 30
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
 0000A0 26??           01531         ADDWF   r0x04, F
 0000A2 50??           01532         MOVF    r0x02, W
 0000A4 22??           01533         ADDWFC  r0x05, F
@@ -1812,7 +1730,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 0000BE D???           01543         BRA     _00186_DS_
 0000C0                01544 _00185_DS_:
                       01545 ;       .line   117; usart.c    return 0;
-Message[1301]: Using default destination of 0 (Access Bank).
 0000C0 6AE8           01546         CLRF    WREG
 0000C2                01547 _00186_DS_:
 0000C2 CFE4 F000      01548         MOVFF   PREINC1, r0x07
@@ -1827,12 +1744,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 0000E6 0012           01557         RETURN  
                       01558 
                       01559 ; ; Starting pCode block
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 32
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
                       01560 S_usart__print_debug_fifo       code
 000000                01561 _print_debug_fifo:
                       01562 ;       .line   83; usart.c     void print_debug_fifo(struct serial_buffer * fifo) {
@@ -1853,51 +1764,43 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
 000032 CFDB F000      01577         MOVFF   PLUSW2, r0x02
                       01578 ;       .line   85; usart.c     putchar_wait('\r');
 000036 0E0D           01579         MOVLW   0x0d
-Message[1301]: Using default destination of 0 (Access Bank).
 000038 6EE5           01580         MOVWF   POSTDEC1
 00003A EC?? F0??      01581         CALL    _putchar_wait
 00003E 52E6           01582         MOVF    POSTINC1, F
                       01583 ;       .line   86; usart.c     putchar_wait('\n');
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 31
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
 000040 0E0A           01584         MOVLW   0x0a
-Message[1301]: Using default destination of 0 (Access Bank).
 000042 6EE5           01585         MOVWF   POSTDEC1
 000044 EC?? F0??      01586         CALL    _putchar_wait
 000048 52E6           01587         MOVF    POSTINC1, F
                       01588 ;       .line   87; usart.c     print_debug_value('S',SERIAL_BUFFER_SIZE);
 00004A 0E40           01589         MOVLW   0x40
-Message[1301]: Using default destination of 0 (Access Bank).
 00004C 6EE5           01590         MOVWF   POSTDEC1
 00004E 0E53           01591         MOVLW   0x53
-Message[1301]: Using default destination of 0 (Access Bank).
 000050 6EE5           01592         MOVWF   POSTDEC1
 000052 EC?? F0??      01593         CALL    _print_debug_value
 000056 52E6           01594         MOVF    POSTINC1, F
 000058 52E6           01595         MOVF    POSTINC1, F
                       01596 ;       .line   88; usart.c     putchar_wait(' ');
 00005A 0E20           01597         MOVLW   0x20
-Message[1301]: Using default destination of 0 (Access Bank).
 00005C 6EE5           01598         MOVWF   POSTDEC1
 00005E EC?? F0??      01599         CALL    _putchar_wait
 000062 52E6           01600         MOVF    POSTINC1, F
                       01601 ;       .line   89; usart.c     print_debug_value('M',SERIAL_BUFFER_SIZE_MASK);
 000064 0E3F           01602         MOVLW   0x3f
-Message[1301]: Using default destination of 0 (Access Bank).
 000066 6EE5           01603         MOVWF   POSTDEC1
 000068 0E4D           01604         MOVLW   0x4d
-Message[1301]: Using default destination of 0 (Access Bank).
 00006A 6EE5           01605         MOVWF   POSTDEC1
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 33
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
 00006C EC?? F0??      01606         CALL    _print_debug_value
 000070 52E6           01607         MOVF    POSTINC1, F
 000072 52E6           01608         MOVF    POSTINC1, F
                       01609 ;       .line   90; usart.c     putchar_wait(' ');
 000074 0E20           01610         MOVLW   0x20
-Message[1301]: Using default destination of 0 (Access Bank).
 000076 6EE5           01611         MOVWF   POSTDEC1
 000078 EC?? F0??      01612         CALL    _putchar_wait
 00007C 52E6           01613         MOVF    POSTINC1, F
@@ -1906,93 +1809,74 @@ Message[1301]: Using default destination of 0 (Access Bank).
 000082 C??? F???      01616         MOVFF   r0x01, PRODL
 000086 50??           01617         MOVF    r0x02, W
 000088 EC?? F0??      01618         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 00008C 6E??           01619         MOVWF   r0x03
 00008E 50??           01620         MOVF    r0x03, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000090 6EE5           01621         MOVWF   POSTDEC1
 000092 0E48           01622         MOVLW   0x48
-Message[1301]: Using default destination of 0 (Access Bank).
 000094 6EE5           01623         MOVWF   POSTDEC1
 000096 EC?? F0??      01624         CALL    _print_debug_value
 00009A 52E6           01625         MOVF    POSTINC1, F
 00009C 52E6           01626         MOVF    POSTINC1, F
                       01627 ;       .line   92; usart.c     putchar_wait(' ');
 00009E 0E20           01628         MOVLW   0x20
-Message[1301]: Using default destination of 0 (Access Bank).
 0000A0 6EE5           01629         MOVWF   POSTDEC1
 0000A2 EC?? F0??      01630         CALL    _putchar_wait
 0000A6 52E6           01631         MOVF    POSTINC1, F
                       01632 ;       .line   93; usart.c     print_debug_value('T',fifo->tail);
 0000A8 50??           01633         MOVF    r0x00, W
 0000AA 0F01           01634         ADDLW   0x01
-Message[1301]: Using default destination of 0 (Access Bank).
 0000AC 6E??           01635         MOVWF   r0x03
 0000AE 0E00           01636         MOVLW   0x00
-0000B0 20??           01637         ADDWFC  r0x01, W
-Message[1301]: Using default destination of 0 (Access Bank).
-0000B2 6E??           01638         MOVWF   r0x04
-0000B4 0E00           01639         MOVLW   0x00
-0000B6 20??           01640         ADDWFC  r0x02, W
-Message[1301]: Using default destination of 0 (Access Bank).
-0000B8 6E??           01641         MOVWF   r0x05
-0000BA C??? F???      01642         MOVFF   r0x03, FSR0L
-0000BE C??? F???      01643         MOVFF   r0x04, PRODL
-0000C2 50??           01644         MOVF    r0x05, W
-0000C4 EC?? F0??      01645         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
-0000C8 6E??           01646         MOVWF   r0x03
-0000CA 50??           01647         MOVF    r0x03, W
-Message[1301]: Using default destination of 0 (Access Bank).
-0000CC 6EE5           01648         MOVWF   POSTDEC1
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 34
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 32
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
   VALUE
 
+0000B0 20??           01637         ADDWFC  r0x01, W
+0000B2 6E??           01638         MOVWF   r0x04
+0000B4 0E00           01639         MOVLW   0x00
+0000B6 20??           01640         ADDWFC  r0x02, W
+0000B8 6E??           01641         MOVWF   r0x05
+0000BA C??? F???      01642         MOVFF   r0x03, FSR0L
+0000BE C??? F???      01643         MOVFF   r0x04, PRODL
+0000C2 50??           01644         MOVF    r0x05, W
+0000C4 EC?? F0??      01645         CALL    __gptrget1
+0000C8 6E??           01646         MOVWF   r0x03
+0000CA 50??           01647         MOVF    r0x03, W
+0000CC 6EE5           01648         MOVWF   POSTDEC1
 0000CE 0E54           01649         MOVLW   0x54
-Message[1301]: Using default destination of 0 (Access Bank).
 0000D0 6EE5           01650         MOVWF   POSTDEC1
 0000D2 EC?? F0??      01651         CALL    _print_debug_value
 0000D6 52E6           01652         MOVF    POSTINC1, F
 0000D8 52E6           01653         MOVF    POSTINC1, F
                       01654 ;       .line   94; usart.c     putchar_wait(' ');
 0000DA 0E20           01655         MOVLW   0x20
-Message[1301]: Using default destination of 0 (Access Bank).
 0000DC 6EE5           01656         MOVWF   POSTDEC1
 0000DE EC?? F0??      01657         CALL    _putchar_wait
 0000E2 52E6           01658         MOVF    POSTINC1, F
                       01659 ;       .line   95; usart.c     putchar_wait(' ');
 0000E4 0E20           01660         MOVLW   0x20
-Message[1301]: Using default destination of 0 (Access Bank).
 0000E6 6EE5           01661         MOVWF   POSTDEC1
 0000E8 EC?? F0??      01662         CALL    _putchar_wait
 0000EC 52E6           01663         MOVF    POSTINC1, F
                       01664 ;       .line   96; usart.c     putchar_wait(' ');
 0000EE 0E20           01665         MOVLW   0x20
-Message[1301]: Using default destination of 0 (Access Bank).
 0000F0 6EE5           01666         MOVWF   POSTDEC1
 0000F2 EC?? F0??      01667         CALL    _putchar_wait
 0000F6 52E6           01668         MOVF    POSTINC1, F
                       01669 ;       .line   97; usart.c     puts_rom(sData);
 0000F8 0E??           01670         MOVLW   UPPER(_sData)
-Message[1301]: Using default destination of 0 (Access Bank).
 0000FA 6E??           01671         MOVWF   r0x05
 0000FC 0E??           01672         MOVLW   HIGH(_sData)
-Message[1301]: Using default destination of 0 (Access Bank).
 0000FE 6E??           01673         MOVWF   r0x04
 000100 0E??           01674         MOVLW   LOW(_sData)
-Message[1301]: Using default destination of 0 (Access Bank).
 000102 6E??           01675         MOVWF   r0x03
 000104 50??           01676         MOVF    r0x05, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000106 6EE5           01677         MOVWF   POSTDEC1
 000108 50??           01678         MOVF    r0x04, W
-Message[1301]: Using default destination of 0 (Access Bank).
 00010A 6EE5           01679         MOVWF   POSTDEC1
 00010C 50??           01680         MOVF    r0x03, W
-Message[1301]: Using default destination of 0 (Access Bank).
 00010E 6EE5           01681         MOVWF   POSTDEC1
 000110 EC?? F0??      01682         CALL    _puts_rom
 000114 0E03           01683         MOVLW   0x03
@@ -2002,45 +1886,36 @@ Message[1301]: Using default destination of 0 (Access Bank).
 00011A 26??           01687         ADDWF   r0x00, F
 00011C 0E00           01688         MOVLW   0x00
 00011E 22??           01689         ADDWFC  r0x01, F
-000120 22??           01690         ADDWFC  r0x02, F
-Message[1301]: Using default destination of 0 (Access Bank).
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 35
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 33
 
 
 LOC    OBJECT CODE    LINE  SOURCE TEXT
   VALUE
 
+000120 22??           01690         ADDWFC  r0x02, F
 000122 6A??           01691         CLRF    r0x03
 000124                01692 _00168_DS_:
                       01693 ;       .line   99; usart.c     print_hex_wait(fifo->data[i]);
 000124 50??           01694         MOVF    r0x03, W
 000126 24??           01695         ADDWF   r0x00, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000128 6E??           01696         MOVWF   r0x04
-Message[1301]: Using default destination of 0 (Access Bank).
 00012A 6AE8           01697         CLRF    WREG
 00012C 20??           01698         ADDWFC  r0x01, W
-Message[1301]: Using default destination of 0 (Access Bank).
 00012E 6E??           01699         MOVWF   r0x05
-Message[1301]: Using default destination of 0 (Access Bank).
 000130 6AE8           01700         CLRF    WREG
 000132 20??           01701         ADDWFC  r0x02, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000134 6E??           01702         MOVWF   r0x06
 000136 C??? F???      01703         MOVFF   r0x04, FSR0L
 00013A C??? F???      01704         MOVFF   r0x05, PRODL
 00013E 50??           01705         MOVF    r0x06, W
 000140 EC?? F0??      01706         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 000144 6E??           01707         MOVWF   r0x04
 000146 50??           01708         MOVF    r0x04, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000148 6EE5           01709         MOVWF   POSTDEC1
 00014A EC?? F0??      01710         CALL    _print_hex_wait
 00014E 52E6           01711         MOVF    POSTINC1, F
                       01712 ;       .line   100; usart.c    putchar_wait(' ');
 000150 0E20           01713         MOVLW   0x20
-Message[1301]: Using default destination of 0 (Access Bank).
 000152 6EE5           01714         MOVWF   POSTDEC1
 000154 EC?? F0??      01715         CALL    _putchar_wait
 000158 52E6           01716         MOVF    POSTINC1, F
@@ -2051,24 +1926,16 @@ Message[1301]: Using default destination of 0 (Access Bank).
 000160 E3??           01721         BNC     _00168_DS_
                       01722 ;       .line   102; usart.c    putchar_wait('\r');
 000162 0E0D           01723         MOVLW   0x0d
-Message[1301]: Using default destination of 0 (Access Bank).
 000164 6EE5           01724         MOVWF   POSTDEC1
 000166 EC?? F0??      01725         CALL    _putchar_wait
 00016A 52E6           01726         MOVF    POSTINC1, F
                       01727 ;       .line   103; usart.c    putchar_wait('\n');
 00016C 0E0A           01728         MOVLW   0x0a
-Message[1301]: Using default destination of 0 (Access Bank).
 00016E 6EE5           01729         MOVWF   POSTDEC1
 000170 EC?? F0??      01730         CALL    _putchar_wait
 000174 52E6           01731         MOVF    POSTINC1, F
 000176 CFE4 F000      01732         MOVFF   PREINC1, r0x06
 00017A CFE4 F000      01733         MOVFF   PREINC1, r0x05
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 36
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
 00017E CFE4 F000      01734         MOVFF   PREINC1, r0x04
 000182 CFE4 F000      01735         MOVFF   PREINC1, r0x03
 000186 CFE4 F000      01736         MOVFF   PREINC1, r0x02
@@ -2078,6 +1945,12 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
 000196 0012           01740         RETURN  
                       01741 
                       01742 ; ; Starting pCode block
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 34
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
                       01743 S_usart__print_debug_value      code
 000000                01744 _print_debug_value:
                       01745 ;       .line   77; usart.c     void print_debug_value(char c, unsigned char value) {
@@ -2091,19 +1964,16 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
 000018 CFDB F000      01753         MOVFF   PLUSW2, r0x01
                       01754 ;       .line   78; usart.c     putchar_wait(c);
 00001C 50??           01755         MOVF    r0x00, W
-Message[1301]: Using default destination of 0 (Access Bank).
 00001E 6EE5           01756         MOVWF   POSTDEC1
 000020 EC?? F0??      01757         CALL    _putchar_wait
 000024 52E6           01758         MOVF    POSTINC1, F
                       01759 ;       .line   79; usart.c     putchar_wait(':');
 000026 0E3A           01760         MOVLW   0x3a
-Message[1301]: Using default destination of 0 (Access Bank).
 000028 6EE5           01761         MOVWF   POSTDEC1
 00002A EC?? F0??      01762         CALL    _putchar_wait
 00002E 52E6           01763         MOVF    POSTINC1, F
                       01764 ;       .line   80; usart.c     print_hex_wait(value);
 000030 50??           01765         MOVF    r0x01, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000032 6EE5           01766         MOVWF   POSTDEC1
 000034 EC?? F0??      01767         CALL    _print_hex_wait
 000038 52E6           01768         MOVF    POSTINC1, F
@@ -2122,12 +1992,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 00000C C??? F???      01781         MOVFF   r0x01, POSTDEC1
 000010 C??? F???      01782         MOVFF   r0x02, POSTDEC1
 000014 C??? F???      01783         MOVFF   r0x03, POSTDEC1
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 37
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
 000018 C??? F???      01784         MOVFF   r0x04, POSTDEC1
 00001C 0E02           01785         MOVLW   0x02
 00001E CFDB F000      01786         MOVFF   PLUSW2, r0x00
@@ -2140,8 +2004,13 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
 00002E C??? F???      01793         MOVFF   r0x00, FSR0L
 000032 C??? F???      01794         MOVFF   r0x01, PRODL
 000036 50??           01795         MOVF    r0x02, W
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 35
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
 000038 EC?? F0??      01796         CALL    __gptrget1
-Message[1301]: Using default destination of 0 (Access Bank).
 00003C 6E??           01797         MOVWF   r0x03
 00003E 2A??           01798         INCF    r0x00, F
 000040 E3??           01799         BNC     _00157_DS_
@@ -2153,7 +2022,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 00004C E0??           01805         BZ      _00148_DS_
                       01806 ;       .line   73; usart.c     putchar_wait( c );
 00004E 50??           01807         MOVF    r0x04, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000050 6EE5           01808         MOVWF   POSTDEC1
 000052 EC?? F0??      01809         CALL    _putchar_wait
 000056 52E6           01810         MOVF    POSTINC1, F
@@ -2180,17 +2048,9 @@ Message[1301]: Using default destination of 0 (Access Bank).
                       01831 ;       .line   61; usart.c     nibble=((c & 0xf0) >> 4 ) + '0';
 000016 0EF0           01832         MOVLW   0xf0
 000018 14??           01833         ANDWF   r0x00, W
-Message[1301]: Using default destination of 0 (Access Bank).
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 38
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
 00001A 6E??           01834         MOVWF   r0x01
 00001C 38??           01835         SWAPF   r0x01, W
 00001E 0B0F           01836         ANDLW   0x0f
-Message[1301]: Using default destination of 0 (Access Bank).
 000020 6E??           01837         MOVWF   r0x01
 000022 0E30           01838         MOVLW   0x30
 000024 26??           01839         ADDWF   r0x01, F
@@ -2203,7 +2063,12 @@ Message[1301]: Using default destination of 0 (Access Bank).
 000030                01846 _00126_DS_:
                       01847 ;       .line   63; usart.c     putchar_wait(nibble);
 000030 50??           01848         MOVF    r0x01, W
-Message[1301]: Using default destination of 0 (Access Bank).
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 36
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
 000032 6EE5           01849         MOVWF   POSTDEC1
 000034 EC?? F0??      01850         CALL    _putchar_wait
 000038 52E6           01851         MOVF    POSTINC1, F
@@ -2212,7 +2077,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 00003C 16??           01854         ANDWF   r0x00, F
 00003E 0E30           01855         MOVLW   0x30
 000040 24??           01856         ADDWF   r0x00, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000042 6E??           01857         MOVWF   r0x01
                       01858 ;       .line   66; usart.c     if (nibble>=0x3a) nibble+=7;
 000044 0E3A           01859         MOVLW   0x3a
@@ -2223,7 +2087,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 00004E                01864 _00128_DS_:
                       01865 ;       .line   67; usart.c     putchar_wait(nibble);
 00004E 50??           01866         MOVF    r0x01, W
-Message[1301]: Using default destination of 0 (Access Bank).
 000050 6EE5           01867         MOVWF   POSTDEC1
 000052 EC?? F0??      01868         CALL    _putchar_wait
 000056 52E6           01869         MOVF    POSTINC1, F
@@ -2240,12 +2103,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 000004 CFE1 FFD9      01880         MOVFF   FSR1L, FSR2L
 000008 C??? F???      01881         MOVFF   r0x00, POSTDEC1
 00000C 0E02           01882         MOVLW   0x02
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 39
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
 00000E CFDB F000      01883         MOVFF   PLUSW2, r0x00
 000012                01884 _00117_DS_:
                       01885 ;       .line   55; usart.c     while (!TXSTA1bits.TRMT1);
@@ -2265,6 +2122,12 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
 000004 CFE1 FFD9      01899         MOVFF   FSR1L, FSR2L
 000008 C??? F???      01900         MOVFF   r0x00, POSTDEC1
 00000C 0E02           01901         MOVLW   0x02
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 37
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
 00000E CFDB F000      01902         MOVFF   PLUSW2, r0x00
                       01903 ;       .line   46; usart.c     if ( TXSTA1bits.TRMT1 ) {
 000012 A2??           01904         BTFSS   _TXSTA1bits, 1
@@ -2276,7 +2139,6 @@ LOC    OBJECT CODE    LINE  SOURCE TEXT
 00001C D???           01910         BRA     _00112_DS_
 00001E                01911 _00111_DS_:
                       01912 ;       .line   50; usart.c     return 0;
-Message[1301]: Using default destination of 0 (Access Bank).
 00001E 6AE8           01913         CLRF    WREG
 000020                01914 _00112_DS_:
 000020 CFE4 F000      01915         MOVFF   PREINC1, r0x00
@@ -2299,13 +2161,6 @@ Message[1301]: Using default destination of 0 (Access Bank).
 00000E 96??           01932         BCF     _BAUDCON1bits, 3
                       01933 ;       .line   20; usart.c     SPBRG = SBRG_VAL;               // calculated by defines
 000010 0E07           01934         MOVLW   0x07
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 40
-
-
-LOC    OBJECT CODE    LINE  SOURCE TEXT
-  VALUE
-
-Message[1301]: Using default destination of 0 (Access Bank).
 000012 6E??           01935         MOVWF   _SPBRG
                       01936 ;       .line   22; usart.c     PIE1bits.RC1IE = 0;             // disbale RX interrupt
 000014 9A??           01937         BCF     _PIE1bits, 5
@@ -2326,6 +2181,12 @@ Message[1301]: Using default destination of 0 (Access Bank).
 000022 8A??           01951         BSF     _TXSTA1bits, 5
 000024 CFE4 FFD9      01952         MOVFF   PREINC1, FSR2L
 000028 0012           01953         RETURN  
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 38
+
+
+LOC    OBJECT CODE    LINE  SOURCE TEXT
+  VALUE
+
                       01954 
                       01955 ; ; Starting pCode block for Ival
                       01956         code
@@ -2342,7 +2203,7 @@ Message[1301]: Using default destination of 0 (Access Bank).
                       01966 
                       01967 
                       01968         end
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 41
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 39
 
 
 SYMBOL TABLE
@@ -2401,7 +2262,7 @@ _B0CONbits                        00000000
 _B0D0                             00000000
 _B0D0bits                         00000000
 _B0D1                             00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 42
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 40
 
 
 SYMBOL TABLE
@@ -2460,7 +2321,7 @@ _B1SIDL                           00000000
 _B1SIDLbits                       00000000
 _B2CON                            00000000
 _B2CONbits                        00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 43
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 41
 
 
 SYMBOL TABLE
@@ -2519,7 +2380,7 @@ _B3EIDLbits                       00000000
 _B3SIDH                           00000000
 _B3SIDHbits                       00000000
 _B3SIDL                           00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 44
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 42
 
 
 SYMBOL TABLE
@@ -2578,7 +2439,7 @@ _B5EIDH                           00000000
 _B5EIDHbits                       00000000
 _B5EIDL                           00000000
 _B5EIDLbits                       00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 45
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 43
 
 
 SYMBOL TABLE
@@ -2637,7 +2498,7 @@ _CANSTAT_RO3bits                  00000000
 _CANSTAT_RO4                      00000000
 _CANSTAT_RO4bits                  00000000
 _CANSTAT_RO5                      00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 46
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 44
 
 
 SYMBOL TABLE
@@ -2696,7 +2557,7 @@ _CMSTATUSbits                     00000000
 _CMSTATbits                       00000000
 _COMSTAT                          00000000
 _COMSTATbits                      00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 47
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 45
 
 
 SYMBOL TABLE
@@ -2755,7 +2616,7 @@ _IPR3                             00000000
 _IPR3bits                         00000000
 _IPR4                             00000000
 _IPR4bits                         00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 48
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 46
 
 
 SYMBOL TABLE
@@ -2814,7 +2675,7 @@ _PIR5bits                         00000000
 _PLUSW0                           00000000
 _PLUSW1                           00000000
 _PLUSW2                           00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 49
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 47
 
 
 SYMBOL TABLE
@@ -2873,7 +2734,7 @@ _RXB0D1                           00000000
 _RXB0D1bits                       00000000
 _RXB0D2                           00000000
 _RXB0D2bits                       00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 50
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 48
 
 
 SYMBOL TABLE
@@ -2932,7 +2793,7 @@ _RXERRCNTbits                     00000000
 _RXF0EIDH                         00000000
 _RXF0EIDHbits                     00000000
 _RXF0EIDL                         00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 51
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 49
 
 
 SYMBOL TABLE
@@ -2991,7 +2852,7 @@ _RXF15SIDH                        00000000
 _RXF15SIDHbits                    00000000
 _RXF15SIDL                        00000000
 _RXF15SIDLbits                    00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 52
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 50
 
 
 SYMBOL TABLE
@@ -3050,7 +2911,7 @@ _RXF7EIDHbits                     00000000
 _RXF7EIDL                         00000000
 _RXF7EIDLbits                     00000000
 _RXF7SIDH                         00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 53
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 51
 
 
 SYMBOL TABLE
@@ -3109,7 +2970,7 @@ _RXM1EIDL                         00000000
 _RXM1EIDLbits                     00000000
 _RXM1SIDH                         00000000
 _RXM1SIDHbits                     00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 54
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 52
 
 
 SYMBOL TABLE
@@ -3168,7 +3029,7 @@ _TMR2                             00000000
 _TMR3                             00000000
 _TMR3H                            00000000
 _TMR3L                            00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 55
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 53
 
 
 SYMBOL TABLE
@@ -3227,7 +3088,7 @@ _TXB1D4                           00000000
 _TXB1D4bits                       00000000
 _TXB1D5                           00000000
 _TXB1D5bits                       00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 56
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 54
 
 
 SYMBOL TABLE
@@ -3286,7 +3147,7 @@ _TXSTA                            00000000
 _TXSTA1                           00000000
 _TXSTA1bits                       00000000
 _TXSTA2                           00000000
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 57
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 55
 
 
 SYMBOL TABLE
@@ -3301,6 +3162,7 @@ _WPUBbits                         00000000
 _WREG                             00000000
 __18F26K80                        00000001
 __ACC_RAM_LOW_END                 0000005F
+__ACC_RAM_LOW_START               00000000
 __CODE_END                        0000FFFF
 __CODE_START                      00000000
 __EEPROM_END                      00F003FF
@@ -3344,13 +3206,13 @@ r0x11                             00000011
 r0x12                             00000012
 r0x13                             00000013
 r0x14                             00000014
-r0x15                             00000015
-gpasm-1.4.0 #1107 (Nov  3 2014)     usart.asm   11-6-2014  11:40:32         PAGE 58
+gpasm-1.4.0 #1135 (Jul  7 2015)     usart.asm   11-17-2015  14:29:38        PAGE 56
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+r0x15                             00000015
 r0x16                             00000016
 r0x17                             00000017
 r0x18                             00000018
@@ -3358,6 +3220,6 @@ r0x19                             00000019
 
 Errors   :     0
 Warnings :     0 reported,     0 suppressed
-Messages :   127 reported,     0 suppressed
+Messages :     0 reported,     0 suppressed
 
 
