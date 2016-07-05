@@ -4,6 +4,7 @@ BOM
 ```
 R1			4k7
 R2,R7		330  (20mA LED)
+R3			1k
 R4			120
 R5,R6		33
 R8			1k	optional (MCP2551 bzw. 2561)
