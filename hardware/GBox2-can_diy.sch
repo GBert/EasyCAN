@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.5.0">
+<eagle version="6.6.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -8867,22 +8867,22 @@ W = angled&lt;p&gt;
 <part name="P+2" library="supply1" deviceset="+5V" device=""/>
 <part name="R1" library="resistor" deviceset="R-EU_" device="R1206" value="4k7"/>
 <part name="P+3" library="supply1" deviceset="+5V" device=""/>
-<part name="C1" library="resistor" deviceset="C-EU" device="C1206"/>
-<part name="Q1" library="crystal" deviceset="CRYSTAL" device="HC49UP"/>
-<part name="C2" library="resistor" deviceset="C-EU" device="C1206"/>
-<part name="C3" library="resistor" deviceset="C-EU" device="C1206"/>
+<part name="C1" library="resistor" deviceset="C-EU" device="C1206" value="100nF"/>
+<part name="Q1" library="crystal" deviceset="CRYSTAL" device="HC49UP" value="16MHz"/>
+<part name="C2" library="resistor" deviceset="C-EU" device="C1206" value="27pF"/>
+<part name="C3" library="resistor" deviceset="C-EU" device="C1206" value="27pF"/>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
-<part name="R2" library="resistor" deviceset="R-EU_" device="R1206"/>
+<part name="R2" library="resistor" deviceset="R-EU_" device="R1206" value="1k5"/>
 <part name="IC2" library="texas" deviceset="ISO1050" device="DUB" value="ISO1050"/>
 <part name="GND5" library="supply1" deviceset="GND" device=""/>
 <part name="P+4" library="supply1" deviceset="+5V" device=""/>
-<part name="R4" library="resistor" deviceset="R-EU_" device="0204/7"/>
+<part name="R4" library="resistor" deviceset="R-EU_" device="0204/7" value="120"/>
 <part name="JP2" library="pinhead" deviceset="PINHD-1X4" device=""/>
 <part name="JP3" library="pinhead" deviceset="PINHD-1X2" device=""/>
-<part name="C4" library="resistor" deviceset="C-EU" device="C1206"/>
+<part name="C4" library="resistor" deviceset="C-EU" device="C1206" value="100nF"/>
 <part name="P+6" library="supply1" deviceset="VCC/2" device="" value="VCC2"/>
 <part name="GND7" library="supply1" deviceset="GNDA" device=""/>
-<part name="C5" library="resistor" deviceset="C-EU" device="C1206"/>
+<part name="C5" library="resistor" deviceset="C-EU" device="C1206" value="100nF"/>
 <part name="P+7" library="supply1" deviceset="VCC/2" device="" value="VCC2"/>
 <part name="GND8" library="supply1" deviceset="GNDA" device=""/>
 <part name="LED1" library="led" deviceset="LED" device="SML1206"/>
@@ -8891,8 +8891,8 @@ W = angled&lt;p&gt;
 <part name="SV1" library="con-lstb" deviceset="MA03-1" device=""/>
 <part name="SV2" library="con-lstb" deviceset="MA06-1" device=""/>
 <part name="LED2" library="led" deviceset="LED" device="SML1206"/>
-<part name="R3" library="resistor" deviceset="R-EU_" device="R1206"/>
-<part name="R5" library="resistor" deviceset="R-EU_" device="R1206"/>
+<part name="R3" library="resistor" deviceset="R-EU_" device="R1206" value="1k5"/>
+<part name="R5" library="resistor" deviceset="R-EU_" device="R1206" value="1k5"/>
 <part name="LED3" library="led" deviceset="LED" device="SML1206"/>
 </parts>
 <sheets>
@@ -8904,6 +8904,8 @@ W = angled&lt;p&gt;
 <text x="68.58" y="50.8" size="1.4224" layer="91">DTR</text>
 <text x="68.58" y="48.26" size="1.4224" layer="91">RxD</text>
 <text x="68.58" y="40.64" size="1.4224" layer="91">CTS</text>
+<text x="289.56" y="78.74" size="1.778" layer="91" rot="R180">VCC2 5v Gleisbox
+GNDA GND Gleisbox</text>
 </plain>
 <instances>
 <instance part="GND1" gate="1" x="96.52" y="27.94"/>
@@ -8919,13 +8921,19 @@ W = angled&lt;p&gt;
 <attribute name="VALUE" x="137.16" y="50.8" size="1.778" layer="96" rot="R90"/>
 </instance>
 <instance part="C2" gate="G$1" x="127" y="50.8" rot="R90"/>
-<instance part="C3" gate="G$1" x="127" y="45.72" rot="R90"/>
+<instance part="C3" gate="G$1" x="127" y="45.72" smashed="yes" rot="R90">
+<attribute name="NAME" x="126.619" y="47.244" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="131.699" y="39.624" size="1.778" layer="96" rot="R90"/>
+</instance>
 <instance part="GND4" gate="1" x="124.46" y="27.94"/>
 <instance part="R2" gate="G$1" x="101.6" y="55.88" rot="R90"/>
 <instance part="IC2" gate="G$1" x="241.3" y="60.96"/>
 <instance part="GND5" gate="1" x="228.6" y="27.94"/>
 <instance part="P+4" gate="1" x="226.06" y="99.06"/>
-<instance part="R4" gate="G$1" x="259.08" y="86.36" rot="R90"/>
+<instance part="R4" gate="G$1" x="259.08" y="86.36" smashed="yes" rot="R90">
+<attribute name="NAME" x="257.5814" y="82.55" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="257.302" y="90.17" size="1.778" layer="96" rot="R90"/>
+</instance>
 <instance part="JP2" gate="A" x="289.56" y="58.42"/>
 <instance part="JP3" gate="G$1" x="269.24" y="88.9"/>
 <instance part="C4" gate="G$1" x="218.44" y="68.58"/>
@@ -9230,4 +9238,10 @@ W = angled&lt;p&gt;
 </sheets>
 </schematic>
 </drawing>
+<compatibility>
+<note version="6.3" minversion="6.2.2" severity="warning">
+Since Version 6.2.2 text objects can contain more than one line,
+which will not be processed correctly with this version.
+</note>
+</compatibility>
 </eagle>
